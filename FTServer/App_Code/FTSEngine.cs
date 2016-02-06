@@ -10,7 +10,7 @@ namespace FTServer
 	{
 
 		public static void test_main ()
-		{
+		{ 
 			//System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) + "/ftsdata/"
 			DB.Root ("/tmp/");
 			iBoxDB.DBDebug.DDebug.DeleteDBFiles(1);
