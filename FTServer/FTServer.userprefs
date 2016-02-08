@@ -1,18 +1,18 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="s.aspx">
+  <MonoDevelop.Ide.Workbench ActiveDocument="App_Code/FTS.cs">
     <Files>
       <File FileName="App_Code/s.aspx.cs" Line="51" Column="61" />
-      <File FileName="App_Code/FTS.cs" Line="270" Column="25" />
+      <File FileName="App_Code/FTS.cs" Line="195" Column="5" />
       <File FileName="s.aspx" Line="111" Column="9" />
+      <File FileName="App_Code/Global.asax.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="FTServer" expanded="True">
+          <Node name="FTServer" expanded="True" selected="True">
             <Node name="References" expanded="True" />
             <Node name="App_Code" expanded="True" />
-            <Node name="s.aspx" selected="True" />
           </Node>
         </State>
       </Pad>

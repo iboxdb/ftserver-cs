@@ -194,7 +194,8 @@ namespace FTServer
 				                         .Replace (">", " ").Replace ("$", " "));
 
 				return page;
-			} catch {
+			} catch(Exception ex) {
+				Console.WriteLine (ex.ToString ());
 				return null;
 			}
 		}
