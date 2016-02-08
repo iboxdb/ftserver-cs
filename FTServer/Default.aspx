@@ -1,22 +1,87 @@
 <%@ Page Language="C#"  EnableSessionState="false" Async="true" AsyncTimeOut="30" %>
+<%@ import namespace="FTServer" %>
+
  
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html>
-<head runat="server">
-	<title>Default</title>
-		<script runat="server">
-		public void button1Clicked (object sender, EventArgs args)
-		{
-			FTServer.MainClass.test_main ();
-			button1.Text = "";
-			
-		}
-	</script>
-</head>
-<body>
-	<form id="form1" runat="server">
-		<asp:Button id="button1" runat="server" Text="Click me!" OnClick="button1Clicked" />
-		cc
-	</form>
-</body>
+    <head>        
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="description" content="iBoxDB NoSQL Database Full Text Search Server FTS" />
+        <title>Full Text Search Server</title>
+
+        <link rel="stylesheet" type="text/css" href="css/semantic.min.css" /> 
+
+        <style>
+            td{ 
+                white-space:nowrap; 
+                overflow: hidden
+            }
+
+            body {
+                margin-top: 100px;
+                overflow:hidden;
+            }
+            body > .grid {
+
+            }
+
+            .column {
+                max-width: 60%;
+            }
+
+        </style> 
+
+    </head>
+    <body> 
+        <div class="ui middle aligned center aligned grid">
+            <div class="column"  >
+
+                <h2 class="ui teal header" > 
+                    <i class="disk outline icon" style="font-size:82px"></i> Full Text Search Server
+                </h2>
+                <form class="ui large form"  action="s.aspx"  onsubmit="formsubmit()"  >
+                    <div class="ui label input">
+                        <div class="ui action input">
+                            <input name="q"  value=""  onfocus="formfocus()" required />
+                            <input id="btnsearch" type="submit"  class="ui teal right button big" 
+                                   value="Search"    /> 
+                        </div> 
+                    </div>
+                </form>
+                <script>
+                    function formsubmit() {
+                        btnsearch.disabled = "disabled";
+                    }
+                    function formfocus() {
+                        btnsearch.disabled = undefined;
+                    }
+                </script>
+
+                <div class="ui message" style="text-align: left">
+                    Input [KeyWrod] to search， input [URL] to index <br /> 
+                    Input [delete URL] to delete.   <a  href="./">Refresh</a> 
+                    <br />
+                    Recent Searches:<br />
+                    <%
+                        foreach (String str in SearchResource.searchList) {
+
+                    %> <a href="s.aspx?q=<%=str%>"><%=str%></a>. &nbsp;  
+                    <%
+                        }
+                    %>
+
+                    <br>Recent Records:<br>
+                    <%
+                        foreach (String str in SearchResource.urlList) {
+                    %>
+                    <a href="<%=str%>" target="_blank" ><%=str%></a>. <br> 
+                    <%
+                        }
+                    %>
+                </div>
+
+            </div>
+        </div>
+
+    </body>
 </html>

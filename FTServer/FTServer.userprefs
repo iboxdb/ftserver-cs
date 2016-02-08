@@ -1,10 +1,22 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Default.aspx">
+  <MonoDevelop.Ide.Workbench ActiveDocument="s.aspx">
     <Files>
-      <File FileName="Default.aspx" Line="11" Column="14" />
-      <File FileName="s.aspx" Line="6" Column="1" />
+      <File FileName="App_Code/s.aspx.cs" Line="51" Column="61" />
+      <File FileName="App_Code/FTS.cs" Line="270" Column="25" />
+      <File FileName="s.aspx" Line="111" Column="9" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="FTServer" expanded="True">
+            <Node name="References" expanded="True" />
+            <Node name="App_Code" expanded="True" />
+            <Node name="s.aspx" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

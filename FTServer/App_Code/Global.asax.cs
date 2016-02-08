@@ -1,3 +1,6 @@
+using System.Net;
+using CsQuery.Web;
+
 
 namespace FTServer
 {
@@ -12,6 +15,13 @@ namespace FTServer
 		
 		protected void Application_Start (Object sender, EventArgs e)
 		{
+			ServicePointManager.ServerCertificateValidationCallback
+				+= (ssender, cert, chain, sslPolicyErrors) => true;
+			ServerConfig.Default.TimeoutSeconds = 10.0;
+
+			String path = System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) + "/ftsdata/";
+			System.IO.Directory.CreateDirectory (path);
+			SDB.init(path);
 		}
 
 		protected void Session_Start (Object sender, EventArgs e)
@@ -40,6 +50,7 @@ namespace FTServer
 
 		protected void Application_End (Object sender, EventArgs e)
 		{
+			SDB.close();
 		}
 	}
 }
