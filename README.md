@@ -1,4 +1,4 @@
-## Lightweight Full Text Search Server for C#
+## Lightweight Full Text Search Server for CSharp
 
 ### Setup
 
