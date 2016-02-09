@@ -31,9 +31,8 @@ namespace FTServer
 			if (isDelete) {
 				return "deleted";
 			}
-			{
-				SortedSet<String> suburls = new SortedSet< String> ();
-				Page p = Page.Get (url, suburls);
+			{ 
+				Page p = Page.Get (url);
 				if (p == null) {
 					return "temporarily unreachable";
 				} else {
@@ -113,7 +112,7 @@ namespace FTServer
 		public String description;
 		public UString content;
 
-		public static Page Get (String url, SortedSet<String> subUrls)
+		public static Page Get (String url)
 		{
 			try {
 				if (url == null || url.Length > 100 || url.Length < 8) {
@@ -128,15 +127,7 @@ namespace FTServer
 				doc ["style"].Remove ();
 				doc ["Script"].Remove ();
 				doc ["Style"].Remove ();
-
-				if (subUrls != null) {
-					foreach (var a in doc["a"]) { 
-						String ss = getFullUrl (url, a.GetAttribute ("href"));
-						if (ss != null) {
-							subUrls.Add (ss);
-						}
-					}
-				}
+						 
 				page.title = doc ["title"].Text ();
 				if (page.title == null) {
 					page.title = doc ["Title"].Text ();
@@ -200,72 +191,6 @@ namespace FTServer
 			}
 		}
 
-		private static String getFullUrl (String _base, String url)
-		{
-			try {
-				if (_base == null || url == null) {
-					return null;
-				}
-				_base = _base.Trim ().ToLower ();
-				url = url.Trim ().ToLower ();
-				if (_base.Length < 2 || url.Length < 2) {
-					return null;
-				}
-				int si = url.IndexOf ("#");
-				if (si > 0) {
-					url = url.Substring (0, si);
-				}
-				if (url.StartsWith ("./")) {
-					url = url.Substring (2);
-				}
-
-				if (url.StartsWith ("javascript")) {
-					return null;
-				}
-				if (url.Contains ("download")) {
-					return null;
-				}
-
-				if (url.StartsWith ("http:") || url.StartsWith ("https:")) {
-					return url;
-				}
-				if ((!_base.StartsWith ("http:")) && (!_base.StartsWith ("https:"))) {
-					return null;
-				}
-
-				int t = _base.IndexOf ("//");
-				t = _base.IndexOf ("/", t + 2);
-				String domain = _base;
-				if (t > 0) {
-					domain = domain.Substring (0, t);
-				}
-				if (!domain.EndsWith ("/")) {
-					domain += "/";
-				}
-				if (url.StartsWith ("/")) {
-					url = domain + url.Substring (1);
-				} else {
-					url = domain + url;
-				}
-
-				t = url.LastIndexOf ("/");
-				if (t > 0) {
-					String tu = url.Substring (t);
-					if (tu.Contains (".")) {
-						if ((!tu.Contains (".html")) && (!tu.Contains (".htm"))
-							&& (!tu.Contains (".shtml"))
-							&& (!tu.Contains (".asp"))
-							&& (!tu.Contains (".aspx")) && (!tu.Contains (".php"))
-							&& (!tu.Contains (".jsp"))) {
-							return null;
-						}
-					}
-				}
-				return url;
-			} catch {
-				return null;
-			}
-		}
 
 		[NotColumn]
 		public KeyWord keyWord;
