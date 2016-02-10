@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+using System.Text; 
 using iBoxDB.LocalServer;
 using System.IO;
 using System.Threading;
+using System.Linq;
 
 namespace FTServer
 {
@@ -183,17 +183,18 @@ namespace FTServer
 	class StringUtil
 	{
  
-		SortedSet<char> set;
+		HashSet<char> set;
 
 		public StringUtil ()
 		{
 			String s = "!\"@$%&'()*+,./:;<=>?[\\]^_`{|}~\r\n"; //@-
 			s += "， 　，《。》、？；：‘’“”【｛】｝——=+、｜·～！￥%……&*（）"; //@-#
 			s += "｀～！＠￥％……—×（）——＋－＝【】｛｝：；’＇”＂，．／＜＞？’‘”“";//＃
-			set = new SortedSet<char> ();
+			set = new HashSet<char> ();
 			foreach (char c in s) {
 				set.Add (c);
 			}
+			set.Add ( (char)0 );
 		}
 
 		public bool isWord (char c)
@@ -222,10 +223,7 @@ namespace FTServer
 			for (int i = 0; i < cs.Length; i++) {
 				if (set.Contains (cs [i])) {
 					cs [i] = ' ';
-				}
-				if (cs [i] == 0) {
-					cs [i] = ' ';
-				}
+				} 
 			}
 			return cs;
 		}
