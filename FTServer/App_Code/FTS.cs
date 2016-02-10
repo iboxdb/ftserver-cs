@@ -181,16 +181,17 @@ namespace FTServer
 			
 				page.content = ((content
 					+ " " + page.url
-					+ " " + page.description).Replace ("<", " ")
-				                         .Replace (">", " ").Replace ("$", " "));
+					+ " " + page.description)
+				       .Replace ("<", " ")
+				       .Replace (">", " ").Replace ("$", " ")
+				        .Replace ("　", " "));
 
 				return page;
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				Console.WriteLine (ex.ToString ());
 				return null;
 			}
 		}
-
 
 		[NotColumn]
 		public KeyWord keyWord;

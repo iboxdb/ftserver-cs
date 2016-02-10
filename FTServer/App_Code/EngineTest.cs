@@ -11,8 +11,7 @@ namespace FTServer
 	public class EngineTest
 	{
 		public static void test_main ()
-		{ 
-			//System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) + "/ftsdata/"
+		{  
 			DB.Root ("/tmp/");
 
 			iBoxDB.DBDebug.DDebug.DeleteDBFiles (1);
@@ -34,7 +33,7 @@ namespace FTServer
 				+ " 关于 see \"Keeping your C# Java NoSQL email address abc@global.com private\".",
 				//ID=1
 				"关于版本控制\n"
-				+ "什么是“版本控制”？我为什么要关心它呢？ 版本控制是一种记录一个或若干文件内容变化，"
+				+ "什么是“版本控制”？我为什么要关心它呢？ 版本控制是一种记录一个或若干文件内容变化，1234567890ABCDEFGH "
 				+ "以便将来查阅特定版本修订情况的系统。 在本书所展示的例子中，我们对保存着软件源代码的文件作版本控制，"
 				+ "但实际上，C lang IT 你可以对任何类型的文件进行版本控制。",
 				//ID=2
@@ -85,10 +84,11 @@ namespace FTServer
 				box.Commit ().Assert ();
 			}
 
-			using (var box = auto.Cube()) {				 
-				foreach (KeyWord kw in engine.searchDistinct(box, "C it 　　版本")) {
+			using (var box = auto.Cube()) {		
+				// searchDistinct() search()
+				foreach (KeyWord kw in engine.search(box, "git")) {
 					Console.WriteLine (kw.ToFullString ());
-					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 100));
+					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
 				}
 			}
 

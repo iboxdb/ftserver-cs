@@ -27,31 +27,30 @@ namespace FTServer
 
 			char[] cs = sUtil.clear (str);
 			Dictionary<int, KeyWord> map = util.fromString (id, cs);
-			RemoveMinMax (map);
-
+	 
 			SortedSet<String> words = new SortedSet<String> ();
 			foreach (KeyWord kw in map.Values) {
 				Binder binder;
-				if (kw.isWord) {
-					if (words.Contains (kw.KWord)) {
+				if (kw is KeyWordE) {
+					if (words.Contains (kw.KWord.ToString ())) {
 						continue;
 					}
-					words.Add (kw.KWord);
+					words.Add (kw.KWord.ToString ());
 					binder = box ["E", kw.KWord, kw.ID];
-				} else {
-					if (!map.ContainsKey (kw.Position - 1)  
-						&& !map.ContainsKey (kw.Position + 1)) {
-						continue;
-					}
+				} else { 
 					binder = box ["N", kw.KWord, kw.ID, kw.Position];
 				}
 				if (isRemove) {
 					binder.Delete ();
 				} else {
-					binder.Insert (kw, 1);
+					if (binder.TableName == "E") {
+						binder.Insert ((KeyWordE)kw, 1);
+					} else {
+						binder.Insert ((KeyWordN)kw, 1);
+					}
+
 				}
 			}
-
 			return true;
 		}
 
@@ -76,32 +75,18 @@ namespace FTServer
 		{
 			char[] cs = sUtil.clear (str);
 			Dictionary<int, KeyWord> map = util.fromString (-1, cs);
-			RemoveMinMax (map);
-
+		
 			if (map.Count > KeyWord.MAX_WORD_LENGTH || map.Count == 0) {
 				return new List<KeyWord> ();
 			}
-			return search (box, map.Values.ToArray ());
-		}
 
-		private void RemoveMinMax (Dictionary<int, KeyWord> map)
-		{
-			foreach (KeyValuePair<int,KeyWord> e
-			     in new Dictionary<int, KeyWord>(map)) {
-				if (e.Value.isWord && e.Value.KWord.Length < 1) {
-					map.Remove (e.Key);
-				}
-				if (e.Value.isWord && e.Value.KWord.Length
-					> KeyWord.MAX_WORD_LENGTH) {
-					map.Remove (e.Key);
-				}
-			}
+			return search (box, map.Values.ToArray ());
 		}
 		// Base
 		private IEnumerable<KeyWord> search (IBox box, KeyWord[] kws)
 		{
 			if (kws.Length == 1) {
-				return search (box, kws [0], (KeyWord)null);
+				return search (box, kws [0], (KeyWord)null, false);
 			}
 			KeyWord[] condition = new KeyWord[kws.Length - 1];
 			Array.Copy (kws, 0, condition, 0, condition.Length);
@@ -121,33 +106,31 @@ namespace FTServer
 						continue;
 					}
 				}
-				r1_id = r1_con.ID;
-				r1_con.isWord = isWord;
-				foreach (KeyWord k in search(box, nw, r1_con)) {
+				r1_id = r1_con.ID; 
+				foreach (KeyWord k in search(box, nw, r1_con,isWord)) {
 					k.previous = r1_con;
 					yield return k;
 				}
 			} 
 		}
 
-		private  IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord condition)
+		private  IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord condition, bool asWord)
 		{
-
-			if (kw.isWord) {
+			if (kw is KeyWordE) {
 				if (condition == null) {
-					return box.Select<KeyWord> ("from E where K==?", kw.KWord);
+					return box.Select<KeyWordE> ("from E where K==?", kw.KWord);
 				} else {
-					return box.Select<KeyWord> ("from E where K==? &  I==?",
-					                            kw.KWord, condition.ID);
+					return box.Select<KeyWordE> ("from E where K==? &  I==?",
+					                             kw.KWord, condition.ID);
 				}
 			} else if (condition == null) {
-				return box.Select<KeyWord> ("from N where K==?", kw.KWord);
-			} else if (condition.isWord) {
-				return box.Select<KeyWord> ("from N where K==? &  I==?",
-				                            kw.KWord, condition.ID);
+				return box.Select<KeyWordN> ("from N where K==?", kw.KWord);
+			} else if (asWord) {
+				return box.Select<KeyWordN> ("from N where K==? &  I==?",
+				                             kw.KWord, condition.ID);
 			} else {
-				return box.Select<KeyWord> ("from N where K==? & I==? & P==?",
-				                            kw.KWord, condition.ID, (condition.Position + 1));
+				return box.Select<KeyWordN> ("from N where K==? & I==? & P==?",
+				                             kw.KWord, condition.ID, (condition.Position + 1));
 			}
 		}
 	}
@@ -172,23 +155,21 @@ namespace FTServer
 					k = null;
 				} else if (sUtil.isWord (c)) {
 					if (k == null && c != '-' && c != '#') {
-						k = new KeyWord ();
-						k.isWord = true;
+						k = new KeyWordE (); 
 						k.ID = id;
 						k.KWord = "";
 						k.Position = i;
 					}
 					if (k != null) {
-						k.KWord = k.KWord + c;
+						k.KWord = k.KWord.ToString () + c;
 					}
 				} else {
 					if (k != null) {
 						kws.Add (k.Position, k);
 					}
-					k = new KeyWord ();
-					k.isWord = false;
+					k = new KeyWordN (); 
 					k.ID = id;
-					k.KWord = c.ToString ();
+					k.KWord = c;
 					k.Position = i;
 					kws.Add (k.Position, k);
 					k = null;
@@ -242,6 +223,9 @@ namespace FTServer
 				if (set.Contains (cs [i])) {
 					cs [i] = ' ';
 				}
+				if (cs [i] == 0) {
+					cs [i] = ' ';
+				}
 			}
 			return cs;
 		}
@@ -264,7 +248,7 @@ namespace FTServer
 			int end = -1;
 			StringBuilder sb = new StringBuilder ();
 			for (int i = 0; i < ps.Length; i++) {
-				if ((ps [i].Position + ps [i].KWord.Length) < end) {
+				if ((ps [i].Position + ps [i].KWord.ToString ().Length) < end) {
 					continue;
 				}
 				start = ps [i].Position;
@@ -280,7 +264,7 @@ namespace FTServer
 		}
 	}
 
-	public class KeyWord
+	public abstract class KeyWord
 	{
 
 		public readonly static int MAX_WORD_LENGTH = 16;
@@ -288,19 +272,17 @@ namespace FTServer
 		public static void config (DatabaseConfig c)
 		{
 			// English Language or Word (max=16)              
-			c.EnsureTable<KeyWord> ("E", "K(" + MAX_WORD_LENGTH + ")", "I");
+			c.EnsureTable<KeyWordE> ("E", "K(" + MAX_WORD_LENGTH + ")", "I");
 
 			// Non-English Language or Character
-			c.EnsureTable<KeyWord> ("N", "K(1)", "I", "P");
+			c.EnsureTable<KeyWordN> ("N", "K", "I", "P");
 
 		}
-		//Key Word
-		public String K;
 
 		[NotColumn]
-		public String KWord {
-			get{ return K;}
-			set{ K = value;}
+		public abstract object KWord {
+			get ;
+			set;
 		}
 		//Position
 		public int P;
@@ -320,18 +302,48 @@ namespace FTServer
 		}
 
 		[NotColumn]
-		public bool isWord;
-		[NotColumn]
 		public KeyWord previous;
 
 		public override String ToString ()
 		{
-			return K + ", Pos=" + P + ", ID=" + I + " " + (isWord ? "1" : "0");
+			return KWord + ", Pos=" + P + ", ID=" + I + " " + (this is KeyWordE ? "E" : "N");
 		}
 
 		public String ToFullString ()
 		{
 			return (previous != null ? previous.ToFullString () + " -> " : "") + ToString ();
+		}
+	}
+
+	public sealed class KeyWordE : KeyWord
+	{
+		//Key Word
+		public String K;
+
+		[NotColumn]
+		public override object KWord {
+			get{ return K;}
+			set {
+				var t = (String)value;
+				if (t.Length > KeyWord.MAX_WORD_LENGTH) {
+					return;
+				}
+				K = t;
+			}
+		}
+	}
+
+	public sealed class KeyWordN : KeyWord
+	{
+		//Key Word
+		public char K;
+
+		[NotColumn]
+		public override object KWord {
+			get{ return K;}
+			set {
+				K = (char)value;
+			}
 		}
 	}
 }
