@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Text; 
+using System.Text;
 using iBoxDB.LocalServer;
 using System.IO;
 using System.Threading;
@@ -28,7 +28,7 @@ namespace FTServer
 			char[] cs = sUtil.clear (str);
 			Dictionary<int, KeyWord> map = util.fromString (id, cs);
 	 
-			SortedSet<String> words = new SortedSet<String> ();
+			HashSet<String> words = new HashSet<String> ();
 			foreach (KeyWord kw in map.Values) {
 				Binder binder;
 				if (kw is KeyWordE) {
@@ -194,7 +194,7 @@ namespace FTServer
 			foreach (char c in s) {
 				set.Add (c);
 			}
-			set.Add ( (char)0 );
+			set.Add ((char)0);
 		}
 
 		public bool isWord (char c)
