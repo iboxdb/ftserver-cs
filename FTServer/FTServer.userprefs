@@ -1,21 +1,13 @@
 ﻿<Properties GitUserInfo="UsingGIT">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="App_Code/EngineTest.cs">
-    <Files>
-      <File FileName="../EngineConsole/Program.cs" Line="10" Column="13" />
-      <File FileName="App_Code/FTS.cs" Line="187" Column="13" />
-      <File FileName="App_Code/EngineTest.cs" Line="136" Column="64" />
-    </Files>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True">
+        <State expanded="True">
           <Node name="EngineConsole" expanded="True">
             <Node name="References" expanded="True" />
           </Node>
-          <Node name="FTServer" expanded="True">
-            <Node name="References" expanded="True" />
-            <Node name="App_Code" expanded="True" />
-          </Node>
+          <Node name="FTServer" selected="True" />
         </State>
       </Pad>
     </Pads>
