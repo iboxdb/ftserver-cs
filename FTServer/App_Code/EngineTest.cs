@@ -25,7 +25,7 @@ namespace FTServer
 				+ "This will automatically install Git and keep it up-to-date for you.\n"
 				+ "On your computer, open the Git Shell application.\n"
 				+ "Tell Git your name so your commits will be properly labeled. Type everything after the $ here:\n"
-				+ "\n"
+				+ "\n babies "
 				+ "git config --global user.name \"YOUR NAME\"\n"
 				+ "Tell Git the email address that will be associated with your Git commits. "
 				+ "The email you specify should be the same one found in your email settings. "
@@ -86,7 +86,7 @@ namespace FTServer
 
 			using (var box = auto.Cube()) {		
 				// searchDistinct() search()
-				foreach (KeyWord kw in engine.search(box, "git")) {
+				foreach (KeyWord kw in engine.search(box, "BABY NAME")) {
 					Console.WriteLine (kw.ToFullString ());
 					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
 				}

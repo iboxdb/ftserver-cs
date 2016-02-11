@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using iBoxDB.LocalServer;
 using System.IO;
-using System.Threading;
-using System.Linq;
 
 namespace FTServer
 {
@@ -26,10 +24,10 @@ namespace FTServer
 			}
 
 			char[] cs = sUtil.clear (str);
-			Dictionary<int, KeyWord> map = util.fromString (id, cs);
+			List<KeyWord> map = util.fromString (id, cs, true);
 	 
 			HashSet<String> words = new HashSet<String> ();
-			foreach (KeyWord kw in map.Values) {
+			foreach (KeyWord kw in map) {
 				Binder binder;
 				if (kw is KeyWordE) {
 					if (words.Contains (kw.KWord.ToString ())) {
@@ -74,13 +72,13 @@ namespace FTServer
 		public IEnumerable<KeyWord> search (IBox box, String str)
 		{
 			char[] cs = sUtil.clear (str);
-			Dictionary<int, KeyWord> map = util.fromString (-1, cs);
+			List<KeyWord> map = util.fromString (-1, cs, false);
 		
 			if (map.Count > KeyWord.MAX_WORD_LENGTH || map.Count == 0) {
 				return new List<KeyWord> ();
 			}
 
-			return search (box, map.Values.ToArray ());
+			return search (box, map.ToArray ());
 		}
 		// Base
 		private IEnumerable<KeyWord> search (IBox box, KeyWord[] kws)
@@ -140,17 +138,23 @@ namespace FTServer
 
 		readonly StringUtil sUtil = new StringUtil ();
 
-		public Dictionary<int, KeyWord> fromString (long id, char[] str)
+		public List<KeyWord> fromString (long id, char[] str, bool includeOF)
 		{
 
-			Dictionary<int, KeyWord> kws = new Dictionary<int, KeyWord> ();
+			List<KeyWord> kws = new List<KeyWord> ();
 
-			KeyWord k = null;
+			KeyWordE k = null;
 			for (int i = 0; i < str.Length; i++) {
 				char c = str [i];
 				if (c == ' ') {
 					if (k != null) {
-						kws.Add (k.Position, k);
+						kws.Add (k);
+						if (includeOF) {
+							k = k.getOriginalForm ();
+							if (k != null) {
+								kws.Add (k);
+							}
+						}
 					}
 					k = null;
 				} else if (sUtil.isWord (c)) {
@@ -165,14 +169,21 @@ namespace FTServer
 					}
 				} else {
 					if (k != null) {
-						kws.Add (k.Position, k);
+						kws.Add (k);
+						if (includeOF) {
+							k = k.getOriginalForm ();
+							if (k != null) {
+								kws.Add (k);
+							}
+						}
 					}
-					k = new KeyWordN (); 
-					k.ID = id;
-					k.KWord = c;
-					k.Position = i;
-					kws.Add (k.Position, k);
 					k = null;
+					KeyWordN n = new KeyWordN (); 
+					n.ID = id;
+					n.KWord = c;
+					n.Position = i;
+					kws.Add (n);
+
 				}
 			}
 
@@ -215,6 +226,7 @@ namespace FTServer
 			if (c >= 0xc0 && c <= 0xff) {
 				return true;
 			}
+			//Korean [uAC00-uD7A3]
 			return c == '-' || c == '#';
 		}
 
@@ -330,6 +342,38 @@ namespace FTServer
 				K = t;
 			}
 		}
+
+		public KeyWordE getOriginalForm ()
+		{
+			String of;
+			if (antetypes.TryGetValue (K, out of)) {
+				KeyWordE e = new KeyWordE ();
+				e.I = this.I;
+				e.P = this.P;
+				e.K = of;
+				return e;
+			}
+			return null;
+		}
+
+		private static Dictionary<String, String> antetypes = new Dictionary<String, String> () {
+			{"dogs", "dog"},
+			{"houses", "house"},
+			{"grams", "gram"},
+
+			{"kisses", "kiss"},
+			{"watches", "watch"},
+			{"boxes", "box"},
+			{"bushes", "bush"},
+
+			{"tomatoes", "tomato"},
+			{"potatoes", "potato"},
+
+			{"babies", "baby"},
+			{"universities", "university"},
+			{"flies", "fly"},
+			{"impurities", "impurity"}			
+		};
 	}
 
 	public sealed class KeyWordN : KeyWord
