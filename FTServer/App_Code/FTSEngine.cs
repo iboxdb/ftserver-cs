@@ -34,7 +34,7 @@ namespace FTServer
 						continue;
 					}
 					words.Add (kw.KWord.ToString ());
-					binder = box ["E", kw.KWord, kw.ID];
+					binder = box ["E", kw.KWord, kw.ID, kw.Position];
 				} else { 
 					binder = box ["N", kw.KWord, kw.ID, kw.Position];
 				}
@@ -116,19 +116,32 @@ namespace FTServer
 		{
 			if (kw is KeyWordE) {
 				if (condition == null) {
-					return box.Select<KeyWordE> ("from E where K==?", kw.KWord);
+					return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K==?", kw.KWord));
 				} else {
-					return box.Select<KeyWordE> ("from E where K==? &  I==?",
-					                             kw.KWord, condition.ID);
+					return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K==? &  I==?",
+					                                                    kw.KWord, condition.ID));
 				}
 			} else if (condition == null) {
-				return box.Select<KeyWordN> ("from N where K==?", kw.KWord);
+				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==?", kw.KWord));
 			} else if (asWord) {
-				return box.Select<KeyWordN> ("from N where K==? &  I==?",
-				                             kw.KWord, condition.ID);
+				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? &  I==?",
+				                                                    kw.KWord, condition.ID));
 			} else {
-				return box.Select<KeyWordN> ("from N where K==? & I==? & P==?",
-				                             kw.KWord, condition.ID, (condition.Position + 1));
+				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? & I==? & P==?",
+				                                                    kw.KWord, condition.ID, (condition.Position + 1))
+				);
+			}
+		}
+		//faster than  box.Select<KeyWordX> ()
+		private  IEnumerable<KeyWord> Index2KeyWord<T> (IEnumerable<object> src) where T:KeyWord, new()
+		{ 
+			foreach (var o in src) {  
+				T cache = new T ();
+				object[] os = (object[])o;
+				cache.KWord = os [0];
+				cache.I = (long)os [1];
+				cache.P = (int)os [2]; 
+				yield return cache;
 			}
 		}
 	}
@@ -283,7 +296,7 @@ namespace FTServer
 		public static void config (DatabaseConfig c)
 		{
 			// English Language or Word (max=16)              
-			c.EnsureTable<KeyWordE> ("E", "K(" + MAX_WORD_LENGTH + ")", "I");
+			c.EnsureTable<KeyWordE> ("E", "K(" + MAX_WORD_LENGTH + ")", "I", "P");
 
 			// Non-English Language or Character
 			c.EnsureTable<KeyWordN> ("N", "K", "I", "P");

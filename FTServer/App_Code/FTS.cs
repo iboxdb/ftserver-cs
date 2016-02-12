@@ -165,7 +165,7 @@ namespace FTServer
 				doc ["Script"].Remove ();
 				doc ["Style"].Remove ();
 
-				String content = doc.Text ();
+				String content = doc.Text ().Trim();
 				if (content.Length < 10) {
 					return null;
 				}

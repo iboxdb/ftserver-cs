@@ -86,7 +86,7 @@ namespace FTServer
 
 			using (var box = auto.Cube()) {		
 				// searchDistinct() search()
-				foreach (KeyWord kw in engine.search(box, "BABY NAME")) {
+				foreach (KeyWord kw in engine.search(box, "nosql 经验 git ")) {
 					Console.WriteLine (kw.ToFullString ());
 					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
 				}

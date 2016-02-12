@@ -87,6 +87,9 @@
                             if (content.Length < 200) {
                                 content += p.description;
                             }
+                             if (content.Length < 200) {
+                                content += p.title;
+                            }
                         }
                 %>
                 <h3>
