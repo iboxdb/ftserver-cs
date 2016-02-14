@@ -123,6 +123,7 @@ namespace FTServer
 
 			 
 				CQ doc = CQ.CreateFromUrl (url);
+				//Console.WriteLine(doc.Html());
 				doc ["script"].Remove ();
 				doc ["style"].Remove ();
 				doc ["Script"].Remove ();
@@ -166,7 +167,7 @@ namespace FTServer
 				doc ["Style"].Remove ();
 
 				String content = doc.Text ().Trim();
-				if (content.Length < 10) {
+				if (content.Length < 50) {
 					return null;
 				}
 				if (content.Length > 5000) {
@@ -175,6 +176,8 @@ namespace FTServer
 
 				content = content.Replace ("\r", " ")
 					.Replace ("\n", " ")
+						.Replace("　", " ")
+						.Replace("   ", " ")
 						.Replace ("   ", " ")
 						.Replace ("  ", " ")
 						.Replace ("  ", " ").Trim ();
