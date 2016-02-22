@@ -166,21 +166,20 @@ namespace FTServer
 				doc ["Script"].Remove ();
 				doc ["Style"].Remove ();
 
-				String content = doc.Text ().Trim();
+				String content = doc.Text ().Trim ();
+				content = content.Replace ("\r", " ")
+					.Replace ("\n", " ")
+						.Replace ("　", " ")
+						.Replace ("   ", " ")
+						.Replace ("   ", " ")
+						.Replace ("  ", " ")
+						.Replace ("  ", " ").Trim ();
 				if (content.Length < 50) {
 					return null;
 				}
 				if (content.Length > 5000) {
 					content = content.Substring (0, 5000);
-				}
-
-				content = content.Replace ("\r", " ")
-					.Replace ("\n", " ")
-						.Replace("　", " ")
-						.Replace("   ", " ")
-						.Replace ("   ", " ")
-						.Replace ("  ", " ")
-						.Replace ("  ", " ").Trim ();
+				}		
 			
 				page.content = ((content
 					+ " " + page.url
