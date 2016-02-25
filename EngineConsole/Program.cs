@@ -7,7 +7,7 @@ namespace EngineConsole
 	{
 		public static void Main (string[] args)
 		{
-			FTServer.EngineTest.test_main_big();
+			FTServer.EngineTest.test_main();
 		}
 	}
 }

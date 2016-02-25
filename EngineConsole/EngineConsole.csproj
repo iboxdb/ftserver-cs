@@ -36,12 +36,10 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\FTServer\App_Code\EngineTest.cs">
-      <Link>EngineTest.cs</Link>
-    </Compile>
     <Compile Include="..\FTServer\App_Code\FTSEngine.cs">
       <Link>FTSEngine.cs</Link>
     </Compile>
+    <Compile Include="EngineTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
