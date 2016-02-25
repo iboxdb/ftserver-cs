@@ -82,13 +82,18 @@
                         String content = null;
                         if (pages.Count == 1 || p.keyWord == null) {
                             content = p.content.ToString();
+                        } else if (p.id != p.keyWord.ID) {
+                            content = p.description;
                         } else {
-                            content = SearchResource.engine.getDesc(p.content.ToString(), p.keyWord, 80);
-                            if (content.Length < 200) {
+                            content = SearchResource.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
+                            if (content.Length < 100) {
+                                content += p.getRandomContent();
+                            }
+                            if (content.Length < 100) {
                                 content += p.description;
                             }
-                             if (content.Length < 200) {
-                                content += p.title;
+                            if (content.Length > 200) {
+                                content = content.Substring(0, 200);
                             }
                         }
                 %>

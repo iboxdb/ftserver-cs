@@ -19,7 +19,7 @@ namespace FTServer
 				+= (ssender, cert, chain, sslPolicyErrors) => true;
 			ServerConfig.Default.TimeoutSeconds = 10.0;
 
-			String path = System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) + "/ftsdata3/";
+			String path = System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) + "/ftsdata4/";
 			System.IO.Directory.CreateDirectory (path);
 			SDB.init(path);
 		}

@@ -23,6 +23,7 @@ namespace FTServer
 			using (var box = SDB.search_db.Cube()) {
 				foreach (Page p in box.Select<Page>( "from Page where url==?", url)) {
 					engine.indexText (box, p.id, p.content.ToString (), true);
+					engine.indexText (box, p.rankUpId (), p.rankUpDescription (), true);
 					box ["Page", p.id].Delete ();
 					break;
 				}
@@ -40,6 +41,7 @@ namespace FTServer
 						p.id = box.NewId ();
 						box ["Page"].Insert (p);
 						engine.indexText (box, p.id, p.content.ToString (), false);
+						engine.indexText (box, p.rankUpId (), p.rankUpDescription (), false);
 						CommitResult cr = box.Commit ();
 						cr.Assert (cr.GetErrorMsg (box));
 					}
@@ -87,7 +89,7 @@ namespace FTServer
 				= (int)server.GetConfig ().DBConfig.MB (2);
 			new Engine ().Config (server.GetConfig ().DBConfig);
 			server.GetConfig ().EnsureTable<Page> ("Page", "id");
-			server.GetConfig ().EnsureIndex<Page> ("Page", true, "url(100)");
+			server.GetConfig ().EnsureIndex<Page> ("Page", true, "url(" + Page.MAX_URL_LENGTH + ")");
 
 			search_db = server.Open ();
 
@@ -105,17 +107,55 @@ namespace FTServer
 
 	public class Page
 	{
-
+		public const int MAX_URL_LENGTH = 200;
 		public long id;
 		public String url;
 		public String title;
 		public String description;
 		public UString content;
 
+		[NotColumn]
+		public long rankUpId ()
+		{
+			return id | (1L << 60);
+		}
+
+		[NotColumn]
+		public static long rankDownId (long id)
+		{
+			return id & (~(1L << 60));
+		}
+
+		[NotColumn]
+		public String rankUpDescription ()
+		{
+			return description + " " + title;
+		}
+
+		private static readonly Random cran = new Random ();
+
+		[NotColumn]
+		public String getRandomContent ()
+		{
+			int len = content.ToString ().Length - 100;
+			if (len <= 0) {
+				return content.ToString ();
+			}
+			int s = cran.Next (len);
+			if (s < 0) {
+				s = 0;
+			}
+			if (s > len) {
+				s = len;
+			}
+			return content.ToString ().Substring (s);
+		}
+
+		[NotColumn]
 		public static Page Get (String url)
 		{
 			try {
-				if (url == null || url.Length > 100 || url.Length < 8) {
+				if (url == null || url.Length > MAX_URL_LENGTH || url.Length < 8) {
 					return null;
 				}
 				Page page = new Page ();
@@ -145,6 +185,8 @@ namespace FTServer
 				}
 				page.title = page.title.Replace ("<", " ")
 					.Replace (">", " ").Replace ("$", " ");
+				doc ["title"].Remove ();
+				doc ["Title"].Remove ();
 
 				page.description = doc ["meta[name='description']"].Attr ("content");
 				if (page.description == null) {
@@ -173,7 +215,10 @@ namespace FTServer
 						.Replace ("   ", " ")
 						.Replace ("   ", " ")
 						.Replace ("  ", " ")
-						.Replace ("  ", " ").Trim ();
+						.Replace ("  ", " ")
+						.Replace ("<", " ")
+						.Replace (">", " ").Replace ("$", " ")
+						.Replace ("　", " ").Trim ();
 				if (content.Length < 50) {
 					return null;
 				}
@@ -181,12 +226,7 @@ namespace FTServer
 					content = content.Substring (0, 5000);
 				}		
 			
-				page.content = ((content
-					+ " " + page.url
-					+ " " + page.description)
-				       .Replace ("<", " ")
-				       .Replace (">", " ").Replace ("$", " ")
-				        .Replace ("　", " "));
+				page.content = content + " " + page.url;
 
 				return page;
 			} catch (Exception ex) {

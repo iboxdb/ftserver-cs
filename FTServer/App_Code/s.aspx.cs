@@ -48,7 +48,9 @@ namespace FTServer
 		
 			using (var box = SDB.search_db.Cube()) {
 				foreach (KeyWord kw in SearchResource.engine.searchDistinct(box, name)) {
-					Page p = box ["Page", kw.ID].Select ().Select<Page> ();
+					long id = kw.ID;
+					id = FTServer.Page.rankDownId(id);
+					Page p = box ["Page", id].Select ().Select<Page> ();
 					p.keyWord = kw;
 					pages.Add (p);
 					if (pages.Count > 100) {
