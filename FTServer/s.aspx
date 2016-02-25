@@ -84,6 +84,9 @@
                             content = p.content.ToString();
                         } else if (p.id != p.keyWord.ID) {
                             content = p.description;
+                            if (content.Length < 20) {
+                                content += p.getRandomContent();
+                            }
                         } else {
                             content = SearchResource.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
                             if (content.Length < 100) {

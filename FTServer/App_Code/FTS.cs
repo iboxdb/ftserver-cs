@@ -148,7 +148,12 @@ namespace FTServer
 			if (s > len) {
 				s = len;
 			}
-			return content.ToString ().Substring (s);
+
+			int count = content.ToString ().Length - s;
+			if (count > 200) {
+				count = 200;
+			}
+			return content.ToString ().Substring (s, count);
 		}
 
 		[NotColumn]
