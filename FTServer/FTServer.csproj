@@ -67,7 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App_Code\FTSEngine.cs" />
-    <None Include="App_Code\EngineTest.cs" />
     <None Include="css\themes\basic\assets\fonts\icons.eot" />
     <None Include="css\themes\basic\assets\fonts\icons.svg" />
     <None Include="css\themes\basic\assets\fonts\icons.ttf" />
