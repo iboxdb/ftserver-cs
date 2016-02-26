@@ -1,8 +1,9 @@
 ﻿<Properties GitUserInfo="UsingGIT">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="App_Code/FTS.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="App_Code/s.aspx.cs">
     <Files>
-      <File FileName="App_Code/FTS.cs" Line="145" Column="16" />
+      <File FileName="App_Code/FTS.cs" Line="56" Column="1" />
+      <File FileName="App_Code/s.aspx.cs" Line="67" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -10,7 +11,7 @@
           <Node name="EngineConsole" expanded="True" />
           <Node name="FTServer" expanded="True">
             <Node name="App_Code" expanded="True">
-              <Node name="FTS.cs" selected="True" />
+              <Node name="s.aspx.cs" selected="True" />
             </Node>
           </Node>
         </State>
@@ -18,7 +19,10 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/bruce/Projects/FTServer/App_Code/FTS.cs" line="163" column="1" />
+      <Breakpoint file="/home/bruce/Projects/FTServer/App_Code/FTS.cs" line="40" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

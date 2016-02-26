@@ -22,7 +22,7 @@ namespace FTServer
 			}
 			name = name.Replace ("<", " ").Replace (">", " ")
 				.Replace ("\"", " ").Replace (",", " ")
-					.Replace ("\\$", " ").ToLower ().Trim ();
+					.Replace ("\\$", " ").Trim ();
 
 			bool? isdelete = null;
 

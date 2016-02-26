@@ -138,7 +138,7 @@ namespace FTServer
 		public String getRandomContent ()
 		{
 			int len = content.ToString ().Length - 100;
-			if (len <= 0) {
+			if (len <= 20) {
 				return content.ToString ();
 			}
 			int s = cran.Next (len);
