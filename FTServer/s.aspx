@@ -19,7 +19,7 @@
             .stext{
 
             }
-            .redtext{
+            .rt{
                 color: red;
             }
         </style> 
@@ -35,7 +35,7 @@
                     if (kw.length < 1) {
                         continue;
                     }
-                    var fontText = "<font class='redtext'>";
+                    var fontText = "<font class='rt'>";
                     if (fontText.indexOf(kw) > -1) {
                         continue;
                     }
