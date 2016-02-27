@@ -1,6 +1,9 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="s.aspx">
+    <Files>
+      <File FileName="s.aspx" Line="42" Column="43" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True" selected="True">

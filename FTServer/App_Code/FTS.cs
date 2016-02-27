@@ -62,7 +62,12 @@ namespace FTServer
 				p = name.IndexOf ("https://");
 			}
 			if (p >= 0) {
-				return name.Substring (p).Trim ();
+				name = name.Substring (p).Trim ();
+				var t = name.IndexOf ("#");
+				if (t > 0) {
+					name = name.Substring (0, t);
+				}
+				return name;
 			}
 			return "";
 		}
@@ -107,7 +112,7 @@ namespace FTServer
 
 	public class Page
 	{
-		public const int MAX_URL_LENGTH = 200;
+		public const int MAX_URL_LENGTH = 100;
 		public long id;
 		public String url;
 		public String title;
