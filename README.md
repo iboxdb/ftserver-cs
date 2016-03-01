@@ -8,7 +8,6 @@ cd FTServer
 xsp4
 ```
 
-![](https://github.com/iboxdb/ftserver/raw/master/FTServer/web/css/fts.png)
 
 ![](https://github.com/iboxdb/ftserver/raw/master/FTServer/web/css/fts2.png)
 
