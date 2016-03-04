@@ -78,20 +78,58 @@ namespace FTServer
 				return new List<KeyWord> ();
 			}
 
-			return search (box, map.ToArray ());
+			List<KeyWord> kws = new List<KeyWord> ();
+
+			for (int i = 0; i < map.Count; i++) {
+				KeyWord kw = map [i];
+				if (kw is KeyWordE) {
+					String s = kw.KWord.ToString ();
+					if ((s.Length > 2) && (!sUtil.mvends.Contains (s))) {
+						kws.Add (kw);
+						map [i] = null;
+					}
+				} else {
+					KeyWordN kwn = (KeyWordN)kw;
+					if (kwn.size () >= 2) {
+						kws.Add (kw);
+						map [i] = null;
+					} else if (kws.Count > 0) {
+						KeyWord p = kws [kws.Count - 1];
+						if (p is KeyWordN) {
+							if (kwn.Position == (p.Position + ((KeyWordN)p).size ())) {
+								kws.Add (kw);
+								map [i] = null;
+							}
+						}
+					}
+				}
+			}
+			for (int i = 0; i < map.Count; i++) {
+				KeyWord kw = map [i];
+				if (kw != null) {
+					kws.Add (kw);
+				}
+			}
+
+			return search (box, kws.ToArray ());
 		}
-		// Base
+
 		private IEnumerable<KeyWord> search (IBox box, KeyWord[] kws)
 		{
 			if (kws.Length == 1) {
 				return search (box, kws [0], (KeyWord)null, false);
 			}
+			bool asWord = true;
+			KeyWord kwa = kws [kws.Length - 2];
+			KeyWord kwb = kws [kws.Length - 1];
+			if ((kwa is KeyWordN) && (kwb is KeyWordN)) {
+				asWord = kwb.Position != (kwa.Position + ((KeyWordN)kwa).size ());
+			}
+
 			KeyWord[] condition = new KeyWord[kws.Length - 1];
 			Array.Copy (kws, 0, condition, 0, condition.Length);
 			return search (box, kws [kws.Length - 1],
-			               search (box, condition),
-			               kws [kws.Length - 1].Position
-				!= (kws [kws.Length - 2].Position + 1));
+			               search (box, condition), asWord);
 		}
 
 		private IEnumerable<KeyWord> search (IBox box, KeyWord nw,
@@ -112,27 +150,35 @@ namespace FTServer
 			} 
 		}
 
-		private  IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord condition, bool asWord)
+		private  IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord con, bool asWord)
 		{
 			if (kw is KeyWordE) {
-				if (condition == null) {
+				if (con == null) {
 					return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K==?", kw.KWord));
 				} else {
 					return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K==? &  I==?",
-					                                                    kw.KWord, condition.ID));
+					                                                    kw.KWord, con.ID));
 				}
-			} else if (condition == null) {
-				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==?", kw.KWord));
-			} else if (asWord) {
-				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? &  I==?",
-				                                                    kw.KWord, condition.ID));
 			} else {
-				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? & I==? & P==?",
-				                                                    kw.KWord, condition.ID, (condition.Position + 1))
-				);
+				KeyWordN kwn = (KeyWordN)kw;
+				if (con is KeyWordE) {
+					asWord = true;
+				}
+				if (con == null) {
+					return Index2KeyWord<KeyWordN> (
+						box.Select<object> ("from N where K>=? & K<?", kwn.K, kwn.theNextK ()));
+				} else if (asWord) {
+					return Index2KeyWord<KeyWordN> (
+						box.Select<object> ("from N where K>=? & K<? & I==?", kwn.K, kwn.theNextK (), con.ID));
+				} else {
+					return Index2KeyWord<KeyWordN> (
+						box.Select<object> ("from N where K>=? & K<? & I==? & P==?",
+					                     kwn.K, kwn.theNextK (), con.ID, (con.Position + ((KeyWordN)con).size ()))
+					);
+				}
 			}
 		}
-		//faster than  box.Select<KeyWordX> ()
+
 		private  IEnumerable<KeyWord> Index2KeyWord<T> (IEnumerable<object> src) where T:KeyWord, new()
 		{ 
 			foreach (var o in src) {  
@@ -193,33 +239,61 @@ namespace FTServer
 					k = null;
 					KeyWordN n = new KeyWordN (); 
 					n.ID = id;
-					n.KWord = c;
 					n.Position = i;
+					char c0 = c;
+					char c1 = str [i + 1];
+					char c2 = str [i + 2];
+					if ((c1 != ' ') && (!sUtil.isWord (c1))) {
+						if ((c2 != ' ') && (!sUtil.isWord (c2))) {
+							n.KWord = new String (new char[] { c0, c1, c2 });
+							if (!includeOF) {
+								i += 2;
+							}
+						} else {
+							n.KWord = new String (new char[] { c0, c1 });
+							if (!includeOF) {
+								i += 1;
+							}
+						}
+					} else {
+						n.KWord = c0.ToString ();
+					}
 					kws.Add (n);
-
 				}
 			}
-
 			return kws;
 		}
 	}
 
 	class StringUtil
-	{
- 
+	{ 
 		HashSet<char> set;
+		public HashSet<String> mvends;
 
 		public StringUtil ()
 		{
 			String s = "!\"@$%&'()*+,./:;<=>?[\\]^_`{|}~\r\n"; //@-
 			s += "， 　，《。》、？；：‘’“”【｛】｝——=+、｜·～！￥%……&*（）"; //@-#
 			s += "｀～！＠￥％……—×（）——＋－＝【】｛｝：；’＇”＂，．／＜＞？’‘”“";//＃
-			s += " ";
+			s += " � ★☆,。？,　！";
 			set = new HashSet<char> ();
 			foreach (char c in s) {
 				set.Add (c);
 			}
 			set.Add ((char)0);
+
+			String[] ms = new String[] {
+				"are", "were", "have", "has", "had",
+				"you", "she", "her", "him", "like", "will", "would", "should",
+				"when", "than", "then", "that", "this", "there", "who", "those", "these",
+				"with", "which", "where", "they", "them", "one",
+				"does", "doesn", "did", "gave", "give",
+				"something", "someone", "about", "come"
+			};
+			mvends = new HashSet<String> ();
+			foreach (String c in ms) {
+				mvends.Add (c);
+			}
 		}
 
 		public bool isWord (char c)
@@ -245,7 +319,7 @@ namespace FTServer
 
 		public char[] clear (String str)
 		{
-			char[] cs = (str + " ").ToLower ().ToCharArray ();
+			char[] cs = (str + "   ").ToLower ().ToCharArray ();
 			for (int i = 0; i < cs.Length; i++) {
 				if (set.Contains (cs [i])) {
 					cs [i] = ' ';
@@ -330,7 +404,7 @@ namespace FTServer
 
 		public override String ToString ()
 		{
-			return KWord + ", Pos=" + P + ", ID=" + I + " " + (this is KeyWordE ? "E" : "N");
+			return KWord + " Pos=" + P + ", ID=" + I + " " + (this is KeyWordE ? "E" : "N");
 		}
 
 		public String ToFullString ()
@@ -392,14 +466,72 @@ namespace FTServer
 	public sealed class KeyWordN : KeyWord
 	{
 		//Key Word
-		public char K;
+		public long K;
 
 		[NotColumn]
 		public override object KWord {
-			get{ return K;}
+			get{ return KtoString (K);}
 			set {
-				K = (char)value;
+				if (value is long) {
+					K = (long)value;
+				} else {
+					K = StringtoK ((string)value);
+			
+				}
 			}
+		}
+
+		public long theNextK ()
+		{
+			byte s = size ();
+			if (s == 3) {
+				return K + 1L;
+			}
+			if (s == 2) {
+				return K + (1L << 16);
+			}
+			return K + (1L << 32);
+
+		}
+
+		public byte size ()
+		{
+			if ((K & CMASK) != 0L) {
+				return 3;
+			}
+			if ((K & (CMASK << 16)) != 0L) {
+				return 2;
+			}
+			return 1;
+		}
+
+		const long CMASK = 0xFFFF;
+
+		private static String KtoString (long k)
+		{
+			char c0 = (char)((k & (CMASK << 32)) >> 32);
+			char c1 = (char)((k & (CMASK << 16)) >> 16);
+			char c2 = (char)(k & CMASK);
+
+			if (c2 != 0) {
+				return new String (new char[] { c0, c1, c2 });
+			}
+			if (c1 != 0) {
+				return new String (new char[] { c0, c1 });
+			}
+			return c0.ToString ();
+		}
+
+		private static long StringtoK (String str)
+		{
+			long k = (0L | str[0]) << 32;
+			if (str.Length > 1) {
+				k |= ((0L | str[1]) << 16);
+			}
+			if (str.Length  > 2) {
+				k |= (0L | str[2]);
+			}
+			return k;
 		}
 	}
 }

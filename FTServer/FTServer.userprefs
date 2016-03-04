@@ -1,9 +1,6 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="s.aspx">
-    <Files>
-      <File FileName="s.aspx" Line="42" Column="43" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True" selected="True">
@@ -17,7 +14,7 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/home/bruce/Projects/FTServer/App_Code/FTS.cs" line="163" column="1" />
+      <Breakpoint file="/home/bruce/Projects/FTServer/App_Code/FTS.cs" line="168" column="1" />
       <Breakpoint file="/home/bruce/Projects/FTServer/App_Code/FTS.cs" line="40" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
