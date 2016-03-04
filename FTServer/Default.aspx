@@ -67,7 +67,7 @@
                     <%
                         foreach (String str in SearchResource.searchList) {
 
-                    %> <a href="s.aspx?q=<%=str%>"><%=str%></a>. &nbsp;  
+                    %> <a href="s.aspx?q=<%=str.Replace("#", "%23") %>"><%=str%></a>. &nbsp;  
                     <%
                         }
                     %>

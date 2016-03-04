@@ -96,7 +96,7 @@
                                 content += p.description;
                             }
                             if (content.Length > 200) {
-                                content = content.Substring(0, 200);
+                                content = content.Substring(0, 200) + "..";
                             }
                         }
                 %>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using iBoxDB.LocalServer;
 using CsQuery;
 using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace FTServer
 {
@@ -218,17 +219,12 @@ namespace FTServer
 				doc ["Script"].Remove ();
 				doc ["Style"].Remove ();
 
-				String content = doc.Text ().Trim ();
-				content = content.Replace ("\r", " ")
-					.Replace ("\n", " ")
-						.Replace ("　", " ")
-						.Replace ("   ", " ")
-						.Replace ("   ", " ")
-						.Replace ("  ", " ")
-						.Replace ("  ", " ")
-						.Replace ("<", " ")
-						.Replace (">", " ").Replace ("$", " ")
-						.Replace ("　", " ").Trim ();
+				String content = doc.Text ().Replace("　", " ");
+				content = Regex.Replace(content,"\t|\r|\n|�|<|>", " " );
+				content = Regex.Replace(content,"\\$", " " );
+				content = Regex.Replace(content,"\\s+", " " );
+				content = content.Trim(); 
+
 				if (content.Length < 50) {
 					return null;
 				}
