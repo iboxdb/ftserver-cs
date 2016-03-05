@@ -53,14 +53,12 @@ namespace FTServer
 		}
 
 		public IEnumerable<KeyWord> searchDistinct (IBox box, String str)
-		{
-			long c_id = -1;
+		{ 
+			HashSet<long> c_id = new HashSet<long>();
 			foreach (KeyWord kw in search(box, str)) {
-				if (kw.ID == c_id) {
-					continue;
+				if (c_id.Add (kw.ID)) {
+					yield return kw;
 				}
-				c_id = kw.ID;
-				yield return kw;
 			}			 
 		}
 
