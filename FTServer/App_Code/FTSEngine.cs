@@ -53,12 +53,14 @@ namespace FTServer
 		}
 
 		public IEnumerable<KeyWord> searchDistinct (IBox box, String str)
-		{ 
-			HashSet<long> c_id = new HashSet<long>();
+		{
+			long c_id = -1;
 			foreach (KeyWord kw in search(box, str)) {
-				if (c_id.Add (kw.ID)) {
-					yield return kw;
+				if (kw.ID == c_id) {
+					continue;
 				}
+				c_id = kw.ID;
+				yield return kw;
 			}			 
 		}
 
@@ -163,16 +165,13 @@ namespace FTServer
 					asWord = true;
 				}
 				if (con == null) {
-					return Index2KeyWord<KeyWordN> (
-						box.Select<object> ("from N where K>=? & K<?", kwn.K, kwn.theNextK ()));
+					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==?", kwn.K));
 				} else if (asWord) {
-					return Index2KeyWord<KeyWordN> (
-						box.Select<object> ("from N where K>=? & K<? & I==?", kwn.K, kwn.theNextK (), con.ID));
+					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? &  I==?",
+					                                                    kwn.K, con.ID));
 				} else {
-					return Index2KeyWord<KeyWordN> (
-						box.Select<object> ("from N where K>=? & K<? & I==? & P==?",
-					                     kwn.K, kwn.theNextK (), con.ID, (con.Position + ((KeyWordN)con).size ()))
-					);
+					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? & I==? & P==?",
+					                                                    kwn.K, con.ID, (con.Position + ((KeyWordN)con).size ())));
 				}
 			}
 		}
@@ -238,25 +237,21 @@ namespace FTServer
 					KeyWordN n = new KeyWordN (); 
 					n.ID = id;
 					n.Position = i;
-					char c0 = c;
-					char c1 = str [i + 1];
-					char c2 = str [i + 2];
-					if ((c1 != ' ') && (!sUtil.isWord (c1))) {
-						if ((c2 != ' ') && (!sUtil.isWord (c2))) {
-							n.KWord = new String (new char[] { c0, c1, c2 });
-							if (!includeOF) {
-								i += 2;
-							}
-						} else {
-							n.KWord = new String (new char[] { c0, c1 });
-							if (!includeOF) {
-								i += 1;
-							}
-						}
-					} else {
-						n.KWord = c0.ToString ();
-					}
+					n.KWord = c.ToString ();
 					kws.Add (n);
+				 
+					char c1 = str [i + 1]; 
+					if ((c1 != ' ') && (!sUtil.isWord (c1))) {
+						n = new KeyWordN (); 
+						n.ID = id;
+						n.Position = i;
+						n.KWord = new String (new char[] { c, c1 });
+						kws.Add (n);
+						if (!includeOF) {
+							kws.RemoveAt (kws.Count - 2);
+							i++; 
+						}						
+					}   
 				}
 			}
 			return kws;
@@ -479,19 +474,6 @@ namespace FTServer
 			}
 		}
 
-		public long theNextK ()
-		{
-			byte s = size ();
-			if (s == 3) {
-				return K + 1L;
-			}
-			if (s == 2) {
-				return K + (1L << 16);
-			}
-			return K + (1L << 32);
-
-		}
-
 		public byte size ()
 		{
 			if ((K & CMASK) != 0L) {
@@ -522,12 +504,12 @@ namespace FTServer
 
 		private static long StringtoK (String str)
 		{
-			long k = (0L | str[0]) << 32;
+			long k = (0L | str [0]) << 32;
 			if (str.Length > 1) {
-				k |= ((0L | str[1]) << 16);
+				k |= ((0L | str [1]) << 16);
 			}
-			if (str.Length  > 2) {
-				k |= (0L | str[2]);
+			if (str.Length > 2) {
+				k |= (0L | str [2]);
 			}
 			return k;
 		}
