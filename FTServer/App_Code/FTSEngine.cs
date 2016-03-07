@@ -159,19 +159,18 @@ namespace FTServer
 					return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K==? &  I==?",
 					                                                    kw.KWord, con.ID));
 				}
-			} else {
-				KeyWordN kwn = (KeyWordN)kw;
+			} else { 
 				if (con is KeyWordE) {
 					asWord = true;
 				}
 				if (con == null) {
-					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==?", kwn.K));
+					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==?", kw.KWord));
 				} else if (asWord) {
 					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? &  I==?",
-					                                                    kwn.K, con.ID));
+					                                                    kw.KWord, con.ID));
 				} else {
 					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? & I==? & P==?",
-					                                                    kwn.K, con.ID, (con.Position + ((KeyWordN)con).size ())));
+					                                                    kw.KWord, con.ID, (con.Position + ((KeyWordN)con).size ())));
 				}
 			}
 		}
@@ -237,7 +236,7 @@ namespace FTServer
 					KeyWordN n = new KeyWordN (); 
 					n.ID = id;
 					n.Position = i;
-					n.KWord = c.ToString ();
+					n.longKeyWord (c, (char)0, (char)0);
 					kws.Add (n);
 				 
 					char c1 = str [i + 1]; 
@@ -245,7 +244,7 @@ namespace FTServer
 						n = new KeyWordN (); 
 						n.ID = id;
 						n.Position = i;
-						n.KWord = new String (new char[] { c, c1 });
+						n.longKeyWord (c, c1, (char)0);
 						kws.Add (n);
 						if (!includeOF) {
 							kws.RemoveAt (kws.Count - 2);
@@ -260,6 +259,24 @@ namespace FTServer
 
 	class StringUtil
 	{ 
+		internal static Dictionary<String, String> antetypes = new Dictionary<String, String> () {
+			{"dogs", "dog"},
+			{"houses", "house"},
+			{"grams", "gram"},
+
+			{"kisses", "kiss"},
+			{"watches", "watch"},
+			{"boxes", "box"},
+			{"bushes", "bush"},
+
+			{"tomatoes", "tomato"},
+			{"potatoes", "potato"},
+
+			{"babies", "baby"},
+			{"universities", "university"},
+			{"flies", "fly"},
+			{"impurities", "impurity"}			
+		};
 		HashSet<char> set;
 		public HashSet<String> mvends;
 
@@ -395,11 +412,6 @@ namespace FTServer
 		[NotColumn]
 		public KeyWord previous;
 
-		public override String ToString ()
-		{
-			return KWord + " Pos=" + P + ", ID=" + I + " " + (this is KeyWordE ? "E" : "N");
-		}
-
 		public String ToFullString ()
 		{
 			return (previous != null ? previous.ToFullString () + " -> " : "") + ToString ();
@@ -426,7 +438,7 @@ namespace FTServer
 		public KeyWordE getOriginalForm ()
 		{
 			String of;
-			if (antetypes.TryGetValue (K, out of)) {
+			if (StringUtil.antetypes.TryGetValue (K, out of)) {
 				KeyWordE e = new KeyWordE ();
 				e.I = this.I;
 				e.P = this.P;
@@ -436,24 +448,10 @@ namespace FTServer
 			return null;
 		}
 
-		private static Dictionary<String, String> antetypes = new Dictionary<String, String> () {
-			{"dogs", "dog"},
-			{"houses", "house"},
-			{"grams", "gram"},
-
-			{"kisses", "kiss"},
-			{"watches", "watch"},
-			{"boxes", "box"},
-			{"bushes", "bush"},
-
-			{"tomatoes", "tomato"},
-			{"potatoes", "potato"},
-
-			{"babies", "baby"},
-			{"universities", "university"},
-			{"flies", "fly"},
-			{"impurities", "impurity"}			
-		};
+		public override String ToString ()
+		{
+			return K + " Pos=" + P + ", ID=" + I + " E";
+		}
 	}
 
 	public sealed class KeyWordN : KeyWord
@@ -463,15 +461,8 @@ namespace FTServer
 
 		[NotColumn]
 		public override object KWord {
-			get{ return KtoString (K);}
-			set {
-				if (value is long) {
-					K = (long)value;
-				} else {
-					K = StringtoK ((string)value);
-			
-				}
-			}
+			get{ return K;}
+			set { K = (long)value; }
 		}
 
 		public byte size ()
@@ -502,16 +493,21 @@ namespace FTServer
 			return c0.ToString ();
 		}
 
-		private static long StringtoK (String str)
+		public void longKeyWord (char c0, char c1, char c2)
 		{
-			long k = (0L | str [0]) << 32;
-			if (str.Length > 1) {
-				k |= ((0L | str [1]) << 16);
+			long k = (0L | c0) << 32;
+			if (c1 != 0) {
+				k |= ((0L | c1) << 16);
+				if (c2 != 0) {
+					k |= (0L | c2);
+				}
 			}
-			if (str.Length > 2) {
-				k |= (0L | str [2]);
-			}
-			return k;
+			K = k;
+		}
+
+		public override String ToString ()
+		{
+			return KtoString (K) + " Pos=" + P + ", ID=" + I + " N";
 		}
 	}
 }

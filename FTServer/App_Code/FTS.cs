@@ -85,14 +85,14 @@ namespace FTServer
 			Console.WriteLine ("DBPath=" + path);
 
 			DB.Root (path);
-
+			//iBoxDB.DBDebug.DDebug.DeleteDBFiles (1);
 			DB server = new DB (1);
 			/*
         server.GetConfig().DBConfig.CacheLength
-                = server.GetConfig().DBConfig.MB(8);
+                = server.GetConfig().DBConfig.MB(16);
          */
 			server.GetConfig ().DBConfig.SwapFileBuffer
-				= (int)server.GetConfig ().DBConfig.MB (2);
+				= (int)server.GetConfig ().DBConfig.MB (4);
 			new Engine ().Config (server.GetConfig ().DBConfig);
 			server.GetConfig ().EnsureTable<Page> ("Page", "id");
 			server.GetConfig ().EnsureIndex<Page> ("Page", true, "url(" + Page.MAX_URL_LENGTH + ")");
