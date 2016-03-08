@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace FTServer
 {
-	using System; 
+	using System;
 
 	public partial class s : System.Web.UI.Page
 	{
@@ -49,8 +49,8 @@ namespace FTServer
 			using (var box = SDB.search_db.Cube()) {
 				foreach (KeyWord kw in SearchResource.engine.searchDistinct(box, name)) {
 					long id = kw.ID;
-					id = FTServer.Page.rankDownId(id);
-					Page p = box ["Page", id].Select ().Select<Page> ();
+					id = FTServer.Page.rankDownId (id);
+					Page p = box ["Page", id].Select<Page> ();
 					p.keyWord = kw;
 					pages.Add (p);
 					if (pages.Count > 100) {

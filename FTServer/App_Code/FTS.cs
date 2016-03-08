@@ -93,8 +93,8 @@ namespace FTServer
          */
 			server.GetConfig ().DBConfig.SwapFileBuffer
 				= (int)server.GetConfig ().DBConfig.MB (4);
-			server.GetConfig().DBConfig.FileIncSize
-				= (int) server.GetConfig().DBConfig.MB(16);
+			server.GetConfig ().DBConfig.FileIncSize
+				= (int)server.GetConfig ().DBConfig.MB (16);
 			new Engine ().Config (server.GetConfig ().DBConfig);
 			server.GetConfig ().EnsureTable<Page> ("Page", "id");
 			server.GetConfig ().EnsureIndex<Page> ("Page", true, "url(" + Page.MAX_URL_LENGTH + ")");
@@ -221,11 +221,11 @@ namespace FTServer
 				doc ["Script"].Remove ();
 				doc ["Style"].Remove ();
 
-				String content = doc.Text ().Replace("　", " ");
-				content = Regex.Replace(content,"\t|\r|\n|�|<|>", " " );
-				content = Regex.Replace(content,"\\$", " " );
-				content = Regex.Replace(content,"\\s+", " " );
-				content = content.Trim(); 
+				String content = doc.Text ().Replace ("　", " ");
+				content = Regex.Replace (content, "\t|\r|\n|�|<|>", " ");
+				content = Regex.Replace (content, "\\$", " ");
+				content = Regex.Replace (content, "\\s+", " ");
+				content = content.Trim (); 
 
 				if (content.Length < 50) {
 					return null;
