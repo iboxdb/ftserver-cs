@@ -62,6 +62,7 @@ namespace FTServer
 			if (pages.Count == 0) {
 				Page p = new Page ();
 				p.title = "NotFound";
+				p.description = "";
 				p.content = "input URL to index";
 				p.url = "https://github.com/iboxdb/ftserver-cs";
 				pages.Add (p);
