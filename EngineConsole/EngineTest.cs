@@ -10,6 +10,7 @@ namespace FTServer
 {
 	public class EngineTest
 	{
+
 		public static void test_main ()
 		{  
 			DB.Root ("/tmp/");
@@ -62,7 +63,16 @@ namespace FTServer
 				+ "到了 2005 年，开发 BitKeeper 的商业公司同 Linux 内核开源社区的合作关系结束，"
 				+ "他们收回了 Linux 内核社区免费使用 BitKeeper 的权力。"
 				+ " 这就迫使 Linux 开源社区（特别是 Linux 的缔造者 Linux Torvalds）基于使用 BitKcheper 时的"
-				+ "经验教训，开发出自己的版本系统。 他们对新的系统制订了若干目标：" 
+				+ "经验教训，开发出自己的版本系统。 他们对新的系统制订了若干目标：",
+				//ID=5
+				"버전 관리란?\n\n버전 관리는 무엇이고 우리는 왜 이것을 알아야 할까? 버전 관리 시스템은 파일 변화를 시간에 따라 " +
+				"기록했다가 나중에 특정 시점의 버전을 다시 꺼내올 수 있는 시스템이다. 이 책에서는 버전 관리하는 예제로 소프트웨어 " +
+				"소스 코드만 보여주지만, 실제로 거의 모든 컴퓨터 파일의 버전을 관리할 수 있다.\n\n그래픽 디자이너나" +
+				"웹 디자이너도 버전 관리 시스템(VCS - Version Control System)을 사용할 수 있다. VCS로 이미지나 레이아웃의" +
+				"버전(변경 이력 혹은 수정 내용)을 관리하는 것은 매우 현명하다. VCS를 사용하면 각 파일을 이전 상태로 되돌릴 수 있고," +
+				"프로젝트를 통째로 이전 is 상태로 되돌릴 수 있고, 시간에 따라 수정 내용을 비교해 볼 수 있고," +
+				"누가 문제를 일으켰는지도 추적할 수 있고, 누가 언제 만들어낸 이슈인지도 알 수 있다. VCS를 사용하면 파일을 잃어버리거나" +
+				"잘못 고쳤을 때도 쉽게 복구할 수 있다. HAS GIT 이런 모든 장점을 큰 노력 없이 이용할 수 있다."
 			};
 
 
@@ -80,18 +90,19 @@ namespace FTServer
 			}
 
 			using (var box = auto.Cube()) {
+		
 				//engine.indexText(box, 4, ts[4], true);
 				box.Commit ().Assert ();
 			}
 
 			using (var box = auto.Cube()) {		
 				// searchDistinct() search()
-				foreach (KeyWord kw in engine.search(box, "nosql 经验 git ")) {
+				foreach (KeyWord kw in engine.search(box, "nosql 原始碼" )) {
 					Console.WriteLine (kw.ToFullString ());
 					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
+					Console.WriteLine ();
 				}
-			}
-
+			} 
 			auto.GetDatabase ().Close ();
 		}
 
@@ -146,6 +157,36 @@ namespace FTServer
 			Console.WriteLine (c + " , " + (DateTime.Now - b).TotalSeconds);
 
 			auto.GetDatabase ().Close ();
+		}
+
+		public class TA
+		{
+			public int a;
+			public int b;
+
+			public override string ToString ()
+			{
+				return  a + "-" + b;
+			}
+		}
+
+		public static void test_db ()
+		{   
+			DB db = new DB (new byte[0]);
+			db.GetConfig ().EnsureTable<TA> ("TA", "a", "b");
+			var auto = db.Open ();
+			using (var box = auto.Cube()) {
+				for (int i=0; i<2; i++) {
+					for (int j=0; j<9; j++) {
+						box ["TA"].Insert (new TA { a=i, b= j });
+					}
+				}
+				box.Commit ().Assert ();
+			}
+
+			foreach (var ta in auto.Select<TA>("from TA where a>= ? & a< ? & b >= ? & b<?" , -100, 100, 3,5 )) {
+				Console.WriteLine (ta);
+			}
 		}
 	}
 }

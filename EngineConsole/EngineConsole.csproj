@@ -32,6 +32,7 @@
     <Reference Include="iBoxDB.NET2">
       <HintPath>..\FTServer\bin\iBoxDB.NET2.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
