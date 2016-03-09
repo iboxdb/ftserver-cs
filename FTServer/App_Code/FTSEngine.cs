@@ -356,7 +356,9 @@ namespace FTServer
 			int end = -1;
 			StringBuilder sb = new StringBuilder ();
 			for (int i = 0; i < ps.Length; i++) {
-				if ((ps [i].Position + ps [i].KWord.ToString ().Length) < end) {
+				int len = ps [i] is KeyWordE ? ps [i].KWord
+					.ToString ().Length : ((KeyWordN)ps [i]).size ();
+				if ((ps [i].Position + len) <= end) {
 					continue;
 				}
 				start = ps [i].Position;

@@ -29,7 +29,7 @@
 
                 var ts = document.getElementsByClassName("stext");
 
-                var kws = txt.split(' ');
+                var kws = txt.split(/[ 　]/);
                 for (var i = 0; i < kws.length; i++) {
                     var kw = String(kws[i]).trim();
                     if (kw.length < 1) {
@@ -81,7 +81,8 @@
                 <% foreach (var p in pages) {
                         String content = null;
                         if (pages.Count == 1 || p.keyWord == null) {
-                            content = p.content.ToString();
+                        	content = p.description + "...";
+                            content += p.content.ToString();
                         } else if (p.id != p.keyWord.ID) {
                             content = p.description;
                             if (content.Length < 20) {
