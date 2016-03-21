@@ -79,7 +79,7 @@ namespace FTServer
 
 		public static DB.AutoBox search_db;
 
-		public static void init (String path)
+		public static void init (String path, bool isVM)
 		{
 
 			Console.WriteLine ("DBPath=" + path);
@@ -87,10 +87,10 @@ namespace FTServer
 			DB.Root (path);
 		 
 			DB server = new DB (1);
-			/*
-        server.GetConfig().DBConfig.CacheLength
-                = server.GetConfig().DBConfig.MB(16);
-         */
+			if (isVM) {
+				server.GetConfig ().DBConfig.CacheLength
+                = server.GetConfig ().DBConfig.MB (16);
+			}
 			server.GetConfig ().DBConfig.SwapFileBuffer
 				= (int)server.GetConfig ().DBConfig.MB (4);
 			server.GetConfig ().DBConfig.FileIncSize
