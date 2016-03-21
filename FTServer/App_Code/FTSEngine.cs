@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using iBoxDB.LocalServer;
@@ -286,6 +286,8 @@ namespace FTServer
 			s += "， 　，《。》、？；：‘’“”【｛】｝——=+、｜·～！￥%……&*（）"; //@-#
 			s += "｀～！＠￥％……—×（）——＋－＝【】｛｝：；’＇”＂，．／＜＞？’‘”“";//＃
 			s += " � ★☆,。？,　！";
+
+
 			set = new HashSet<char> ();
 			foreach (char c in s) {
 				set.Add (c);
