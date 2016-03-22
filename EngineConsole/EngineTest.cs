@@ -102,6 +102,11 @@ namespace FTServer
 					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
 					Console.WriteLine ();
 				}
+				foreach (String skw in engine.discover(box,
+				                                  'n', 's', 2,
+				                                  '\u2E80', '\u9fa5', 2)) {
+					Console.WriteLine (skw);
+				}
 			} 
 			auto.GetDatabase ().Close ();
 		}
