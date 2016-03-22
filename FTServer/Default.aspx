@@ -71,15 +71,6 @@
                     Input [KeyWord] to search,  input [URL] to index <br /> 
                     Input [delete URL] to delete.   <a  href="./">Refresh</a> 
                   
-					<br />Discoveries:&nbsp; 
-   					<%
-                        foreach (String str in discoveries) {
-
-                    %> <a href="s.aspx?q=<%=str.Replace("#", "%23") %>"><%=str%></a>. &nbsp;  
-                    <%
-                        }
-                    %>
-
  					<br />Recent Searches:<br />
                     <%
                         foreach (String str in SearchResource.searchList) {
@@ -94,6 +85,15 @@
                         foreach (String str in SearchResource.urlList) {
                     %>
                     <a href="<%=str%>" target="_blank" ><%=str%></a>. <br> 
+                    <%
+                        }
+                    %>
+                    
+                    <br />Discoveries:&nbsp; 
+   					<%
+                        foreach (String str in discoveries) {
+
+                    %> <a href="s.aspx?q=<%=str.Replace("#", "%23") %>"><%=str%></a>. &nbsp;  
                     <%
                         }
                     %>

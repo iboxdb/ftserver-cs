@@ -66,7 +66,7 @@ namespace FTServer
 				p.title = "NotFound";
 				p.description = "";
 				p.content = "input URL to index";
-				p.url = "https://github.com/iboxdb/ftserver-cs";
+				p.url = "./";
 				pages.Add (p);
 			}
 

@@ -67,8 +67,12 @@ namespace FTServer
 				KeyWordE kw = new KeyWordE ();
 				kw.KWord = new String (cs);
 				foreach (KeyWord tkw in lessMatch(box, kw)) {
+					String str = tkw.KWord.ToString ();
+					if (str.Length < 3 || sUtil.mvends.Contains (str)) {
+						continue;
+					}
 					int c = list.Count;
-					list.Add (tkw.KWord.ToString ());
+					list.Add (str);
 					if (list.Count > c) {
 						elength--;
 						if (elength <= 0) {
