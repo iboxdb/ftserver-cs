@@ -1,8 +1,16 @@
 <%@ Page Language="C#"  EnableSessionState="false" Async="true" AsyncTimeOut="30" %>
 <%@ import namespace="FTServer" %>
+<%@ import namespace="System.Collections.Generic" %>
 
  <%
-    
+     List<String> discoveries = new List<String> ();
+     
+     using (var box = SDB.search_db.Cube()) {
+     	foreach (String skw in SearchResource.engine.discover(box, 'a', 'z', 4,
+				                                       '\u2E80', '\u9fa5', 1)) {
+			discoveries.Add (skw);
+		}
+     }
  %>
 <!DOCTYPE html>
 <html>
@@ -62,8 +70,17 @@
                 <div class="ui message" style="text-align: left">
                     Input [KeyWord] to search,  input [URL] to index <br /> 
                     Input [delete URL] to delete.   <a  href="./">Refresh</a> 
-                    <br />
-                    Recent Searches:<br />
+                  
+					<br />Discoveries:&nbsp; 
+   					<%
+                        foreach (String str in discoveries) {
+
+                    %> <a href="s.aspx?q=<%=str.Replace("#", "%23") %>"><%=str%></a>. &nbsp;  
+                    <%
+                        }
+                    %>
+
+ 					<br />Recent Searches:<br />
                     <%
                         foreach (String str in SearchResource.searchList) {
 

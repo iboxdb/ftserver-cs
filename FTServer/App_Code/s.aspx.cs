@@ -8,6 +8,7 @@ namespace FTServer
 	{
 		protected string name;
 		protected List<Page> pages;
+
 		protected DateTime begin;
 
 		protected override void OnLoad (EventArgs e)
@@ -42,7 +43,8 @@ namespace FTServer
 				name = SearchResource.indexText (name, isdelete.Value);
 			}
 
-			pages = new List<Page> ();
+			pages = new List<Page> ();			
+		 
 			begin = DateTime.Now;
 
 		
@@ -67,6 +69,7 @@ namespace FTServer
 				p.url = "https://github.com/iboxdb/ftserver-cs";
 				pages.Add (p);
 			}
+
 
 		}
 	}

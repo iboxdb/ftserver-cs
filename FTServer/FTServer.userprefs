@@ -5,10 +5,8 @@
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="EngineConsole" expanded="True" />
-          <Node name="FTServer" expanded="True">
-            <Node name="App_Code" expanded="True">
-              <Node name="FTSEngine.cs" selected="True" />
-            </Node>
+          <Node name="FTServer" expanded="True" selected="True">
+            <Node name="App_Code" expanded="True" />
           </Node>
         </State>
       </Pad>

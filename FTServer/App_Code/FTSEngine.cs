@@ -52,6 +52,52 @@ namespace FTServer
 			return true;
 		}
 
+		public SortedSet <String> discover (IBox box,
+		                                    char efrom, char eto, int elength,
+		                                    char nfrom, char nto, int nlength)
+		{
+			SortedSet<String> list = new SortedSet<String> ();
+			Random ran = new Random ();
+			if (elength > 0) {
+				int len = ran.Next (KeyWord.MAX_WORD_LENGTH) + 1;
+				char[] cs = new char[len];
+				for (int i = 0; i < cs.Length; i++) {
+					cs [i] = (char)(ran.Next (eto - efrom) + efrom);
+				}
+				KeyWordE kw = new KeyWordE ();
+				kw.KWord = new String (cs);
+				foreach (KeyWord tkw in lessMatch(box, kw)) {
+					int c = list.Count;
+					list.Add (tkw.KWord.ToString ());
+					if (list.Count > c) {
+						elength--;
+						if (elength <= 0) {
+							break;
+						}
+					}
+				}
+			}
+			if (nlength > 0) {
+				char[] cs = new char[2];
+				for (int i = 0; i < cs.Length; i++) {
+					cs [i] = (char)(ran.Next (nto - nfrom) + nfrom);
+				}
+				KeyWordN kw = new KeyWordN ();
+				kw.longKeyWord (cs [0], cs [1], (char)0);
+				foreach (KeyWord tkw in lessMatch(box, kw)) {
+					int c = list.Count;
+					list.Add (((KeyWordN)tkw).toKString ());
+					if (list.Count > c) {
+						nlength--;
+						if (nlength <= 0) {
+							break;
+						}
+					}
+				}
+			}
+			return list;
+		}
+
 		public IEnumerable<KeyWord> searchDistinct (IBox box, String str)
 		{
 			long c_id = -1;
@@ -172,6 +218,15 @@ namespace FTServer
 					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? & I==? & P==?",
 					                                                    kw.KWord, con.ID, (con.Position + ((KeyWordN)con).size ())));
 				}
+			}
+		}
+
+		private  IEnumerable<KeyWord> lessMatch (IBox box, KeyWord kw)
+		{
+			if (kw is KeyWordE) { 
+				return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K<=?", kw.KWord));				 
+			} else { 				 
+				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K<=?", kw.KWord));			 
 			}
 		}
 
@@ -307,7 +362,9 @@ namespace FTServer
 				mvends.Add (c);
 			}
 		}
-
+		//Chinese  [\u2E80-\u9fa5]
+		//Japanese [\u0800-\u4e00]|
+		//Korean   [\uAC00-\uD7A3] [\u3130-\u318F] 
 		public bool isWord (char c)
 		{
 			//English
@@ -324,8 +381,7 @@ namespace FTServer
 			//Germen
 			if (c >= 0xc0 && c <= 0xff) {
 				return true;
-			}
-			//Korean [uAC00-uD7A3]
+			} 
 			return c == '-' || c == '#';
 		}
 
@@ -509,9 +565,14 @@ namespace FTServer
 			K = k;
 		}
 
+		public String toKString ()
+		{
+			return KtoString (K);
+		}
+
 		public override String ToString ()
 		{
-			return KtoString (K) + " Pos=" + P + ", ID=" + I + " N";
+			return toKString () + " Pos=" + P + ", ID=" + I + " N";
 		}
 	}
 }
