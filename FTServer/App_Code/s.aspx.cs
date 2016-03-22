@@ -41,6 +41,7 @@ namespace FTServer
 				}
 			} else {
 				name = SearchResource.indexText (name, isdelete.Value);
+				System.GC.Collect ();
 			}
 
 			pages = new List<Page> ();			
