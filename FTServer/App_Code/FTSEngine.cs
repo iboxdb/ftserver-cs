@@ -228,9 +228,9 @@ namespace FTServer
 		private  IEnumerable<KeyWord> lessMatch (IBox box, KeyWord kw)
 		{
 			if (kw is KeyWordE) { 
-				return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K<=?", kw.KWord));				 
+				return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K<=? limit 0, 50", kw.KWord));				 
 			} else { 				 
-				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K<=?", kw.KWord));			 
+				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K<=? limit 0, 50", kw.KWord));			 
 			}
 		}
 
@@ -345,7 +345,7 @@ namespace FTServer
 			s += "， 　，《。》、？；：‘’“”【｛】｝——=+、｜·～！￥%……&*（）"; //@-#
 			s += "｀～！＠￥％……—×（）——＋－＝【】｛｝：；’＇”＂，．／＜＞？’‘”“";//＃
 			s += " � ★☆,。？,　！";
-
+			s += "©»¥";
 
 			set = new HashSet<char> ();
 			foreach (char c in s) {
