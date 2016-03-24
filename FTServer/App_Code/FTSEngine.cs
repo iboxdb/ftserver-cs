@@ -123,7 +123,8 @@ namespace FTServer
 		{
 			char[] cs = sUtil.clear (str);
 			List<KeyWord> map = util.fromString (-1, cs, false);
-		
+			sUtil.correctInput (map);
+
 			if (map.Count > KeyWord.MAX_WORD_LENGTH || map.Count == 0) {
 				return new List<KeyWord> ();
 			}
@@ -318,6 +319,13 @@ namespace FTServer
 
 	class StringUtil
 	{ 
+		internal static Dictionary<String, String> correctKW = new Dictionary<String, String> () {
+			{"databae", "database"},
+			{"beby", "baby"},
+			{"androd", "android"},
+			{"canguan", "餐馆"},
+			{"meishi", "美食"}
+		};
 		internal static Dictionary<String, String> antetypes = new Dictionary<String, String> () {
 			{"dogs", "dog"},
 			{"houses", "house"},
@@ -432,7 +440,36 @@ namespace FTServer
 					.Append ("...");
 			}
 			return sb.ToString ();
+		}
 
+		public void correctInput (List<KeyWord> kws)
+		{
+			for (int i = 0; i < kws.Count; i++) {
+				KeyWord kw = (KeyWord)kws [i];
+				if (kw is KeyWordE) {
+					String str = kw.KWord.ToString (); 
+					if (correctKW.TryGetValue (str, out str)) {
+						if (isWord (str [0])) {
+							kw.KWord = str;
+						} else {
+							KeyWordN kwn = new KeyWordN ();
+							kwn.I = kw.I;
+							kwn.P = kw.P + 1;
+							switch (str.Length) {
+							case 1:
+								kwn.longKeyWord (str [0], (char)0, (char)0);
+								break;
+							case 2:
+								kwn.longKeyWord (str [0], str [1], (char)0);
+								break;
+							default:
+								continue;
+							}
+							kws [i] = kwn;
+						}
+					}
+				}
+			}
 		}
 	}
 
