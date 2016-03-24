@@ -47,10 +47,10 @@ namespace FTServer
 				+ "実際にはコンピューター上のあらゆる種類のファイルをバージョン管理のもとに置くことができます。",
 				//ID=3
 				"關於版本控制\n"
-				+ "什麼是版本控制？ 以及為什麼讀者會在意它？ "
+				+ "什麼是版本控制？ 以及為什麼讀者會在意它？ 美食"
 				+ "版本控制是一個能夠記錄一個或一組檔案在某一段時間的變更，"
-				+ "使得讀者以後能取回特定版本的系統。 NoSQL"
-				+ "在本書的範例中，讀者會學到如何對軟體的原始碼做版本控制。"
+				+ "使得讀者以後能取回特定版本的系統。has NoSQL"
+				+ "在本書的範例中，android 讀者會學到如何對軟體的原始碼做版本控制。"
 				+ " 即使實際上讀者幾乎可以針對電腦上任意型態的檔案做版本控制。",
 				//ID=4
 				"Git 简史\n"
@@ -97,7 +97,7 @@ namespace FTServer
 
 			using (var box = auto.Cube()) {		
 				// searchDistinct() search()
-				foreach (KeyWord kw in engine.search(box, "nosql 原始碼" )) {
+				foreach (KeyWord kw in engine.search(box, "nosql has 電 原始碼 meishi androd" )) {
 					Console.WriteLine (kw.ToFullString ());
 					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
 					Console.WriteLine ();
