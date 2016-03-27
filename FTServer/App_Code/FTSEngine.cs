@@ -205,14 +205,6 @@ namespace FTServer
 
 		private  static IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord con, bool asWord, MaxID maxId)
 		{
-			if (con != null) {
-				if (con.I > maxId.id) {
-					throw new Exception ("Unreachable");
-					//return emptySearch;
-				} else {
-					maxId.id = con.I;
-				}
-			}
 			if (kw is KeyWordE) {
 				asWord = true;
 				return new Index2KeyWordIterable<KeyWordE> (
@@ -276,7 +268,7 @@ namespace FTServer
 				this.index = findex.GetEnumerator ();
 				this.iterator = new KWIterator ();
 
-				long firstMaxId = maxId.id;
+				long currentMaxId = maxId.id;
 				KeyWord cache = null;
 				this.iterator.moveNext = () => {
 					if (con != null) {
@@ -284,8 +276,8 @@ namespace FTServer
 							return false;
 						}
 					}
-					if (firstMaxId > (maxId.id)) {
-						firstMaxId = maxId.id;
+					if (currentMaxId > (maxId.id + 1) && currentMaxId != long.MaxValue) {
+						currentMaxId = maxId.id;
 
 						IEnumerable<KeyWord> tmp = search (box, kw, con, asWord, maxId);
 						if (tmp is IIndex2KeyWordIterable) {
@@ -297,7 +289,7 @@ namespace FTServer
 
 						long osid = (long)os [1];
 						maxId.id = osid;
-						firstMaxId = maxId.id;
+						currentMaxId = maxId.id;
 
 						if (con != null) {
 							if (con.I != maxId.id) {
