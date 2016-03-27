@@ -17,12 +17,12 @@ namespace FTServer
 			KeyWord.config (config);
 		}
 
-		public bool indexText (IBox box, long id, String str, bool isRemove)
+		public long indexText (IBox box, long id, String str, bool isRemove)
 		{
 			if (id == -1) {
-				return false;
+				return -1;
 			}
-
+			long itCount = 0;
 			char[] cs = sUtil.clear (str);
 			List<KeyWord> map = util.fromString (id, cs, true);
 	 
@@ -46,10 +46,10 @@ namespace FTServer
 					} else {
 						binder.Insert ((KeyWordN)kw, 1);
 					}
-
 				}
+				itCount++;
 			}
-			return true;
+			return itCount;
 		}
 
 		public SortedSet <String> discover (IBox box,
@@ -161,14 +161,14 @@ namespace FTServer
 					kws.Add (kw);
 				}
 			}
-
-			return search (box, kws.ToArray ());
+			MaxID maxId = new MaxID ();
+			return search (box, kws.ToArray (), maxId);
 		}
 
-		private IEnumerable<KeyWord> search (IBox box, KeyWord[] kws)
+		private IEnumerable<KeyWord> search (IBox box, KeyWord[] kws, MaxID maxId)
 		{
 			if (kws.Length == 1) {
-				return search (box, kws [0], (KeyWord)null, false);
+				return search (box, kws [0], (KeyWord)null, false, maxId);
 			}
 			bool asWord = true;
 			KeyWord kwa = kws [kws.Length - 2];
@@ -180,11 +180,11 @@ namespace FTServer
 			KeyWord[] condition = new KeyWord[kws.Length - 1];
 			Array.Copy (kws, 0, condition, 0, condition.Length);
 			return search (box, kws [kws.Length - 1],
-			               search (box, condition), asWord);
+			               search (box, condition, maxId), asWord, maxId);
 		}
 
 		private IEnumerable<KeyWord> search (IBox box, KeyWord nw,
-		                                     IEnumerable<KeyWord> condition, bool isWord)
+		                                     IEnumerable<KeyWord> condition, bool isWord, MaxID maxId)
 		{
 			long r1_id = -1;
 			foreach (KeyWord r1_con in condition) {
@@ -194,57 +194,186 @@ namespace FTServer
 					}
 				}
 				r1_id = r1_con.ID; 
-				foreach (KeyWord k in search(box, nw, r1_con,isWord)) {
+				foreach (KeyWord k in search(box, nw, r1_con,isWord,maxId)) {
 					k.previous = r1_con;
 					yield return k;
 				}
 			} 
 		}
 
-		private  IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord con, bool asWord)
+		private static readonly List<KeyWord> emptySearch = new  List<KeyWord> ();
+
+		private  static IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord con, bool asWord, MaxID maxId)
 		{
-			if (kw is KeyWordE) {
-				if (con == null) {
-					return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K==?", kw.KWord));
+			if (con != null) {
+				if (con.I > maxId.id) {
+					throw new Exception ("Unreachable");
+					//return emptySearch;
 				} else {
-					return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K==? &  I==?",
-					                                                    kw.KWord, con.ID));
+					maxId.id = con.I;
 				}
+			}
+			if (kw is KeyWordE) {
+				asWord = true;
+				return new Index2KeyWordIterable<KeyWordE> (
+					box.Select<Object> ("from E where K==? & I<=?",
+				                     kw.KWord, maxId.id), box, kw, con, asWord, maxId);
 			} else { 
 				if (con is KeyWordE) {
 					asWord = true;
 				}
-				if (con == null) {
-					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==?", kw.KWord));
-				} else if (asWord) {
-					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? &  I==?",
-					                                                    kw.KWord, con.ID));
+				if (con == null || asWord) {
+					asWord = true;
+					return new Index2KeyWordIterable<KeyWordN> (
+						box.Select<Object> ("from N where K==? & I<=?",
+					                     kw.KWord, maxId.id), box, kw, con, asWord, maxId);
 				} else {
-					return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K==? & I==? & P==?",
-					                                                    kw.KWord, con.ID, (con.Position + ((KeyWordN)con).size ())));
+					Object[] os = (Object[])box ["N", kw.KWord,
+					                             con.ID, (con.Position + ((KeyWordN)con).size ())]
+						.Select<Object> ();
+					if (os != null) {
+						KeyWordN cache = new KeyWordN ();
+						cache.KWord = os [0];
+						cache.I = (long)os [1];
+						cache.P = (int)os [2];
+						List<KeyWord> r = new List<KeyWord> (1);
+						r.Add (cache);
+						return r;
+					} else {
+						return emptySearch;
+					}
 				}
 			}
 		}
 
-		private  IEnumerable<KeyWord> lessMatch (IBox box, KeyWord kw)
+		private static IEnumerable<KeyWord> lessMatch (IBox box, KeyWord kw)
 		{
 			if (kw is KeyWordE) { 
-				return Index2KeyWord<KeyWordE> (box.Select<object> ("from E where K<=? limit 0, 50", kw.KWord));				 
+				return new Index2KeyWordIterable<KeyWordE> (box.Select<object> ("from E where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID ());				 
 			} else { 				 
-				return Index2KeyWord<KeyWordN> (box.Select<object> ("from N where K<=? limit 0, 50", kw.KWord));			 
+				return new Index2KeyWordIterable<KeyWordN> (box.Select<object> ("from N where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID ());			 
 			}
 		}
 
-		private  IEnumerable<KeyWord> Index2KeyWord<T> (IEnumerable<object> src) where T:KeyWord, new()
-		{ 
-			foreach (var o in src) {  
-				T cache = new T ();
-				object[] os = (object[])o;
-				cache.KWord = os [0];
-				cache.I = (long)os [1];
-				cache.P = (int)os [2]; 
-				yield return cache;
+		private sealed class MaxID
+		{
+			public long id = long.MaxValue;
+		}
+
+		interface IIndex2KeyWordIterable
+		{
+			IEnumerator<Object> GetIndex ();
+		}
+
+		class Index2KeyWordIterable<T>	: IIndex2KeyWordIterable,IEnumerable<KeyWord> where T:KeyWord, new()
+		{
+			readonly KWIterator iterator;
+			IEnumerator<Object> index;
+
+			internal Index2KeyWordIterable (IEnumerable<Object> findex,
+			                                IBox box, KeyWord kw, KeyWord con, bool asWord, MaxID maxId)
+			{
+				this.index = findex.GetEnumerator ();
+				this.iterator = new KWIterator ();
+
+				long firstMaxId = maxId.id;
+				KeyWord cache = null;
+				this.iterator.moveNext = () => {
+					if (con != null) {
+						if (con.I != maxId.id) {
+							return false;
+						}
+					}
+					if (firstMaxId > (maxId.id)) {
+						firstMaxId = maxId.id;
+
+						IEnumerable<KeyWord> tmp = search (box, kw, con, asWord, maxId);
+						if (tmp is IIndex2KeyWordIterable) {
+							index = ((IIndex2KeyWordIterable)tmp).GetIndex ();
+						}
+					}
+					if (index.MoveNext ()) {
+						Object[] os = (Object[])index.Current;
+
+						long osid = (long)os [1];
+						maxId.id = osid;
+						firstMaxId = maxId.id;
+
+						if (con != null) {
+							if (con.I != maxId.id) {
+								return false;
+							}
+						}
+
+						cache = new T ();
+						cache.KWord = os [0];
+						cache.I = (long)os [1];
+						cache.P = (int)os [2];
+
+						return true;
+					}
+					return false;
+				};
+
+				this.iterator.current = () => {
+					return cache;
+				};
 			}
+
+			internal class KWIterator: IEnumerator<KeyWord>
+			{
+				public delegate bool MoveNextDelegate ();
+
+				public delegate KeyWord CurrentDelegate ();
+
+				public MoveNextDelegate moveNext;
+				public CurrentDelegate current;
+
+				public bool  MoveNext ()
+				{
+					return moveNext ();
+				}
+
+				public KeyWord Current {
+					get {
+						return current ();
+					}
+				}
+				#region IEnumerator implementation
+				void System.Collections.IEnumerator.Reset ()
+				{
+					 
+				}
+
+				object System.Collections.IEnumerator.Current {
+					get {
+						return this.Current;
+					}
+				}
+
+				void IDisposable.Dispose ()
+				{
+					 
+				}
+				#endregion
+			}
+
+			public IEnumerator<KeyWord> GetEnumerator ()
+			{
+				return iterator;
+			}
+			#region IEnumerable implementation
+			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+			{
+				return GetEnumerator ();
+			}
+			#endregion
+			#region IIndex2KeyWordIterable implementation
+			public IEnumerator<object> GetIndex ()
+			{
+				return index;
+			}
+			#endregion
 		}
 	}
 
