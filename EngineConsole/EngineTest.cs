@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Linq;
 using iBoxDB.LocalServer;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FTServer
 {
@@ -15,8 +15,8 @@ namespace FTServer
 		{  
 			DB.Root ("/tmp/");
 
-			iBoxDB.DBDebug.DDebug.DeleteDBFiles (1);
-			DB db = new DB (1);
+			iBoxDB.DBDebug.DDebug.DeleteDBFiles (3);
+			DB db = new DB (3);
 
 			String[] ts = new String[] {
 				//ID=0
@@ -111,17 +111,58 @@ namespace FTServer
 			auto.GetDatabase ().Close ();
 		}
 
-		public static void test_main_big ()
+		public static void test_big_n ()
+		{
+			String book = "/hero.txt";
+			long dbid = 1;
+			char split = '。';
+
+			bool rebuild = false;
+
+			String strkw = "黄蓉 郭靖 洪七公";
+			strkw = "黄蓉 郭靖";
+			strkw = "黄蓉 十八掌";
+			//strkw = "黄蓉";
+			//strkw = "时察";
+			//strkw = "的";
+			//strkw = "七十二路";
+			//strkw = "十八掌";
+			test_big (book, dbid, rebuild, split, strkw);
+		}
+
+		public static void test_big_e ()
+		{
+			String book = "/phoenix.txt";
+			long dbid = 2;
+			char split = '.';
+
+			bool rebuild = false;
+
+			String strkw = "Harry";
+			strkw = "Harry Philosopher";
+			//strkw = "Philosopher";
+			test_big (book, dbid, rebuild, split, strkw);
+		}
+
+		private static void test_big (String book, long dbid, bool rebuild,
+		                              char split, String strkw)
 		{  
 			DB.Root ("/tmp/");
 
-			iBoxDB.DBDebug.DDebug.DeleteDBFiles (1);
-			DB db = new DB (1);
+			if (rebuild) {
+				iBoxDB.DBDebug.DDebug.DeleteDBFiles (dbid);
+			}
+			DB db = new DB (dbid);
 
-			String[] ts = new String[] { 
-				File.OpenText(System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) +
-				              "/hero.txt").ReadToEnd()
-			};
+			String[] tstmp = File.OpenText (System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) +
+				book).ReadToEnd ().Split (split);
+			List<String> list = new List<String> ();
+			for (int i = 0; i < 2; i++) {
+				foreach (String str in tstmp) {
+					list.Add (str);
+				}
+			}
+			String[] ts = list.ToArray ();
 
 
 			Engine engine = new Engine ();
@@ -130,14 +171,18 @@ namespace FTServer
 			AutoBox auto = db.Open ();
 
 			var b = DateTime.Now;
-			for (int i = 0; i < ts.Length; i++) {
-				using (var box = auto.Cube()) {
-					engine.indexText (box, i, ts [i], false);
-					box.Commit ().Assert ();
-				}
+			if (rebuild) {
+				long rbcount = 0;
+		 
+				Parallel.For (0, ts.Length, (i) => {
+					using (var box = auto.Cube()) {
+						Interlocked.Add (ref rbcount, engine.indexText (box, i, ts [i], false));
+						box.Commit ().Assert ();
+					}
+				});
+			 
+				Console.WriteLine ("Index " + (DateTime.Now - b).TotalSeconds + " -" + rbcount);
 			}
-			Console.WriteLine ("Index " + (DateTime.Now - b).TotalSeconds);
-			var strkw = "黄蓉";
 
 			b = DateTime.Now;
 			int c = 0;
@@ -145,21 +190,41 @@ namespace FTServer
 				b = DateTime.Now;
 				c = 0;
 				using (var box = auto.Cube()) {				 
-					foreach (KeyWord kw in engine.search(box, strkw)) {
+					foreach (KeyWord kw in engine.searchDistinct(box, strkw)) {
 						c++;
 					}
 				}
 				Console.WriteLine (c + " , " + (DateTime.Now - b).TotalSeconds);
 			}
 
+			for (int i = 0; i < ts.Length; i++) {
+				ts [i] = ts [i].ToLower () + " ";
+			}
+			strkw = strkw.ToLower ();
+			String[] kws = strkw.Split (' ');
+			StringUtil sutil = new StringUtil ();
+
 			b = DateTime.Now;
 			c = 0;
-			int p = ts [0].IndexOf (strkw);
-			while (p > 0) {
+			int starti = 0;
+			Test:
+			for (int i = starti; i < ts.Length; i++) {
+				for (int j = 0; j < kws.Length; j++) {
+					int p = ts [i].IndexOf (kws [j]);
+					if (p < 0) {
+						starti = i + 1;
+						goto Test;
+					}
+					char pc = ts [i] [p + kws [j].Length];
+					if (sutil.isWord (pc)) {
+						//System.out.println(pc);
+						starti = i + 1;
+						goto Test;
+					}
+				}
 				c++;
-				p = ts [0].IndexOf (strkw, p + 2);
 			}
-			Console.WriteLine (c + " , " + (DateTime.Now - b).TotalSeconds);
+			Console.WriteLine (c + " , " + (DateTime.Now - b).TotalSeconds + " -" + ts.Length);
 
 			auto.GetDatabase ().Close ();
 		}
