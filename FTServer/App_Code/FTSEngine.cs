@@ -11,6 +11,7 @@ namespace FTServer
 
 		readonly Util util = new Util ();
 		readonly StringUtil sUtil = new StringUtil ();
+		public long maxSearchTime = long.MaxValue;
 
 		public void Config (DatabaseConfig config)
 		{
@@ -161,7 +162,7 @@ namespace FTServer
 					kws.Add (kw);
 				}
 			}
-			MaxID maxId = new MaxID ();
+			MaxID maxId = new MaxID (this.maxSearchTime);
 			return search (box, kws.ToArray (), maxId);
 		}
 
@@ -217,8 +218,7 @@ namespace FTServer
 				if (con == null || asWord) {
 					asWord = true;
 					return new Index2KeyWordIterable<KeyWordN> (
-						box.Select<Object> ("from N where K==? & I<=?",
-					                     kw.KWord, maxId.id), box, kw, con, asWord, maxId);
+						box.Select<Object> ("from N where K==? & I<=?", kw.KWord, maxId.id), box, kw, con, asWord, maxId);
 				} else {
 					Object[] os = (Object[])box ["N", kw.KWord,
 					                             con.ID, (con.Position + ((KeyWordN)con).size ())]
@@ -241,14 +241,20 @@ namespace FTServer
 		private static IEnumerable<KeyWord> lessMatch (IBox box, KeyWord kw)
 		{
 			if (kw is KeyWordE) { 
-				return new Index2KeyWordIterable<KeyWordE> (box.Select<object> ("from E where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID ());				 
+				return new Index2KeyWordIterable<KeyWordE> (box.Select<object> ("from E where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));				 
 			} else { 				 
-				return new Index2KeyWordIterable<KeyWordN> (box.Select<object> ("from N where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID ());			 
+				return new Index2KeyWordIterable<KeyWordN> (box.Select<object> ("from N where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));			 
 			}
 		}
 
 		private sealed class MaxID
 		{
+			public MaxID (long maxSearchTime)
+			{
+				maxTime = maxSearchTime;
+			}
+
+			public long maxTime;
 			public long id = long.MaxValue;
 		}
 
@@ -271,6 +277,9 @@ namespace FTServer
 				long currentMaxId = maxId.id;
 				KeyWord cache = null;
 				this.iterator.moveNext = () => {
+					if (maxId.id == -1) {
+						return false;
+					}
 					if (con != null) {
 						if (con.I != maxId.id) {
 							return false;
@@ -285,6 +294,11 @@ namespace FTServer
 						}
 					}
 					if (index.MoveNext ()) {
+						if (--maxId.maxTime < 0) {
+							maxId.id = -1;
+							return false;
+						}
+
 						Object[] os = (Object[])index.Current;
 
 						long osid = (long)os [1];
@@ -304,6 +318,7 @@ namespace FTServer
 
 						return true;
 					}
+					maxId.id = -1;
 					return false;
 				};
 
