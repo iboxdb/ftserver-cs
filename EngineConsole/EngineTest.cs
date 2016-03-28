@@ -120,8 +120,9 @@ namespace FTServer
 			bool rebuild = false;
 
 			String strkw = "黄蓉 郭靖 洪七公";
-			strkw = "黄蓉 郭靖";
-			strkw = "黄蓉 十八掌";
+			//strkw = "黄蓉 郭靖";
+			//strkw = "黄蓉 郭靖 时察";
+			//strkw = "黄蓉 十八掌";
 			//strkw = "黄蓉";
 			//strkw = "时察";
 			//strkw = "的";
@@ -167,6 +168,7 @@ namespace FTServer
 
 			Engine engine = new Engine ();
 			engine.Config (db.GetConfig ().DBConfig);
+			//engine.maxSearchTime = 1000;
 
 			AutoBox auto = db.Open ();
 
