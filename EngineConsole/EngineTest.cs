@@ -140,8 +140,8 @@ namespace FTServer
 			bool rebuild = false;
 
 			String strkw = "Harry";
-			strkw = "Harry Philosopher";
-			//strkw = "Philosopher";
+			//strkw = "Harry Philosopher";
+			strkw = "Philosopher";
 			test_big (book, dbid, rebuild, split, strkw);
 		}
 
