@@ -1,18 +1,18 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="App_Code/FTSEngine.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../EngineConsole/EngineTest.cs">
     <Files>
-      <File FileName="App_Code/FTSEngine.cs" Line="4" Column="7" />
-      <File FileName="../EngineConsole/EngineTest.cs" Line="123" Column="4" />
-      <File FileName="../EngineConsole/Program.cs" Line="10" Column="29" />
+      <File FileName="App_Code/FTSEngine.cs" Line="288" Column="22" />
+      <File FileName="../EngineConsole/Program.cs" Line="11" Column="32" />
+      <File FileName="../EngineConsole/EngineTest.cs" Line="129" Column="4" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="EngineConsole" expanded="True" selected="True">
+          <Node name="EngineConsole" expanded="True">
             <Node name="References" expanded="True" />
           </Node>
-          <Node name="FTServer" expanded="True">
+          <Node name="FTServer" expanded="True" selected="True">
             <Node name="App_Code" expanded="True" />
           </Node>
         </State>

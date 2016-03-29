@@ -178,9 +178,13 @@ namespace FTServer
 				CQ doc = CQ.CreateFromUrl (url);
 				//Console.WriteLine(doc.Html());
 				doc ["script"].Remove ();
-				doc ["style"].Remove ();
 				doc ["Script"].Remove ();
+
+				doc ["style"].Remove ();
 				doc ["Style"].Remove ();
+
+				doc ["textarea"].Remove ();
+				doc ["Textarea"].Remove ();
 						 
 				page.title = doc ["title"].Text ();
 				if (page.title == null) {
@@ -214,13 +218,7 @@ namespace FTServer
 				page.description = page.description.Replace ("<", " ")
 					.Replace (">", " ").Replace ("$", " ");
 
-				doc = CQ.Create (doc.Text ().Replace ("&lt;", "<")
-				            .Replace ("&gt;", ">"));
-				doc ["script"].Remove ();
-				doc ["style"].Remove ();
-				doc ["Script"].Remove ();
-				doc ["Style"].Remove ();
-
+			
 				String content = doc.Text ().Replace ("　", " ");
 				content = Regex.Replace (content, "\t|\r|\n|�|<|>", " ");
 				content = Regex.Replace (content, "\\$", " ");
