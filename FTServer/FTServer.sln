@@ -21,6 +21,6 @@ Global
 		{E68F6464-6C17-4C70-9BE8-5F7E1DDCBAA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = FTServer.csproj
+		StartupItem = ..\EngineConsole\EngineConsole.csproj
 	EndGlobalSection
 EndGlobal

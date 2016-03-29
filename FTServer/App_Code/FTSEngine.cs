@@ -311,7 +311,7 @@ namespace FTServer
 							}
 						}
 
-						cache = new T ();
+						cache = typeof(T) == typeof(KeyWordE) ? (KeyWord)new KeyWordE () : new KeyWordN ();
 						cache.KWord = os [0];
 						cache.I = (long)os [1];
 						cache.P = (int)os [2];

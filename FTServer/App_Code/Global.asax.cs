@@ -16,10 +16,10 @@ namespace FTServer
 		{
 			ServicePointManager.ServerCertificateValidationCallback
 				+= (ssender, cert, chain, sslPolicyErrors) => true;
-			ServerConfig.Default.TimeoutSeconds = 10.0;
+			ServerConfig.Default.TimeoutSeconds = 20.0;
 			bool isVM = false;
 
-			String dir = "/ftsdata52/";
+			String dir = "/ftsdata6/";
 			String path = System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) + dir;
 			try {
 				System.IO.Directory.CreateDirectory (path);
