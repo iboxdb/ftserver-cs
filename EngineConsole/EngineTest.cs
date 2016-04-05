@@ -120,10 +120,11 @@ namespace FTServer
 			bool rebuild = false;
 
 			String strkw = "黄蓉 郭靖 洪七公";
+			strkw = "黄蓉 郭靖 公";
 			//strkw = "黄蓉 郭靖";
 			//strkw = "黄蓉 郭靖 时察";
 			//strkw = "黄蓉 十八掌";
-			//strkw = "黄蓉";
+			//strkw = "郭靖 十八掌";
 			//strkw = "时察";
 			//strkw = "的";
 			//strkw = "七十二路";
@@ -140,8 +141,8 @@ namespace FTServer
 			bool rebuild = false;
 
 			String strkw = "Harry";
-			//strkw = "Harry Philosopher";
-			strkw = "Philosopher";
+			strkw = "Harry Philosopher";
+			//strkw = "Philosopher";
 			test_big (book, dbid, rebuild, split, strkw);
 		}
 

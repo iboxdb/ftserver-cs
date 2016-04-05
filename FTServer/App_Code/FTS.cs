@@ -185,6 +185,9 @@ namespace FTServer
 
 				doc ["textarea"].Remove ();
 				doc ["Textarea"].Remove ();
+
+				doc ["noscript"].Remove ();
+				doc ["Noscript"].Remove ();
 						 
 				page.title = doc ["title"].Text ();
 				if (page.title == null) {

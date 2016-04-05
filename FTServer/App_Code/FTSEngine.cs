@@ -35,17 +35,17 @@ namespace FTServer
 						continue;
 					}
 					words.Add (kw.KWord.ToString ());
-					binder = box ["E", kw.KWord, kw.ID, kw.Position];
+					binder = box ["/E", kw.KWord, kw.ID, kw.Position];
 				} else { 
-					binder = box ["N", kw.KWord, kw.ID, kw.Position];
+					binder = box ["/N", kw.KWord, kw.ID, kw.Position];
 				}
 				if (isRemove) {
 					binder.Delete ();
 				} else {
-					if (binder.TableName == "E") {
-						binder.Insert ((KeyWordE)kw, 1);
+					if (binder.TableName == "/E") {
+						binder.Insert ((KeyWordE)kw);
 					} else {
-						binder.Insert ((KeyWordN)kw, 1);
+						binder.Insert ((KeyWordN)kw);
 					}
 				}
 				itCount++;
@@ -209,7 +209,7 @@ namespace FTServer
 			if (kw is KeyWordE) {
 				asWord = true;
 				return new Index2KeyWordIterable<KeyWordE> (
-					box.Select<Object> ("from E where K==? & I<=?",
+					box.Select<Object> ("from /E where K==? & I<=?",
 				                     kw.KWord, maxId.id), box, kw, con, asWord, maxId);
 			} else { 
 				if (con is KeyWordE) {
@@ -218,9 +218,9 @@ namespace FTServer
 				if (con == null || asWord) {
 					asWord = true;
 					return new Index2KeyWordIterable<KeyWordN> (
-						box.Select<Object> ("from N where K==? & I<=?", kw.KWord, maxId.id), box, kw, con, asWord, maxId);
+						box.Select<Object> ("from /N where K==? & I<=?", kw.KWord, maxId.id), box, kw, con, asWord, maxId);
 				} else {
-					Object[] os = (Object[])box ["N", kw.KWord,
+					Object[] os = (Object[])box ["/N", kw.KWord,
 					                             con.ID, (con.Position + ((KeyWordN)con).size ())]
 						.Select<Object> ();
 					if (os != null) {
@@ -241,9 +241,9 @@ namespace FTServer
 		private static IEnumerable<KeyWord> lessMatch (IBox box, KeyWord kw)
 		{
 			if (kw is KeyWordE) { 
-				return new Index2KeyWordIterable<KeyWordE> (box.Select<object> ("from E where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));				 
+				return new Index2KeyWordIterable<KeyWordE> (box.Select<object> ("from /E where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));				 
 			} else { 				 
-				return new Index2KeyWordIterable<KeyWordN> (box.Select<object> ("from N where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));			 
+				return new Index2KeyWordIterable<KeyWordN> (box.Select<object> ("from /N where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));			 
 			}
 		}
 
@@ -617,10 +617,10 @@ namespace FTServer
 		public static void config (DatabaseConfig c)
 		{
 			// English Language or Word (max=16)              
-			c.EnsureTable<KeyWordE> ("E", "K(" + MAX_WORD_LENGTH + ")", "I", "P");
+			c.EnsureTable<KeyWordE> ("/E", "K(" + MAX_WORD_LENGTH + ")", "I", "P");
 
 			// Non-English Language or Character
-			c.EnsureTable<KeyWordN> ("N", "K", "I", "P");
+			c.EnsureTable<KeyWordN> ("/N", "K", "I", "P");
 
 		}
 
