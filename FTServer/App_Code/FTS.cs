@@ -15,21 +15,18 @@ namespace FTServer
 		public static ConcurrentQueue<String> urlList
 			= new ConcurrentQueue<String> ();
 		public readonly static Engine engine = new Engine ();
+		public static int commitCount = 200;
 
 		public static String indexText (String name, bool isDelete)
 		{
-
 			String url = getUrl (name);
-
-			using (var box = SDB.search_db.Cube()) {
-				foreach (Page p in box.Select<Page>( "from Page where url==?", url)) {
-					engine.indexText (box, p.id, p.content.ToString (), true);
-					engine.indexText (box, p.rankUpId (), p.rankUpDescription (), true);
-					box ["Page", p.id].Delete ();
-					break;
-				}
-				box.Commit ().Assert ();
+					 
+			foreach (Page p in SDB.search_db.Select<Page>( "from Page where url==?", url)) {
+				engine.indexTextNoTran (SDB.search_db, commitCount, p.id, p.content.ToString (), true);
+				engine.indexTextNoTran (SDB.search_db, commitCount, p.rankUpId (), p.rankUpDescription (), true);
+				SDB.search_db.Delete ("Page", p.id);				 
 			}
+		 
 			if (isDelete) {
 				return "deleted";
 			}
@@ -37,15 +34,12 @@ namespace FTServer
 				Page p = Page.Get (url);
 				if (p == null) {
 					return "temporarily unreachable";
-				} else {
-					using (var box = SDB.search_db.Cube()) {
-						p.id = box.NewId ();
-						box ["Page"].Insert (p);
-						engine.indexText (box, p.id, p.content.ToString (), false);
-						engine.indexText (box, p.rankUpId (), p.rankUpDescription (), false);
-						CommitResult cr = box.Commit ();
-						cr.Assert (cr.GetErrorMsg (box));
-					}
+				} else {				 
+					p.id = SDB.search_db.NewId ();
+					SDB.search_db.Insert ("Page", p);
+					engine.indexTextNoTran (SDB.search_db, commitCount, p.id, p.content.ToString (), false);
+					engine.indexTextNoTran (SDB.search_db, commitCount, p.rankUpId (), p.rankUpDescription (), false);
+			 
 					urlList.Enqueue (p.url);
 					while (urlList.Count > 3) {
 						String t;

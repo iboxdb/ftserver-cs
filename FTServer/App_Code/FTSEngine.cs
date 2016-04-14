@@ -29,28 +29,63 @@ namespace FTServer
 	 
 			HashSet<String> words = new HashSet<String> ();
 			foreach (KeyWord kw in map) {
-				Binder binder;
-				if (kw is KeyWordE) {
-					if (words.Contains (kw.KWord.ToString ())) {
-						continue;
-					}
-					words.Add (kw.KWord.ToString ());
-					binder = box ["/E", kw.KWord, kw.ID, kw.Position];
-				} else { 
-					binder = box ["/N", kw.KWord, kw.ID, kw.Position];
-				}
-				if (isRemove) {
-					binder.Delete ();
-				} else {
-					if (binder.TableName == "/E") {
-						binder.Insert ((KeyWordE)kw);
-					} else {
-						binder.Insert ((KeyWordN)kw);
-					}
-				}
+				insertToBox (box, kw, words, isRemove);
 				itCount++;
 			}
 			return itCount;
+		}
+
+		public long indexTextNoTran (AutoBox auto, int commitCount, long id, String str, bool isRemove)
+		{
+			if (id == -1) {
+				return -1;
+			}
+			long itCount = 0;
+			char[] cs = sUtil.clear (str);
+			List<KeyWord> map = util.fromString (id, cs, true);
+
+			HashSet<String> words = new HashSet<String> ();
+			IBox box = null;
+			int ccount = 0;
+			foreach (KeyWord kw in map) {
+				if (box == null) {
+					box = auto.Cube ();
+					ccount = commitCount;
+				}
+				insertToBox (box, kw, words, isRemove);
+				itCount++;
+				if (--ccount < 1) {
+					box.Commit ().Assert ();
+					box = null;
+				}
+			}
+			if (box != null) {
+				box.Commit ().Assert ();
+			}
+			return itCount;
+		}
+
+		static void insertToBox (IBox box, KeyWord kw, HashSet<String> insertedWords, bool isRemove)
+		{
+			Binder binder;
+			if (kw is KeyWordE) {
+				if (insertedWords.Contains (kw.KWord.ToString ())) {
+					return;
+				}
+				insertedWords.Add (kw.KWord.ToString ());
+				binder = box ["/E", kw.KWord, kw.ID, kw.Position];
+			} else {
+				binder = box ["/N", kw.KWord, kw.ID, kw.Position];
+			}
+			if (isRemove) {
+				binder.Delete ();
+			} else {
+				if (binder.TableName == "/E") {
+					binder.Insert ((KeyWordE)kw);
+				} else {
+					binder.Insert ((KeyWordN)kw);
+				}
+			}
 		}
 
 		public SortedSet <String> discover (IBox box,
