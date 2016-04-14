@@ -15,8 +15,6 @@ namespace FTServer
 		{  
 			DB.Root ("/tmp/");
 
-			iBoxDB.DBDebug.DDebug.DeleteDBFiles (3);
-			DB db = new DB (3);
 
 			String[] ts = new String[] {
 				//ID=0
@@ -74,41 +72,48 @@ namespace FTServer
 				"누가 문제를 일으켰는지도 추적할 수 있고, 누가 언제 만들어낸 이슈인지도 알 수 있다. VCS를 사용하면 파일을 잃어버리거나" +
 				"잘못 고쳤을 때도 쉽게 복구할 수 있다. HAS GIT 이런 모든 장점을 큰 노력 없이 이용할 수 있다."
 			};
+			for (int tran = 0; tran < 2; tran++) {
+				iBoxDB.DBDebug.DDebug.DeleteDBFiles (3);
+				DB db = new DB (3);
+				Engine engine = new Engine ();
+				engine.Config (db.GetConfig ().DBConfig);
+
+				AutoBox auto = db.Open ();
 
 
-			Engine engine = new Engine ();
-			engine.Config (db.GetConfig ().DBConfig);
+				for (int i = 0; i < ts.Length; i++) {
+					if (tran == 0) {
+						using (var box = auto.Cube()) {
+							engine.indexText (box, i, ts [i], false);
+							box.Commit ().Assert ();
+						}
+					} else {
+						engine.indexTextNoTran (auto, 3, i, ts [i], false);
+					}
+				}
 
-			AutoBox auto = db.Open ();
-
-
-			for (int i = 0; i < ts.Length; i++) {
 				using (var box = auto.Cube()) {
-					engine.indexText (box, i, ts [i], false);
+		
+					//engine.indexText(box, 4, ts[4], true);
 					box.Commit ().Assert ();
 				}
-			}
 
-			using (var box = auto.Cube()) {
-		
-				//engine.indexText(box, 4, ts[4], true);
-				box.Commit ().Assert ();
-			}
-
-			using (var box = auto.Cube()) {		
-				// searchDistinct() search()
-				foreach (KeyWord kw in engine.search(box, "nosql has 電 原始碼 meishi androd" )) {
-					Console.WriteLine (kw.ToFullString ());
-					Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
-					Console.WriteLine ();
-				}
-				foreach (String skw in engine.discover(box,
+				using (var box = auto.Cube()) {		
+					// searchDistinct() search()
+					foreach (KeyWord kw in engine.search(box, "nosql has 電 原始碼 meishi androd" )) {
+						Console.WriteLine (kw.ToFullString ());
+						Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
+						Console.WriteLine ();
+					}
+					foreach (String skw in engine.discover(box,
 				                                  'n', 's', 2,
 				                                  '\u2E80', '\u9fa5', 2)) {
-					Console.WriteLine (skw);
-				}
-			} 
-			auto.GetDatabase ().Close ();
+						Console.WriteLine (skw);
+					}
+				} 
+				auto.GetDatabase ().Close ();
+				Console.WriteLine ("----------------------------------");
+			}
 		}
 
 		public static void test_big_n ()
@@ -117,10 +122,10 @@ namespace FTServer
 			long dbid = 1;
 			char split = '。';
 
-			bool rebuild = false;
-
+			bool rebuild = true;
+			int notranCount = 10;
 			String strkw = "黄蓉 郭靖 洪七公";
-			strkw = "黄蓉 郭靖 公";
+			//strkw = "黄蓉 郭靖 公";
 			//strkw = "黄蓉 郭靖";
 			//strkw = "黄蓉 郭靖 时察";
 			//strkw = "黄蓉 十八掌";
@@ -129,7 +134,7 @@ namespace FTServer
 			//strkw = "的";
 			//strkw = "七十二路";
 			//strkw = "十八掌";
-			test_big (book, dbid, rebuild, split, strkw);
+			test_big (book, dbid, rebuild, split, strkw, notranCount);
 		}
 
 		public static void test_big_e ()
@@ -138,16 +143,17 @@ namespace FTServer
 			long dbid = 2;
 			char split = '.';
 
-			bool rebuild = false;
+			bool rebuild = true;
+			int notranCount = 10;
 
 			String strkw = "Harry";
 			strkw = "Harry Philosopher";
 			//strkw = "Philosopher";
-			test_big (book, dbid, rebuild, split, strkw);
+			test_big (book, dbid, rebuild, split, strkw, notranCount);
 		}
 
 		private static void test_big (String book, long dbid, bool rebuild,
-		                              char split, String strkw)
+		                              char split, String strkw, int notranCount)
 		{  
 			DB.Root ("/tmp/");
 
@@ -178,9 +184,13 @@ namespace FTServer
 				long rbcount = 0;
 		 
 				Parallel.For (0, ts.Length, (i) => {
-					using (var box = auto.Cube()) {
-						Interlocked.Add (ref rbcount, engine.indexText (box, i, ts [i], false));
-						box.Commit ().Assert ();
+					if (notranCount < 1) {
+						using (var box = auto.Cube()) {
+							Interlocked.Add (ref rbcount, engine.indexText (box, i, ts [i], false));
+							box.Commit ().Assert ();
+						}
+					} else {
+						Interlocked.Add (ref rbcount, engine.indexTextNoTran (auto, notranCount, i, ts [i], false));
 					}
 				});
 			 
