@@ -58,6 +58,8 @@ public static bool IsAdvertisingId(long id)
 
 the Page.GetRandomContent() method is used to keep the Search-Page-Content always changing, doesn't affect the real page order.
 
+if you have many pages(>100,000),  use the ID number to control the order instead of loading all pages to memory.
+
 
 #### the Page and the Index -Process flow
 
