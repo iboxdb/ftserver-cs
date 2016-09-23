@@ -84,6 +84,9 @@ namespace FTServer
 			if (isVM) {
 				server.GetConfig ().DBConfig.CacheLength
                 = server.GetConfig ().DBConfig.MB (16);
+			} else {
+				server.GetConfig ().DBConfig.CacheLength
+					= server.GetConfig ().DBConfig.MB (512);
 			}
 			server.GetConfig ().DBConfig.SwapFileBuffer
 				= (int)server.GetConfig ().DBConfig.MB (4);

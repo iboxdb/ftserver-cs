@@ -24,7 +24,7 @@
             }
         </style> 
         <script>
-            function hightlight() {
+            function highlight() {
                 var txt = document.title.substr(0, document.title.indexOf(','));
 
                 var ts = document.getElementsByClassName("stext");
@@ -52,7 +52,7 @@
             }
         </script>
     </head>
-    <body onload="hightlight()"> 
+    <body onload="highlight()"> 
         <div class="ui left aligned grid">
             <div class="column"  style="max-width: 600px;"> 
                 <form class="ui large form"  action="s.aspx" onsubmit="formsubmit()">

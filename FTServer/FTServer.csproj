@@ -35,12 +35,12 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="iBoxDB.NET2">
-      <HintPath>..\..\Downloads\iBoxDBv281_231 %281%29\Lib\NetDB\NET2\iBoxDB.NET2.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="CsQuery">
-      <HintPath>..\..\Downloads\CsQuery.dll</HintPath>
+      <HintPath>bin\CsQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="iBoxDB.NET2">
+      <HintPath>bin\iBoxDB.NET2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
