@@ -51,3 +51,28 @@ public long rankDownId(long id)
 
 
 the Page.GetRandomContent() method is used to keep the Search-Page-Content always changing, doesn't affect the real page order.
+
+
+#### the Page and the Index -Process flow
+
+When Insert
+
+1.insert page --> 2.insert index
+````
+DB.Insert ("Page", page);
+Engine.IndexTextNoTran( IsRemove = false );
+...IndexTextNoTran...
+````
+
+
+When Delete  
+
+1.delete index --> 2.delete page
+````
+Engine.IndexTextNoTran( IsRemove = true );
+...IndexTextNoTran...
+DB.Delete("Page", page.Id);
+````				
+
+
+
