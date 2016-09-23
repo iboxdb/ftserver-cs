@@ -7,8 +7,7 @@ namespace FTServer
 	public class AspxMethods
 	{
 		public AspxMethods ()
-		{
-		
+		{		
 		}
 	}
 }
