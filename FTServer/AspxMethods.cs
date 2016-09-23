@@ -8,7 +8,6 @@ namespace FTServer
 	{
 		public AspxMethods ()
 		{	
-
 		}
 	}
 }
