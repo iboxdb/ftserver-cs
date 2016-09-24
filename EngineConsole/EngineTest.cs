@@ -11,6 +11,51 @@ namespace FTServer
 	public class EngineTest
 	{
 
+		public static void test_order ()
+		{  
+			DB.Root ("/tmp/");
+
+	
+			iBoxDB.DBDebug.DDebug.DeleteDBFiles (3);
+			DB db = new DB (3);
+			Engine engine = new Engine ();
+			engine.Config (db.GetConfig ().DBConfig);
+
+			AutoBox auto = db.Open ();
+
+			int count = 100;
+			String[] ts = new String[count];
+			for (int i = 0; i < count; i++) {
+				ts [i] = "test " + i;
+			}
+			for (int i = 0; i < ts.Length; i++) {
+				using (IBox box = auto.Cube()) {
+					engine.indexText (box, i, ts [i], false);
+					box.Commit ().Assert ();
+				}
+			}
+
+			bool doagain = true;
+			long startId = long.MaxValue;
+			long tcount = 0;
+			while (doagain && (startId >= 0)) {
+				doagain = false;
+				using (IBox box = auto.Cube()) {
+					foreach (KeyWord kw in engine.searchDistinct(box, "test", startId, 9)) {
+						Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
+						tcount++;
+						doagain = true;
+						startId = kw.ID - 1;
+					}
+				}
+				Console.WriteLine ();
+				Console.WriteLine (startId);
+			}
+			Console.WriteLine (count + " == " + tcount);
+			auto.GetDatabase ().Close ();
+			 
+		}
+
 		public static void test_main ()
 		{  
 			DB.Root ("/tmp/");
