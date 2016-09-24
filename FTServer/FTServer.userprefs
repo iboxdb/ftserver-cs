@@ -1,13 +1,14 @@
 ﻿<Properties GitUserInfo="UsingGIT">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
   <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True">
+        <State expanded="True" selected="True">
           <Node name="EngineConsole" expanded="True">
             <Node name="References" expanded="True" />
           </Node>
-          <Node name="FTServer" expanded="True" selected="True">
+          <Node name="FTServer" expanded="True">
+            <Node name="References" expanded="True" />
             <Node name="App_Code" expanded="True" />
           </Node>
         </State>

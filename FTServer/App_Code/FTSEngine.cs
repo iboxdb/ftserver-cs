@@ -140,12 +140,21 @@ namespace FTServer
 
 		public IEnumerable<KeyWord> searchDistinct (IBox box, String str)
 		{
+			return searchDistinct (box, str, long.MaxValue, long.MaxValue);
+		}
+
+		public IEnumerable<KeyWord> searchDistinct (IBox box, String str, long startId, long len)
+		{
 			long c_id = -1;
-			foreach (KeyWord kw in search(box, str)) {
+			foreach (KeyWord kw in search(box, str,startId)) {
+				if (len < 1) {
+					break;
+				}
 				if (kw.ID == c_id) {
 					continue;
 				}
 				c_id = kw.ID;
+				len--;
 				yield return kw;
 			}			 
 		}
@@ -157,6 +166,14 @@ namespace FTServer
 
 		public IEnumerable<KeyWord> search (IBox box, String str)
 		{
+			return search (box, str, long.MaxValue);
+		}
+
+		public IEnumerable<KeyWord> search (IBox box, String str, long startId)
+		{
+			if (startId < 0) {
+				return new List<KeyWord> ();
+			}
 			char[] cs = sUtil.clear (str);
 			List<KeyWord> map = util.fromString (-1, cs, false);
 			sUtil.correctInput (map);
@@ -198,6 +215,7 @@ namespace FTServer
 				}
 			}
 			MaxID maxId = new MaxID (this.maxSearchTime);
+			maxId.id = startId;
 			return search (box, kws.ToArray (), maxId);
 		}
 
