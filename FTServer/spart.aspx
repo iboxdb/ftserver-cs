@@ -1,8 +1,11 @@
 <%@ Page Language="C#" Inherits="FTServer.spart" EnableSessionState="false" Async="true" AsyncTimeOut="30"%>
 <%@ import namespace="FTServer" %>
- <% foreach (var p in pages) {
+
+<div id="ldiv<%= startId%>">
+ <% 
+                     foreach (var p in pages) {
                         String content = null;
-                        if (pages.Count == 1 || p.keyWord == null) {
+                        if ( (pages.Count == 1 && isFirstLoad)|| p.keyWord == null) {
                         	content = p.description + "...";
                             content += p.content.ToString();
                         } else if (p.id != p.keyWord.ID) {
@@ -23,15 +26,15 @@
                             }
                            
                         }
-                %>
+%>
 <h3>
  <a class="stext" target="_blank"   href="<%= p.url%>" ><%= p.title%></a></h3> 
 <span class="stext"> <%=content%> </span>
  <div class="gt">
-        <%=p.url%>
+        <%=p.url%>  
 </div>                
                 <% }%>
-
+</div>
                 
  <div class="ui teal message" id="s<%= startId%>">
     <%

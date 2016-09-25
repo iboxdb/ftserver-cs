@@ -14,7 +14,7 @@ namespace FTServer
 		protected DateTime begin;
 		protected readonly long pageCount = 12;
 		protected long startId = long.MaxValue;
-
+		protected bool isFirstLoad ;
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e); 
@@ -25,6 +25,7 @@ namespace FTServer
 			if (!string.IsNullOrEmpty(temps)) {
 				startId = long.Parse (temps);
 			}
+			isFirstLoad = startId == long.MaxValue;
 
 			pages = new List<FTServer.Page> ();			
 

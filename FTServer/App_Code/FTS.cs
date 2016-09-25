@@ -166,8 +166,9 @@ namespace FTServer
 				Page page = new Page ();
 				page.url = url;
 
-			 
-				CQ doc = CQ.CreateFromUrl (url);
+			  
+				CQ doc = CQ.CreateFromUrl (url);// GZIP ??
+
 				//Console.WriteLine(doc.Html());
 				doc ["script"].Remove ();
 				doc ["Script"].Remove ();
