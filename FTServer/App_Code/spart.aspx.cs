@@ -18,6 +18,10 @@ namespace FTServer
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e); 
+			Response.Expires = 0;
+			Response.CacheControl = "no-cache";
+			Response.AppendHeader("Pragma", "No-Cache");
+
 			name = Request ["q"];
 			name = name.Trim ();
 

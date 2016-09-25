@@ -12,6 +12,9 @@ namespace FTServer
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
+			Response.Expires = 0;
+			Response.CacheControl = "no-cache";
+			Response.AppendHeader("Pragma", "No-Cache");
 
 			queryString = Request.RawUrl.Substring (Request.RawUrl.IndexOf ("?") + 1);
 			name = Request ["q"];
