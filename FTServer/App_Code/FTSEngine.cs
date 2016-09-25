@@ -142,7 +142,7 @@ namespace FTServer
 		{
 			return searchDistinct (box, str, long.MaxValue, long.MaxValue);
 		}
-
+		// startId -> descending order
 		public IEnumerable<KeyWord> searchDistinct (IBox box, String str, long startId, long len)
 		{
 			long c_id = -1;

@@ -200,6 +200,10 @@ namespace FTServer
 					.Replace (">", " ").Replace ("$", " ");
 				doc ["title"].Remove ();
 				doc ["Title"].Remove ();
+				if (page.title.Contains ("�")) {
+					//encode ??
+					return null;
+				}
 
 				page.description = doc ["meta[name='description']"].Attr ("content");
 				if (page.description == null) {
