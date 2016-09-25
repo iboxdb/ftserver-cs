@@ -38,13 +38,8 @@ namespace FTServer
 					p.id = SDB.search_db.NewId ();
 					SDB.search_db.Insert ("Page", p);
 					engine.indexTextNoTran (SDB.search_db, commitCount, p.id, p.content.ToString (), false);
-					engine.indexTextNoTran (SDB.search_db, commitCount, p.rankUpId (), p.rankUpDescription (), false);
-			 
-					urlList.Enqueue (p.url);
-					while (urlList.Count > 3) {
-						String t;
-						urlList.TryDequeue (out t);
-					}
+					engine.indexTextNoTran (SDB.search_db, commitCount, p.rankUpId (), p.rankUpDescription (), false);			 
+				
 					return p.url;
 				}
 			}

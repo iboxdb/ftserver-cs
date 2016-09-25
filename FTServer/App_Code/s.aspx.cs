@@ -7,23 +7,15 @@ namespace FTServer
 	public partial class s : System.Web.UI.Page
 	{
 		protected string name;
-		protected List<Page> pages;
-
-		protected DateTime begin;
+		protected string queryString; 
 
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
 
+			queryString = Request.RawUrl.Substring (Request.RawUrl.IndexOf ("?") + 1);
 			name = Request ["q"];
-
-			if (name.Length > 500) {
-				name = "";
-				return;
-			}
-			name = name.Replace ("<", " ").Replace (">", " ")
-				.Replace ("\"", " ").Replace (",", " ")
-					.Replace ("\\$", " ").Trim ();
+			name = name.Trim ();
 
 			bool? isdelete = null;
 
@@ -34,43 +26,19 @@ namespace FTServer
 				isdelete = true;
 			}
 			if (!isdelete.HasValue) {
-				SearchResource.searchList.Enqueue (name);
+				SearchResource.searchList.Enqueue (name.Replace("<",""));
 				while (SearchResource.searchList.Count > 15) {
 					String t;
 					SearchResource.searchList.TryDequeue (out t);
 				}
 			} else {
 				name = SearchResource.indexText (name, isdelete.Value);
-				System.GC.Collect ();
-			}
-
-			pages = new List<Page> ();			
-		 
-			begin = DateTime.Now;
-
-		
-			using (var box = SDB.search_db.Cube()) {
-				foreach (KeyWord kw in SearchResource.engine.searchDistinct(box, name)) {
-					long id = kw.ID;
-					id = FTServer.Page.rankDownId (id);
-					Page p = box ["Page", id].Select<Page> ();
-					p.keyWord = kw;
-					pages.Add (p);
-					if (pages.Count > 100) {
-						break;
-					}
+				SearchResource.urlList.Enqueue (name.Replace("<",""));
+				while (SearchResource.urlList.Count > 3) {
+					String t;
+					SearchResource.urlList.TryDequeue (out t);
 				}
-			}  
-
-			if (pages.Count == 0) {
-				Page p = new Page ();
-				p.title = "NotFound";
-				p.description = "";
-				p.content = "input URL to index";
-				p.url = "./";
-				pages.Add (p);
 			}
-
 
 		}
 	}

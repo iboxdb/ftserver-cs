@@ -19,11 +19,11 @@ namespace FTServer
 			ServerConfig.Default.TimeoutSeconds = 20.0;
 			bool isVM = false;
 
-			String dir = "/ftsdata7/";
+			String dir = "/ftsdata8/";
 			String path = System.Environment.GetFolderPath (Environment.SpecialFolder.Personal) + dir;
 			try {
 				System.IO.Directory.CreateDirectory (path);
-			} catch (UnauthorizedAccessException ex) {
+			} catch (UnauthorizedAccessException) {
 				isVM = true;
 				path = this.Server.MapPath (dir);
 				System.IO.Directory.CreateDirectory (path);

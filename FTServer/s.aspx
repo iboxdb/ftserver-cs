@@ -4,8 +4,8 @@
 <html>
     <head>        
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <meta name="description" content="<%=name%> what is? iBoxDB NoSQL Database Full Text Search">
-        <title><%=name%>, what is? iBoxDB Full Text Search</title>
+        <meta name="description" content="<%=name%> what is? iBoxDB NoSQL Document Database Full Text Search FTS">
+        <title><%=name%>, what is? iBoxDB NoSQL Document Database Full Text Search</title>
 
         <link rel="stylesheet" type="text/css" href="css/semantic.min.css"> 
 
@@ -22,12 +22,17 @@
             .rt{
                 color: red;
             }
+            .gt{
+                color: green;
+            }
         </style> 
         <script>
-            function highlight() {
+            function highlight(loadedDivId) {
+
                 var txt = document.title.substr(0, document.title.indexOf(','));
 
-                var ts = document.getElementsByClassName("stext");
+                var div = document.getElementById(loadedDivId);
+                var ts = div.getElementsByClassName("stext");
 
                 var kws = txt.split(/[ 　]/);
                 for (var i = 0; i < kws.length; i++) {
@@ -51,8 +56,51 @@
                 }
             }
         </script>
+        <script>
+            var div_load = null;
+            document.addEventListener("scroll", function () {
+                scroll_event();
+            });
+            function onscroll_loaddiv(divid, startId) {
+                div_load = document.getElementById(divid);
+                div_load.startId = startId;
+                scroll_event();
+            }
+            function scroll_event() {
+                if (div_load !== null) {
+                    var top = div_load.getBoundingClientRect().top;
+                    var se = document.documentElement.clientHeight;
+                    if (top <= se) {
+                        var startId = div_load.startId;
+                        div_load = null;
+                        var xhr = new XMLHttpRequest();
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == XMLHttpRequest.DONE) {
+                                var html = xhr.responseText;
+
+                                var frag = document.createElement("div");
+                                frag.innerHTML = html;
+                                var maindiv = document.getElementById('maindiv');
+                                maindiv.appendChild(frag);
+
+                                var ss = frag.getElementsByTagName("script");
+                                for (var i = 0; i < ss.length; i++) {
+                                    eval(ss[i].innerHTML);
+                                }
+                            }
+                        }
+                        var url = "spart.aspx?<%= queryString %>" + "&s=" + startId;
+                        xhr.open('GET', url, true);
+                        xhr.send(null);
+                    }
+                }
+            }
+            function onload_event(){
+               onscroll_loaddiv('maindiv',  '<%=long.MaxValue %>' );
+            }
+        </script>
     </head>
-    <body onload="highlight()"> 
+    <body onload="onload_event()" >
         <div class="ui left aligned grid">
             <div class="column"  style="max-width: 600px;"> 
                 <form class="ui large form"  action="s.aspx" onsubmit="formsubmit()">
@@ -77,51 +125,20 @@
         </div>
 
         <div class="ui grid">
-            <div class="ten wide column" style="max-width: 600px;">
-                <% foreach (var p in pages) {
-                        String content = null;
-                        if (pages.Count == 1 || p.keyWord == null) {
-                        	content = p.description + "...";
-                            content += p.content.ToString();
-                        } else if (p.id != p.keyWord.ID) {
-                            content = p.description;
-                            if (content.Length < 20) {
-                                content += p.getRandomContent();
-                            }
-                        } else {
-                            content = SearchResource.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
-                            if (content.Length < 100) {
-                                content += p.getRandomContent();
-                            }
-                            if (content.Length < 100) {
-                                content += p.description;
-                            }
-                            if (content.Length > 200) {
-                                content = content.Substring(0, 200) + "..";
-                            }
-                        }
-                %>
-                <h3>
-                    <a class="stext" target="_blank"   href="<%=p.url%>" ><%= p.title%></a></h3> 
-                <span class="stext"> <%=content%> </span>
-                <% }%>
-
+            <div class="ten wide column" style="max-width: 600px;" id="maindiv">
+               
 
             </div>
             <div class="six wide column" style="max-width: 200px;">
+
                 <div class="ui segment">
                     <h4><a href="http://www.iboxdb.com" target="_blank">iBoxDB</a></h4> 
                     Fast NoSQL Document Database
                 </div>
-                
-                <%
-                    String tcontent = (DateTime.Now - begin).TotalSeconds + "s, "
-                            + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
-                %>
+
                 <div class="ui segment">
-                    <h4>Time</h4> 
-                    <%= tcontent%>
-                </div>
+                    <h4>Full Text Search</h4> 
+                </div> 
 
 
             </div>

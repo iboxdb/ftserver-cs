@@ -49,8 +49,8 @@
     <Content Include="Default.aspx" />
     <Content Include="css\semantic.min.css" />
     <Content Include="css\themes\default\assets\images\flags.png" />
-    <Content Include="App_Code\Global.asax.cs" />
     <Content Include="s.aspx" />
+    <Content Include="spart.aspx" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
@@ -66,7 +66,6 @@
     <Folder Include="css\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App_Code\FTSEngine.cs" />
     <None Include="css\themes\basic\assets\fonts\icons.eot" />
     <None Include="css\themes\basic\assets\fonts\icons.svg" />
     <None Include="css\themes\basic\assets\fonts\icons.ttf" />
@@ -77,8 +76,11 @@
     <None Include="css\themes\default\assets\fonts\icons.ttf" />
     <None Include="css\themes\default\assets\fonts\icons.woff" />
     <None Include="css\themes\default\assets\fonts\icons.woff2" />
+    <None Include="App_Code\Global.asax.cs" />
+    <None Include="App_Code\FTSEngine.cs" />
     <None Include="App_Code\FTS.cs" />
     <None Include="App_Code\s.aspx.cs" />
+    <None Include="App_Code\spart.aspx.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AspxMethods.cs" />
