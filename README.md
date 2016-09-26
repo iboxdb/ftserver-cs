@@ -84,7 +84,7 @@ DB.Delete("Page", page.Id);
 
 
 #### Known Issues
-if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the Engine.IndexTextNoTran() to be unexpected. a test sample in IndexTextNoTran()
+1: if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the Engine.IndexTextNoTran() to be unexpected. a test sample in IndexTextNoTran()
 ````
 if (--ccount < 1) {
 	runCount++
@@ -95,4 +95,8 @@ if (--ccount < 1) {
 "Without Debugging" the runCount is 9, and "start Debugging" only get 1.
 
 
-
+2: some characters need to be encoded.
+````
+  <a href="s.aspx?q=基础"></a> 
+  s.aspx?q=%E5%9F%BA%E7%A1%80
+````
