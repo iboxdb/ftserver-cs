@@ -95,7 +95,7 @@ if (--ccount < 1) {
 "Without Debugging" the runCount is 9, and "start Debugging" only get 1.
 
 
-2: some characters need to be encoded.
+2: encode characters.
 ````
   <a href="s.aspx?q=..."></a> 
   s.aspx?q=%E5%9F%BA%E7%A1%80
