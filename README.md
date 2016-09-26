@@ -97,6 +97,6 @@ if (--ccount < 1) {
 
 2: some characters need to be encoded.
 ````
-  <a href="s.aspx?q=基础"></a> 
+  <a href="s.aspx?q=..."></a> 
   s.aspx?q=%E5%9F%BA%E7%A1%80
 ````
