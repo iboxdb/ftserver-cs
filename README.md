@@ -83,7 +83,7 @@ DB.Delete("Page", page.Id);
 ````				
 
 
-#### Common Issues
+#### Known Issues
 if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the Engine.IndexTextNoTran() to be unexpected. a test sample in IndexTextNoTran()
 ````
 if (--ccount < 1) {
