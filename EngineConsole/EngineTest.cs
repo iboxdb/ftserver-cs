@@ -42,10 +42,10 @@ namespace FTServer
 				doagain = false;
 				using (IBox box = auto.Cube()) {
 					foreach (KeyWord kw in engine.searchDistinct(box, "test", startId, 9)) {
-						Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
+						Console.WriteLine (engine.getDesc (ts [(int)kw.getID()], kw, 20));
 						tcount++;
 						doagain = true;
-						startId = kw.ID - 1;
+						startId = kw.getID() - 1;
 					}
 				}
 				Console.WriteLine ();
@@ -145,9 +145,9 @@ namespace FTServer
 
 				using (var box = auto.Cube()) {		
 					// searchDistinct() search()
-					foreach (KeyWord kw in engine.search(box, "nosql has 電 原始碼 meishi androd" )) {
+					foreach (KeyWord kw in engine.search(box, "nosql has 電 原始碼" )) {
 						Console.WriteLine (kw.ToFullString ());
-						Console.WriteLine (engine.getDesc (ts [(int)kw.ID], kw, 20));
+						Console.WriteLine (engine.getDesc (ts [(int)kw.getID()], kw, 20));
 						Console.WriteLine ();
 					}
 					foreach (String skw in engine.discover(box,
@@ -254,6 +254,7 @@ namespace FTServer
 				}
 				Console.WriteLine (c + " , " + (DateTime.Now - b).TotalSeconds);
 			}
+
 
 			for (int i = 0; i < ts.Length; i++) {
 				ts [i] = ts [i].ToLower () + " ";
