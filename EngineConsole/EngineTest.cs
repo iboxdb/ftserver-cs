@@ -42,10 +42,10 @@ namespace FTServer
 				doagain = false;
 				using (IBox box = auto.Cube()) {
 					foreach (KeyWord kw in engine.searchDistinct(box, "test", startId, 9)) {
-						Console.WriteLine (engine.getDesc (ts [(int)kw.getID()], kw, 20));
+						Console.WriteLine (engine.getDesc (ts [(int)kw.getID ()], kw, 20));
 						tcount++;
 						doagain = true;
-						startId = kw.getID() - 1;
+						startId = kw.getID () - 1;
 					}
 				}
 				Console.WriteLine ();
@@ -147,7 +147,7 @@ namespace FTServer
 					// searchDistinct() search()
 					foreach (KeyWord kw in engine.search(box, "nosql has 電 原始碼" )) {
 						Console.WriteLine (kw.ToFullString ());
-						Console.WriteLine (engine.getDesc (ts [(int)kw.getID()], kw, 20));
+						Console.WriteLine (engine.getDesc (ts [(int)kw.getID ()], kw, 20));
 						Console.WriteLine ();
 					}
 					foreach (String skw in engine.discover(box,
@@ -188,12 +188,23 @@ namespace FTServer
 			long dbid = 2;
 			char split = '.';
 
-			bool rebuild = true;
+			bool rebuild = false;
 			int notranCount = 10;
 
 			String strkw = "Harry";
-			strkw = "Harry Philosopher";
+			//strkw = "Harry Philosopher";
 			//strkw = "Philosopher";
+			//strkw = "\"Harry Philosopher\"";
+			//strkw = "\"He looks\"";
+			//strkw = "He looks";
+			strkw = "\"he drove toward town he thought\"";
+			strkw = "\"he drove toward\"";
+			strkw = "\"he thought\"";
+			strkw = "\"he thought\" toward";
+			//strkw = "toward \"he thought\"";
+			strkw = "he thought";
+			strkw = "he thought toward";
+			strkw = "He";
 			test_big (book, dbid, rebuild, split, strkw, notranCount);
 		}
 
@@ -256,36 +267,94 @@ namespace FTServer
 			}
 
 
+			StringUtil sutil = new StringUtil ();
 			for (int i = 0; i < ts.Length; i++) {
 				ts [i] = ts [i].ToLower () + " ";
+				ts [i] = " " + new String (sutil.clear (ts [i])) + " ";
 			}
+
 			strkw = strkw.ToLower ();
-			String[] kws = strkw.Split (' ');
-			StringUtil sutil = new StringUtil ();
+			String[] kws = strkw.Split (new char[] { ' ' });
+			String tmp_kws = null;
+			for (int i = 0; i < kws.Length; i++) {
+				if (kws [i].length () < 1) {
+					kws [i] = null;
+					continue;
+				}
+				if (tmp_kws == null) {
+					if (kws [i].StartsWith ("\"")) {
+						tmp_kws = kws [i];
+						kws [i] = null;
+					}
+				} else if (tmp_kws != null) {
+					tmp_kws += (" " + kws [i]);
+
+					if (kws [i].EndsWith ("\"")) {
+						kws [i] = tmp_kws.substring (1, tmp_kws.length () - 1);
+						tmp_kws = null;
+					} else {
+						kws [i] = null;
+					}
+				}
+			}
+
 
 			b = DateTime.Now;
 			c = 0;
 			int starti = 0;
 			Test:
-			for (int i = starti; i < ts.Length; i++) {
+			while (starti < ts.Length) {
+				int i = starti++;
 				for (int j = 0; j < kws.Length; j++) {
-					int p = ts [i].IndexOf (kws [j]);
-					if (p < 0) {
-						starti = i + 1;
-						goto Test;
+					if (kws [j] == null) {
+						continue;
 					}
-					char pc = ts [i] [p + kws [j].Length];
-					if (sutil.isWord (pc)) {
-						//System.out.println(pc);
-						starti = i + 1;
-						goto Test;
+					int p = 0;
+					Test_P:
+					while (p >= 0) {
+						p = ts [i].IndexOf (kws [j], p + 1);
+						if (p < 0) {
+							goto Test;
+						}
+						if (onlyPart (ts [i], kws [j], p)) {
+							goto Test_P;
+						}
+						break;
 					}
 				}
 				c++;
+	 
 			}
 			Console.WriteLine (c + " , " + (DateTime.Now - b).TotalSeconds + " -" + ts.Length);
 
 			auto.GetDatabase ().Close ();
+		}
+
+		private static bool onlyPart (String str, String wd, int p)
+		{
+			char pc = str [p + wd.length ()];
+			if (pc >= 'a' && pc <= 'z') {
+				return true;
+			}
+			if (pc == '-') {
+				return true;
+			}
+
+			int bef = p;
+			Test:
+			while (bef > 0) {
+				pc = str [bef - 1];
+				if (pc >= 'a' && pc <= 'z') {
+					return true;
+				}
+				if (pc == '-') {
+					bef--;
+					goto Test;
+				}
+				break;
+			}
+
+			return false;
 		}
 
 		public class TA

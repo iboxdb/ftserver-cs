@@ -583,6 +583,24 @@ namespace FTServer
 		{
 			return (previous != null ? previous.ToFullString () + " -> " : "") + ToString ();
 		}
+
+		[NotColumn]
+		public object KWord {
+			get { return getKeyWord ();	}
+			set { setKeyWord (value);}
+		}
+
+		[NotColumn]
+		public int Position {
+			get{ return getPosition ();}
+			set{ setPosition (value);}
+		}
+
+		[NotColumn]
+		public long ID {
+			get{ return getID ();}
+			set{ setID (value); }
+		}
 	}
 
 	public sealed class KeyWordE : KeyWord
