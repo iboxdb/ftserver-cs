@@ -9,9 +9,7 @@ namespace FTServer
 	public class Engine
 	{
 
-		readonly Util util = new Util ();
 		readonly StringUtil sUtil = new StringUtil ();
-		public long maxSearchTime = long.MaxValue;
 
 		public void Config (DatabaseConfig config)
 		{
@@ -25,11 +23,11 @@ namespace FTServer
 			}
 			long itCount = 0;
 			char[] cs = sUtil.clear (str);
-			List<KeyWord> map = util.fromString (id, cs, true);
+			List<KeyWord> map = sUtil.fromString (id, cs, true);
 	 
-			HashSet<String> words = new HashSet<String> ();
+	
 			foreach (KeyWord kw in map) {
-				insertToBox (box, kw, words, isRemove);
+				insertToBox (box, kw, isRemove);
 				itCount++;
 			}
 			return itCount;
@@ -42,9 +40,9 @@ namespace FTServer
 			}
 			long itCount = 0;
 			char[] cs = sUtil.clear (str);
-			List<KeyWord> map = util.fromString (id, cs, true);
+			List<KeyWord> map = sUtil.fromString (id, cs, true);
 
-			HashSet<String> words = new HashSet<String> ();
+		
 			IBox box = null;
 			int ccount = 0;
 			foreach (KeyWord kw in map) {
@@ -52,7 +50,7 @@ namespace FTServer
 					box = auto.Cube ();
 					ccount = commitCount;
 				}
-				insertToBox (box, kw, words, isRemove);
+				insertToBox (box, kw, isRemove);
 				itCount++;
 				if (--ccount < 1) {
 					box.Commit ().Assert ();
@@ -65,17 +63,13 @@ namespace FTServer
 			return itCount;
 		}
 
-		static void insertToBox (IBox box, KeyWord kw, HashSet<String> insertedWords, bool isRemove)
+		static void insertToBox (IBox box, KeyWord kw, bool isRemove)
 		{
 			Binder binder;
 			if (kw is KeyWordE) {
-				if (insertedWords.Contains (kw.KWord.ToString ())) {
-					return;
-				}
-				insertedWords.Add (kw.KWord.ToString ());
-				binder = box ["/E", kw.KWord, kw.ID, kw.Position];
+				binder = box ["/E", kw.getKeyWord (), kw.getID (), kw.getPosition ()];
 			} else {
-				binder = box ["/N", kw.KWord, kw.ID, kw.Position];
+				binder = box ["/N", kw.getKeyWord (), kw.getID (), kw.getPosition ()];
 			}
 			if (isRemove) {
 				binder.Delete ();
@@ -101,10 +95,10 @@ namespace FTServer
 					cs [i] = (char)(ran.Next (eto - efrom) + efrom);
 				}
 				KeyWordE kw = new KeyWordE ();
-				kw.KWord = new String (cs);
+				kw.setKeyWord (new String (cs));
 				foreach (KeyWord tkw in lessMatch(box, kw)) {
-					String str = tkw.KWord.ToString ();
-					if (str.Length < 3 || sUtil.mvends.Contains (str)) {
+					String str = tkw.getKeyWord ().ToString ();
+					if (str.Length < 3) {
 						continue;
 					}
 					int c = list.Count;
@@ -150,10 +144,10 @@ namespace FTServer
 				if (len < 1) {
 					break;
 				}
-				if (kw.ID == c_id) {
+				if (kw.getID () == c_id) {
 					continue;
 				}
-				c_id = kw.ID;
+				c_id = kw.getID ();
 				len--;
 				yield return kw;
 			}			 
@@ -172,401 +166,203 @@ namespace FTServer
 		public IEnumerable<KeyWord> search (IBox box, String str, long startId)
 		{
 			if (startId < 0) {
-				return new List<KeyWord> ();
+				return new ArrayList<KeyWord> ();
 			}
 			char[] cs = sUtil.clear (str);
-			List<KeyWord> map = util.fromString (-1, cs, false);
-			sUtil.correctInput (map);
+			ArrayList<KeyWord> map = sUtil.fromString (-1, cs, false);
 
-			if (map.Count > KeyWord.MAX_WORD_LENGTH || map.Count == 0) {
-				return new List<KeyWord> ();
+			if (map.size () > KeyWord.MAX_WORD_LENGTH || map.isEmpty ()) {
+				return new ArrayList<KeyWord> ();
 			}
 
-			List<KeyWord> kws = new List<KeyWord> ();
-
-			for (int i = 0; i < map.Count; i++) {
-				KeyWord kw = map [i];
-				if (kw is KeyWordE) {
-					String s = kw.KWord.ToString ();
-					if ((s.Length > 2) && (!sUtil.mvends.Contains (s))) {
-						kws.Add (kw);
-						map [i] = null;
-					}
-				} else {
-					KeyWordN kwn = (KeyWordN)kw;
-					if (kwn.size () >= 2) {
-						kws.Add (kw);
-						map [i] = null;
-					} else if (kws.Count > 0) {
-						KeyWord p = kws [kws.Count - 1];
-						if (p is KeyWordN) {
-							if (kwn.Position == (p.Position + ((KeyWordN)p).size ())) {
-								kws.Add (kw);
-								map [i] = null;
-							}
-						}
-					}
-				}
-			}
-			for (int i = 0; i < map.Count; i++) {
-				KeyWord kw = map [i];
-				if (kw != null) {
-					kws.Add (kw);
-				}
-			}
-			MaxID maxId = new MaxID (this.maxSearchTime);
+			MaxID maxId = new MaxID ();
 			maxId.id = startId;
-			return search (box, kws.ToArray (), maxId);
+			return search (box, map.ToArray (), maxId);
 		}
 
 		private IEnumerable<KeyWord> search (IBox box, KeyWord[] kws, MaxID maxId)
 		{
+
 			if (kws.Length == 1) {
-				return search (box, kws [0], (KeyWord)null, false, maxId);
-			}
-			bool asWord = true;
-			KeyWord kwa = kws [kws.Length - 2];
-			KeyWord kwb = kws [kws.Length - 1];
-			if ((kwa is KeyWordN) && (kwb is KeyWordN)) {
-				asWord = kwb.Position != (kwa.Position + ((KeyWordN)kwa).size ());
+				return search (box, kws [0], (KeyWord)null, maxId);
 			}
 
-			KeyWord[] condition = new KeyWord[kws.Length - 1];
-			Array.Copy (kws, 0, condition, 0, condition.Length);
 			return search (box, kws [kws.Length - 1],
-			               search (box, condition, maxId), asWord, maxId);
+			               search (box, Arrays.copyOf (kws, kws.Length - 1), maxId),
+			               maxId);
 		}
 
 		private IEnumerable<KeyWord> search (IBox box, KeyWord nw,
-		                                     IEnumerable<KeyWord> condition, bool isWord, MaxID maxId)
+		                                     IEnumerable<KeyWord> condition, MaxID maxId)
 		{
+			IEnumerator<KeyWord> cd = condition.GetEnumerator ();
+
+			IEnumerator<KeyWord> r1 = null;
+
+			KeyWord r1_con = null;
 			long r1_id = -1;
-			foreach (KeyWord r1_con in condition) {
-				if (isWord) {
-					if (r1_id == r1_con.ID) {
-						continue;
+			return new Iterable<KeyWord> () {
+
+				iterator = new EngineIterator<KeyWord>() {
+
+
+					hasNext = ()=> {
+							if (r1 != null && r1.MoveNext()) {
+								return true;
+							}
+							while (cd.MoveNext()) {
+								r1_con = cd.Current;
+
+								if (r1_id == r1_con.getID()) {
+									continue;
+								}
+								if (!nw.isLinked) {
+									r1_id = r1_con.getID();
+								}
+
+							r1 = search(box, nw, r1_con, maxId).GetEnumerator();
+								if (r1.MoveNext()) {
+									return true;
+								}
+
+							}
+							return false;
+						},
+
+					next = ()=> {
+							KeyWord k = r1.Current;
+							k.previous = r1_con;
+							return k;
+						}
 					}
-				}
-				r1_id = r1_con.ID; 
-				foreach (KeyWord k in search(box, nw, r1_con,isWord,maxId)) {
-					k.previous = r1_con;
-					yield return k;
-				}
-			} 
+
+			};
+		 
 		}
 
-		private static readonly List<KeyWord> emptySearch = new  List<KeyWord> ();
-
-		private  static IEnumerable<KeyWord> search (IBox box, KeyWord kw, KeyWord con, bool asWord, MaxID maxId)
+		private static IEnumerable<KeyWord> search (IBox box,
+		                                            KeyWord kw, KeyWord con, MaxID maxId)
 		{
-			if (kw is KeyWordE) {
-				asWord = true;
-				return new Index2KeyWordIterable<KeyWordE> (
-					box.Select<Object> ("from /E where K==? & I<=?",
-				                     kw.KWord, maxId.id), box, kw, con, asWord, maxId);
-			} else { 
-				if (con is KeyWordE) {
-					asWord = true;
-				}
-				if (con == null || asWord) {
-					asWord = true;
-					return new Index2KeyWordIterable<KeyWordN> (
-						box.Select<Object> ("from /N where K==? & I<=?", kw.KWord, maxId.id), box, kw, con, asWord, maxId);
-				} else {
-					Object[] os = (Object[])box ["/N", kw.KWord,
-					                             con.ID, (con.Position + ((KeyWordN)con).size ())]
-						.Select<Object> ();
-					if (os != null) {
-						KeyWordN cache = new KeyWordN ();
-						cache.KWord = os [0];
-						cache.I = (long)os [1];
-						cache.P = (int)os [2];
-						List<KeyWord> r = new List<KeyWord> (1);
-						r.Add (cache);
-						return r;
-					} else {
-						return emptySearch;
+
+			String ql = kw is KeyWordE
+				? "from /E where K==? & I<=?"
+					: "from /N where K==? & I<=?";
+
+			//final Class rclass = kw instanceof KeyWordE ? KeyWordE.class : KeyWordN.class;
+
+			int linkPos = kw.isLinked ? (con.getPosition () + con.size ()
+				+ (kw is KeyWordE ? 1 : 0)) : -1;
+
+			long currentMaxId = long.MaxValue;
+			KeyWord cache = null;
+			IEnumerator<KeyWord> iter = null;
+			bool isLinkEndMet = false;
+
+			return new Iterable<KeyWord> () {
+				iterator = new EngineIterator<KeyWord>() {
+
+
+					hasNext = ()=> {
+							if (maxId.id == -1) {
+								return false;
+							}
+
+							if (currentMaxId > (maxId.id + 1)) {
+								currentMaxId = maxId.id;							 
+							iter =  kw is KeyWordE ? 
+								(IEnumerator<KeyWord>)box.Select<KeyWordE>( ql, kw.getKeyWord(), maxId.id).GetEnumerator() :
+									box.Select<KeyWordN>( ql, kw.getKeyWord(), maxId.id).GetEnumerator();
+							}
+
+							while (iter.MoveNext()) {
+
+							cache = iter.Current;
+
+								maxId.id = cache.getID();
+								currentMaxId = maxId.id;
+								if (con != null && con.I != maxId.id) {
+									return false;
+								}
+
+								if (isLinkEndMet) {
+									continue;
+								}
+
+								if (linkPos == -1) {
+									return true;
+								}
+
+								int cpos = cache.getPosition();
+								if (cpos > linkPos) {
+									continue;
+								}
+								if (cpos == linkPos) {
+									if (kw.isLinkedEnd) {
+										isLinkEndMet = true;
+									}
+									return true;
+								}
+								return false;
+							}
+
+							maxId.id = -1;
+							return false;
+
+						},
+
+					next = ()=>{
+							return cache;
+						}
+
 					}
-				}
-			}
+			};
+
+			 
 		}
 
 		private static IEnumerable<KeyWord> lessMatch (IBox box, KeyWord kw)
 		{
-			if (kw is KeyWordE) { 
-				return new Index2KeyWordIterable<KeyWordE> (box.Select<object> ("from /E where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));				 
-			} else { 				 
-				return new Index2KeyWordIterable<KeyWordN> (box.Select<object> ("from /N where K<=? limit 0, 50", kw.KWord), null, null, null, true, new MaxID (long.MaxValue));			 
+			if (kw is KeyWordE) {
+				return box.Select<KeyWordE> ("from /E where K<=? limit 0, 50", kw.getKeyWord ());
+
+			} else {
+				return box.Select<KeyWordN> ("from /N where K<=? limit 0, 50", kw.getKeyWord ());
 			}
 		}
 
 		private sealed class MaxID
 		{
-			public MaxID (long maxSearchTime)
-			{
-				maxTime = maxSearchTime;
-			}
-
-			public long maxTime;
 			public long id = long.MaxValue;
 		}
-
-		interface IIndex2KeyWordIterable
-		{
-			IEnumerator<Object> GetIndex ();
-		}
-
-		class Index2KeyWordIterable<T>	: IIndex2KeyWordIterable,IEnumerable<KeyWord> where T:KeyWord, new()
-		{
-			readonly KWIterator iterator;
-			IEnumerator<Object> index;
-
-			internal Index2KeyWordIterable (IEnumerable<Object> findex,
-			                                IBox box, KeyWord kw, KeyWord con, bool asWord, MaxID maxId)
-			{
-				this.index = findex.GetEnumerator ();
-				this.iterator = new KWIterator ();
-
-				long currentMaxId = maxId.id;
-				KeyWord cache = null;
-				this.iterator.moveNext = () => {
-					if (maxId.id == -1) {
-						return false;
-					}
-					if (con != null) {
-						if (con.I != maxId.id) {
-							return false;
-						}
-					}
-					if (currentMaxId > (maxId.id + 1) && currentMaxId != long.MaxValue) {
-						currentMaxId = maxId.id;
-
-						IEnumerable<KeyWord> tmp = search (box, kw, con, asWord, maxId);
-						if (tmp is IIndex2KeyWordIterable) {
-							index = ((IIndex2KeyWordIterable)tmp).GetIndex ();
-						}
-					}
-					if (index.MoveNext ()) {
-						if (--maxId.maxTime < 0) {
-							maxId.id = -1;
-							return false;
-						}
-
-						Object[] os = (Object[])index.Current;
-
-						long osid = (long)os [1];
-						maxId.id = osid;
-						currentMaxId = maxId.id;
-
-						if (con != null) {
-							if (con.I != maxId.id) {
-								return false;
-							}
-						}
-
-						cache = typeof(T) == typeof(KeyWordE) ? (KeyWord)new KeyWordE () : new KeyWordN ();
-						cache.KWord = os [0];
-						cache.I = (long)os [1];
-						cache.P = (int)os [2];
-
-						return true;
-					}
-					maxId.id = -1;
-					return false;
-				};
-
-				this.iterator.current = () => {
-					return cache;
-				};
-			}
-
-			internal class KWIterator: IEnumerator<KeyWord>
-			{
-				public delegate bool MoveNextDelegate ();
-
-				public delegate KeyWord CurrentDelegate ();
-
-				public MoveNextDelegate moveNext;
-				public CurrentDelegate current;
-
-				public bool  MoveNext ()
-				{
-					return moveNext ();
-				}
-
-				public KeyWord Current {
-					get {
-						return current ();
-					}
-				}
-				#region IEnumerator implementation
-				void System.Collections.IEnumerator.Reset ()
-				{
-					 
-				}
-
-				object System.Collections.IEnumerator.Current {
-					get {
-						return this.Current;
-					}
-				}
-
-				void IDisposable.Dispose ()
-				{
-					 
-				}
-				#endregion
-			}
-
-			public IEnumerator<KeyWord> GetEnumerator ()
-			{
-				return iterator;
-			}
-			#region IEnumerable implementation
-			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
-			{
-				return GetEnumerator ();
-			}
-			#endregion
-			#region IIndex2KeyWordIterable implementation
-			public IEnumerator<object> GetIndex ()
-			{
-				return index;
-			}
-			#endregion
-		}
 	}
-
-	class Util
-	{
-
-		readonly StringUtil sUtil = new StringUtil ();
-
-		public List<KeyWord> fromString (long id, char[] str, bool includeOF)
-		{
-
-			List<KeyWord> kws = new List<KeyWord> ();
-
-			KeyWordE k = null;
-			for (int i = 0; i < str.Length; i++) {
-				char c = str [i];
-				if (c == ' ') {
-					if (k != null) {
-						kws.Add (k);
-						if (includeOF) {
-							k = k.getOriginalForm ();
-							if (k != null) {
-								kws.Add (k);
-							}
-						}
-					}
-					k = null;
-				} else if (sUtil.isWord (c)) {
-					if (k == null && c != '-' && c != '#') {
-						k = new KeyWordE (); 
-						k.ID = id;
-						k.KWord = "";
-						k.Position = i;
-					}
-					if (k != null) {
-						k.KWord = k.KWord.ToString () + c;
-					}
-				} else {
-					if (k != null) {
-						kws.Add (k);
-						if (includeOF) {
-							k = k.getOriginalForm ();
-							if (k != null) {
-								kws.Add (k);
-							}
-						}
-					}
-					k = null;
-					KeyWordN n = new KeyWordN (); 
-					n.ID = id;
-					n.Position = i;
-					n.longKeyWord (c, (char)0, (char)0);
-					kws.Add (n);
-				 
-					char c1 = str [i + 1]; 
-					if ((c1 != ' ') && (!sUtil.isWord (c1))) {
-						n = new KeyWordN (); 
-						n.ID = id;
-						n.Position = i;
-						n.longKeyWord (c, c1, (char)0);
-						kws.Add (n);
-						if (!includeOF) {
-							kws.RemoveAt (kws.Count - 2);
-							i++; 
-						}						
-					}   
-				}
-			}
-			return kws;
-		}
-	}
-
+	#region StringUtil
 	class StringUtil
 	{ 
-		internal static Dictionary<String, String> correctKW = new Dictionary<String, String> () {
-			{"databae", "database"},
-			{"beby", "baby"},
-			{"androd", "android"},
-			{"canguan", "餐馆"},
-			{"meishi", "美食"}
-		};
-		internal static Dictionary<String, String> antetypes = new Dictionary<String, String> () {
-			{"dogs", "dog"},
-			{"houses", "house"},
-			{"grams", "gram"},
-
-			{"kisses", "kiss"},
-			{"watches", "watch"},
-			{"boxes", "box"},
-			{"bushes", "bush"},
-
-			{"tomatoes", "tomato"},
-			{"potatoes", "potato"},
-
-			{"babies", "baby"},
-			{"universities", "university"},
-			{"flies", "fly"},
-			{"impurities", "impurity"}			
-		};
-		HashSet<char> set;
-		public HashSet<String> mvends;
+		HashSet<Char> set;
 
 		public StringUtil ()
 		{
 			String s = "!\"@$%&'()*+,./:;<=>?[\\]^_`{|}~\r\n"; //@-
 			s += "， 　，《。》、？；：‘’“”【｛】｝——=+、｜·～！￥%……&*（）"; //@-#
 			s += "｀～！＠￥％……—×（）——＋－＝【】｛｝：；’＇”＂，．／＜＞？’‘”“";//＃
-			s += " � ★☆,。？,　！";
+			s += "� ★☆,。？,　！";
 			s += "©»¥「」";
+			s += "[¡, !, \", ', (, ), -, °, :, ;, ?]-\"#";
 
-			set = new HashSet<char> ();
-			foreach (char c in s) {
-				set.Add (c);
+			set = new HashSet<Char> ();
+			foreach (char c in s.toCharArray()) {
+				if (isWord (c)) {
+					continue;
+				}
+				set.add (c);
 			}
-			set.Add ((char)0);
+			set.add ((char)0);
 
-			String[] ms = new String[] {
-				"are", "were", "have", "has", "had",
-				"you", "she", "her", "him", "like", "will", "would", "should",
-				"when", "than", "then", "that", "this", "there", "who", "those", "these",
-				"with", "which", "where", "they", "them", "one",
-				"does", "doesn", "did", "gave", "give",
-				"something", "someone", "about", "come"
-			};
-			mvends = new HashSet<String> ();
-			foreach (String c in ms) {
-				mvends.Add (c);
-			}
 		}
 		//Chinese  [\u2E80-\u9fa5]
 		//Japanese [\u0800-\u4e00]|
 		//Korean   [\uAC00-\uD7A3] [\u3130-\u318F] 
-		public bool isWord (char c)
+		public  bool isWord (char c)
 		{
 			//English
 			if (c >= 'a' && c <= 'z') {
@@ -582,86 +378,155 @@ namespace FTServer
 			//Germen
 			if (c >= 0xc0 && c <= 0xff) {
 				return true;
-			} 
+			}
+			//special
 			return c == '-' || c == '#';
 		}
 
 		public char[] clear (String str)
 		{
-			char[] cs = (str + "   ").ToLower ().ToCharArray ();
+			char[] cs = (str + "   ").toLowerCase ().toCharArray ();
 			for (int i = 0; i < cs.Length; i++) {
-				if (set.Contains (cs [i])) {
+				if (cs [i] == '"') {
+					continue;
+				}
+				if (set.contains (cs [i])) {
 					cs [i] = ' ';
-				} 
+				}
 			}
 			return cs;
 		}
 
+		public ArrayList<KeyWord> fromString (long id, char[] str, bool forIndex)
+		{
+
+			ArrayList<KeyWord> kws = new ArrayList<KeyWord> ();
+
+			KeyWordE k = null;
+			int linkedCount = 0;
+			int lastNPos = -2;
+			for (int i = 0; i < str.Length; i++) {
+				char c = str [i];
+				if (c == ' ') {
+					if (k != null) {
+						kws.add (k);
+					}
+					k = null;
+
+				} else if (c == '"') {
+					if (k != null) {
+						kws.add (k);
+					}
+					k = null;
+
+					if (linkedCount > 0) {
+						linkedCount = 0;
+						setLinkEnd (kws);
+					} else {
+						linkedCount = 1;
+					}
+				} else if (isWord (c)) {
+					if (k == null && c != '-' && c != '#') {
+						k = new KeyWordE ();
+						k.setID (id);
+						k.setKeyWord ("");
+						k.setPosition (i);
+						if (linkedCount > 0) {
+							linkedCount++;
+						}
+						if (linkedCount > 2) {
+							k.isLinked = true;
+						}
+					}
+					if (k != null) {
+						k.setKeyWord (k.getKeyWord () + c.ToString ());
+					}
+				} else {
+					if (k != null) {
+						kws.add (k);
+					}
+					k = null;
+
+					KeyWordN n = new KeyWordN ();
+					n.setID (id);
+					n.setPosition (i);
+					n.longKeyWord (c, (char)0, (char)0);
+					n.isLinked = i == (lastNPos + 1);
+					kws.add (n);
+
+					char c1 = str [i + 1];
+					if ((c1 != ' ') && (!isWord (c1))) {
+						n = new KeyWordN ();
+						n.setID (id);
+						n.setPosition (i);
+						n.longKeyWord (c, c1, (char)0);
+						n.isLinked = i == (lastNPos + 1);
+						kws.add (n);
+						if (!forIndex) {
+							kws.remove (kws.size () - 2);
+							i++;
+						}
+					}
+
+					if (c1 == ' ') {
+						setLinkEnd (kws);
+					}
+
+					lastNPos = i;
+
+				}
+			}
+			setLinkEnd (kws);
+			return kws;
+		}
+
+		private void setLinkEnd (ArrayList<KeyWord> kws)
+		{
+			if (kws.size () > 1) {
+				KeyWord last = kws.get (kws.size () - 1);
+				if (last.isLinked) {
+					last.isLinkedEnd = true;
+				}
+			}
+		}
+
 		public String getDesc (String str, KeyWord kw, int length)
 		{
-			List<KeyWord> list = new List<KeyWord> ();
+			ArrayList<KeyWord> list = new ArrayList<KeyWord> ();
 			while (kw != null) {
-				list.Add (kw);
+				list.add (kw);
 				kw = kw.previous;
 			}
-			list.Sort (
-				(o1, o2) => {
-				return o1.Position - o2.Position;
-			}
-			);
-			KeyWord[] ps = list.ToArray ();
-	 
+		  
+			KeyWord[] ps = list.toArray ();
+			Array.Sort (ps, (KeyWord o1, KeyWord o2) => {
+				return o1.getPosition () - o2.getPosition ();
+			});
+		
+
 			int start = -1;
 			int end = -1;
 			StringBuilder sb = new StringBuilder ();
 			for (int i = 0; i < ps.Length; i++) {
-				int len = ps [i] is KeyWordE ? ps [i].KWord
-					.ToString ().Length : ((KeyWordN)ps [i]).size ();
-				if ((ps [i].Position + len) <= end) {
+				int len = ps [i] is KeyWordE ? ps [i].getKeyWord ()
+					.ToString ().length () : ((KeyWordN)ps [i]).size ();
+				if ((ps [i].getPosition () + len) <= end) {
 					continue;
 				}
-				start = ps [i].Position;
-				end = ps [i].Position + length;
-				if (end > str.Length) {
-					end = str.Length;
+				start = ps [i].getPosition ();
+				end = ps [i].getPosition () + length;
+				if (end > str.length ()) {
+					end = str.length ();
 				}
-				sb.Append (str.Substring (start, end - start))
-					.Append ("...");
+				sb.append (str.substring (start, end))
+					.append ("...");
 			}
 			return sb.ToString ();
-		}
 
-		public void correctInput (List<KeyWord> kws)
-		{
-			for (int i = 0; i < kws.Count; i++) {
-				KeyWord kw = (KeyWord)kws [i];
-				if (kw is KeyWordE) {
-					String str = kw.KWord.ToString (); 
-					if (correctKW.TryGetValue (str, out str)) {
-						if (isWord (str [0])) {
-							kw.KWord = str;
-						} else {
-							KeyWordN kwn = new KeyWordN ();
-							kwn.I = kw.I;
-							kwn.P = kw.P + 1;
-							switch (str.Length) {
-							case 1:
-								kwn.longKeyWord (str [0], (char)0, (char)0);
-								break;
-							case 2:
-								kwn.longKeyWord (str [0], str [1], (char)0);
-								break;
-							default:
-								continue;
-							}
-							kws [i] = kwn;
-						}
-					}
-				}
-			}
 		}
 	}
-
+	#endregion
+	#region KeyWord
 	public abstract class KeyWord
 	{
 
@@ -677,30 +542,42 @@ namespace FTServer
 
 		}
 
-		[NotColumn]
-		public abstract object KWord {
-			get ;
-			set;
-		}
+		public abstract Object getKeyWord ();
+
+		public abstract void setKeyWord (Object k);
+
+		public abstract int size ();
 		//Position
 		public int P;
 
-		[NotColumn]
-		public int Position {
-			get{ return P;}
-			set{ P = value;}
+		public int getPosition ()
+		{
+			return P;
+		}
+
+		public void setPosition (int p)
+		{
+			P = p;
 		}
 		//Document ID
 		public long I;
 
-		[NotColumn]
-		public long ID {
-			get{ return I;}
-			set{ I = value;}
+		public long getID ()
+		{
+			return I;
+		}
+
+		public void setID (long i)
+		{
+			I = i;
 		}
 
 		[NotColumn]
 		public KeyWord previous;
+		[NotColumn]
+		public bool isLinked;
+		[NotColumn]
+		public bool isLinkedEnd;
 
 		public String ToFullString ()
 		{
@@ -713,29 +590,23 @@ namespace FTServer
 		//Key Word
 		public String K;
 
-		[NotColumn]
-		public override object KWord {
-			get{ return K;}
-			set {
-				var t = (String)value;
-				if (t.Length > KeyWord.MAX_WORD_LENGTH) {
-					return;
-				}
-				K = t;
-			}
+		public override Object getKeyWord ()
+		{
+			return K;
 		}
 
-		public KeyWordE getOriginalForm ()
+		public override void setKeyWord (Object k)
 		{
-			String of;
-			if (StringUtil.antetypes.TryGetValue (K, out of)) {
-				KeyWordE e = new KeyWordE ();
-				e.I = this.I;
-				e.P = this.P;
-				e.K = of;
-				return e;
+			String t = (String)k;
+			if (t.length () > KeyWord.MAX_WORD_LENGTH) {
+				return;
 			}
-			return null;
+			K = t;
+		}
+
+		public override int size ()
+		{
+			return K.length ();
 		}
 
 		public override String ToString ()
@@ -746,16 +617,20 @@ namespace FTServer
 
 	public sealed class KeyWordN : KeyWord
 	{
-		//Key Word
+		//Key Word 
 		public long K;
 
-		[NotColumn]
-		public override object KWord {
-			get{ return K;}
-			set { K = (long)value; }
+		public override Object getKeyWord ()
+		{
+			return K;
 		}
 
-		public byte size ()
+		public override void setKeyWord (Object k)
+		{
+			K = (long)k;
+		}
+
+		public override int size ()
 		{
 			if ((K & CMASK) != 0L) {
 				return 3;
@@ -805,5 +680,146 @@ namespace FTServer
 			return toKString () + " Pos=" + P + ", ID=" + I + " N";
 		}
 	}
+	#endregion
+	#region Bridge
+	internal static class CSharpJavaBridge
+	{
+		public static int length (this String self)
+		{
+			return self.Length;
+		}
+
+		public static char[] toCharArray (this String self)
+		{
+			return self.ToCharArray ();
+		}
+
+		public static string toLowerCase (this String self)
+		{
+			return self.ToLower ();
+		}
+
+		public static string substring (this String self, int start, int end)
+		{
+			return self.Substring (start, end - start);
+		}
+
+		public static bool add<T> (this HashSet<T> self, T v)
+		{
+			return self.Add (v);
+		}
+
+		public static bool contains<T> (this HashSet<T> self, T v)
+		{
+			return self.Contains (v);
+		}
+
+		public static void remove<T> (this ArrayList<T> self, int pos)
+		{
+			self.RemoveAt (pos);
+		}
+
+		public static int size<T> (this ArrayList<T> self)
+		{
+			return self.Count;
+		}
+
+		public static T[] toArray<T> (this ArrayList<T> self)
+		{
+			return self.ToArray ();
+		}
+
+		public static T get<T> (this ArrayList<T> self, int pos)
+		{
+			return self [pos];
+		}
+
+		public static StringBuilder append (this StringBuilder self, string str)
+		{
+			return self.Append (str);
+		}
+	}
+
+	internal class ArrayList<T> : List<T>
+	{
+		public bool isEmpty ()
+		{
+			return this.Count == 0;
+		}
+
+		public void add (T t)
+		{
+			this.Add (t);
+		}
+	}
+
+	internal class EngineIterator<T> : Iterator<T>
+	{
+	}
+
+	internal class Iterator<T>: IEnumerator<T>
+	{
+		public delegate bool MoveNextDelegate ();
+
+		public delegate T CurrentDelegate ();
+
+		public MoveNextDelegate hasNext;
+		public CurrentDelegate next;
+
+		public bool  MoveNext ()
+		{
+			return hasNext ();
+		}
+
+		public T Current {
+			get {
+				return next ();
+			}
+		}
+
+		void System.Collections.IEnumerator.Reset ()
+		{
+
+		}
+
+		object System.Collections.IEnumerator.Current {
+			get {
+				return this.Current;
+			}
+		}
+
+		void IDisposable.Dispose ()
+		{
+
+		}
+	}
+
+	internal class Iterable<T> : IEnumerable<T>
+	{
+		 
+
+		public IEnumerator<T> GetEnumerator ()
+		{
+			return iterator;
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+		{
+			return iterator;
+		}
+
+		public EngineIterator<T> iterator;
+	}
+
+	internal class Arrays
+	{
+		public static T[] copyOf<T> (T[] kws, int len)
+		{
+			T[] condition = new T[kws.Length - 1];
+			Array.Copy (kws, 0, condition, 0, condition.Length);
+			return condition;
+		}
+	}
+	#endregion
 }
 
