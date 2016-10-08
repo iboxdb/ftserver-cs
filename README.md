@@ -61,7 +61,7 @@ the Page.GetRandomContent() method is used to keep the Search-Page-Content alway
 if you have many pages(>100,000),  use the ID number to control the order instead of loading all pages to memory.
 
 
-#### the Page and the Index -Process flow
+#### The Page and the Index -Process flow
 
 When Insert
 
@@ -82,21 +82,13 @@ Engine.IndexTextNoTran( IsRemove = true );
 DB.Delete("Page", page.Id);
 ````				
 
+#### Memory
+
+indexText(IBox, id, String, bool) // faster, more memories
+
+indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
+
 
 #### Known Issues
-1: if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the Engine.IndexTextNoTran() to be unexpected. a test sample in IndexTextNoTran()
-````
-if (--ccount < 1) {
-	runCount++
-	box.Commit ().Assert ();
-	box = null;
-}
-````
-"Without Debugging" the runCount is 9, and "start Debugging" only get 1.
+1: if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the XSP4 to be unexpected. 
 
-
-2: encode characters.
-````
-  <a href="s.aspx?q=..."></a> 
-  s.aspx?q=%E5%9F%BA%E7%A1%80
-````
