@@ -97,3 +97,4 @@ indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
 #### Known Issues
 1: if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the XSP4 to be unexpected. 
 
+2: set Web Server runtime to .NET4+
