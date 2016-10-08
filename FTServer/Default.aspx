@@ -60,10 +60,10 @@
                 </form>
                 <script>
                     function formsubmit() {
-                        btnsearch.disabled = "disabled";
+                       document.getElementById('btnsearch').disabled = "disabled";
                     }
                     function formfocus() {
-                        btnsearch.disabled = undefined;
+                        document.getElementById('btnsearch').disabled = undefined;
                     }
                 </script>
 
@@ -75,7 +75,7 @@
                     <%
                         foreach (String str in SearchResource.searchList) {
 
-                    %> <a href="s.aspx?q=<%=str.Replace("#", "%23") %>"><%=str%></a>. &nbsp;  
+                    %> <a href="s.aspx?q=<%=this.Server.UrlEncode(str) %>"><%=str%></a>. &nbsp;  
                     <%
                         }
                     %>
@@ -93,7 +93,7 @@
    					<%
                         foreach (String str in discoveries) {
 
-                    %> <a href="s.aspx?q=<%=str.Replace("#", "%23") %>"><%=str%></a>. &nbsp;  
+                    %> <a href="s.aspx?q=<%=this.Server.UrlEncode(str) %>"><%=str%></a>. &nbsp;  
                     <%
                         }
                     %>

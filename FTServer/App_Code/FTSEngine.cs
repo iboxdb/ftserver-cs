@@ -455,7 +455,7 @@ namespace FTServer
 					kws.add (n);
 
 					char c1 = str [i + 1];
-					if ((c1 != ' ') && (!isWord (c1))) {
+					if ((c1 != ' ' && c1 != '"') && (!isWord (c1))) {
 						n = new KeyWordN ();
 						n.setID (id);
 						n.setPosition (i);

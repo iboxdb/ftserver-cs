@@ -29,13 +29,14 @@ namespace FTServer
 				isdelete = true;
 			}
 			if (!isdelete.HasValue) {
+
 				SearchResource.searchList.Enqueue (name.Replace("<",""));
 				while (SearchResource.searchList.Count > 15) {
 					String t;
 					SearchResource.searchList.TryDequeue (out t);
 				}
 			} else {
-				name = SearchResource.indexText (name, isdelete.Value);
+				SearchResource.indexText (name, isdelete.Value);
 				SearchResource.urlList.Enqueue (name.Replace("<",""));
 				while (SearchResource.urlList.Count > 3) {
 					String t;
