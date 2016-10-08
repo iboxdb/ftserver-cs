@@ -167,18 +167,22 @@ namespace FTServer
 			long dbid = 1;
 			char split = '。';
 
-			bool rebuild = true;
+			bool rebuild = false;
 			int notranCount = 10;
 			String strkw = "黄蓉 郭靖 洪七公";
+			//strkw = "洪七公 黄蓉 郭靖";
 			//strkw = "黄蓉 郭靖 公";
-			//strkw = "黄蓉 郭靖";
-			//strkw = "黄蓉 郭靖 时察";
-			//strkw = "黄蓉 十八掌";
-			//strkw = "郭靖 十八掌";
+			//strkw = "郭靖 黄蓉";
+			//strkw = "黄蓉";
 			//strkw = "时察";
 			//strkw = "的";
 			//strkw = "七十二路";
 			//strkw = "十八掌";
+			//strkw = "日日夜夜无穷无尽的";
+			//strkw = "牛家村边绕 日日夜夜无穷无尽的";
+			//strkw = "这几天";
+			//strkw = "有 这几天";
+			//strkw = "这几天 有";
 			test_big (book, dbid, rebuild, split, strkw, notranCount);
 		}
 
@@ -197,14 +201,14 @@ namespace FTServer
 			//strkw = "\"Harry Philosopher\"";
 			//strkw = "\"He looks\"";
 			//strkw = "He looks";
-			strkw = "\"he drove toward town he thought\"";
-			strkw = "\"he drove toward\"";
-			strkw = "\"he thought\"";
-			strkw = "\"he thought\" toward";
+			//strkw = "\"he drove toward town he thought\"";
+			//strkw = "\"he drove toward\"";
+			//strkw = "\"he thought\"";
+			//strkw = "\"he thought\" toward";
 			//strkw = "toward \"he thought\"";
-			strkw = "he thought";
-			strkw = "he thought toward";
-			strkw = "He";
+			//strkw = "he thought";
+			//strkw = "he thought toward";
+			//strkw = "He";
 			test_big (book, dbid, rebuild, split, strkw, notranCount);
 		}
 
