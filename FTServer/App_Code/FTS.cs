@@ -216,10 +216,10 @@ namespace FTServer
 					page.description = page.description.Substring (0, 200);
 				}
 				page.description = page.description.Replace ("<", " ")
-					.Replace (">", " ").Replace ("$", " ");
+					.Replace (">", " ").Replace ("$", " ").Replace (((char)8203).ToString (), "");
 
 			
-				String content = doc.Text ().Replace ("　", " ");
+				String content = doc.Text ().Replace ("　", " ").Replace (((char)8203).ToString (), "");
 				content = Regex.Replace (content, "\t|\r|\n|�|<|>", " ");
 				content = Regex.Replace (content, "\\$", " ");
 				content = Regex.Replace (content, "\\s+", " ");

@@ -248,7 +248,6 @@ namespace FTServer
 				? "from /E where K==? & I<=?"
 					: "from /N where K==? & I<=?";
 
-			//final Class rclass = kw instanceof KeyWordE ? KeyWordE.class : KeyWordN.class;
 
 			int linkPos = kw.isLinked ? (con.getPosition () + con.size ()
 				+ (kw is KeyWordE ? 1 : 0)) : -1;
@@ -357,7 +356,7 @@ namespace FTServer
 				set.add (c);
 			}
 			set.add ((char)0);
-
+			set.add ((char)8203);
 		}
 		//Chinese  [\u2E80-\u9fa5]
 		//Japanese [\u0800-\u4e00]|
@@ -468,7 +467,7 @@ namespace FTServer
 						}
 					}
 
-					if (c1 == ' ') {
+					if (c1 == ' ' || c1 == '"') {
 						setLinkEnd (kws);
 					}
 

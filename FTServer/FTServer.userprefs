@@ -3,11 +3,8 @@
   <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="EngineConsole" expanded="True">
-            <Node name="References" expanded="True" />
-          </Node>
-          <Node name="FTServer" expanded="True" selected="True" />
+        <State expanded="True" selected="True">
+          <Node name="FTServer" expanded="True" />
         </State>
       </Pad>
     </Pads>
