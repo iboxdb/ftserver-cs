@@ -88,6 +88,11 @@ indexText(IBox, id, String, bool) // faster, more memories
 
 indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
 
+#### Search format
+
+[Word1 Word2 Word3] => text has **Word1** and **Word2** and **Word3**
+
+["Word1 Word2 Word3"] => text has **"Word1 Word2 Word3"** as a whole
 
 #### Known Issues
 1: if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the XSP4 to be unexpected. 
