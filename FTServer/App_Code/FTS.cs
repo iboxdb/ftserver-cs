@@ -167,7 +167,7 @@ namespace FTServer
 				page.url = url;
 
 			  
-				CQ doc = CQ.CreateFromUrl (url);// GZIP ??
+				CQ doc = CQ.CreateFromUrl (url); 
 
 				//Console.WriteLine(doc.Html());
 				doc ["script"].Remove ();
@@ -219,6 +219,7 @@ namespace FTServer
 					.Replace (">", " ").Replace ("$", " ").Replace (((char)8203).ToString (), "");
 
 			
+				fixSpan(doc);
 				String content = doc.Text ().Replace ("　", " ").Replace (((char)8203).ToString (), "");
 				content = Regex.Replace (content, "\t|\r|\n|�|<|>", " ");
 				content = Regex.Replace (content, "\\$", " ");
@@ -238,6 +239,14 @@ namespace FTServer
 			} catch (Exception ex) {
 				Console.WriteLine (ex.ToString ());
 				return null;
+			}
+		}
+
+		private static void fixSpan( CQ doc ){
+			foreach (var c in doc ["span"]) {
+				if (c.ChildNodes.Length == 1) {
+					c.InnerText = c.InnerText + " ";
+				}
 			}
 		}
 
