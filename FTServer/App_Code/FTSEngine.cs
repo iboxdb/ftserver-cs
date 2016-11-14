@@ -699,7 +699,7 @@ namespace FTServer
 	}
 	#endregion
 	#region Bridge
-	internal static class CSharpJavaBridge
+	internal static class CSharpBridge
 	{
 		public static int length (this String self)
 		{
