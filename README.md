@@ -47,7 +47,7 @@ public long AdvertisingId()
 ````
 public static long RankDownId(long id)
 {
-    return id & (~(1L << 60 & 1L << 61)) ;
+    return id & (~(1L << 60 | 1L << 61)) ;
 }
 public static bool IsAdvertisingId(long id)
 {
