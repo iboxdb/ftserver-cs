@@ -123,3 +123,7 @@ indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
 2: set FTServer as startup project and set runtime to .NET4+
 
 3: use new version engine to read old version data may get unexpected result, remove old data, use new version engine to re-index text
+
+
+#### More
+[Full Text Search Java JSP Version](https://github.com/iboxdb/ftserver)
