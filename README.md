@@ -69,21 +69,21 @@ if you have many pages(>100,000),  use the ID number to control the order instea
 
 
 #### Search Method
-searchDistinct (... String keywords, long **startId**, long **length**)
+searchDistinct (... String keywords, long **startId**, long **count**)
 
 **startId** => which ID(the id when you called IndexText(,**id**,text)) to start, use (startId=Long.MaxValue) to read from the top, descending order
 
-**length** => records to read
+**count** => records to read,  **important parameter**, the search speed depends on this parameter, not how big the data.
 
 ##### Next Page
 set the startId as the last id from the results of searchDistinct() minus one
 
 ```
-keywords = function(searchDistinct(box, "keywords", startId, length));
+keywords = function(searchDistinct(box, "keywords", startId, count));
 nextpage_startId = keywords[last].ID - 1 
 ...
 //read next page
-searchDistinct(box, "keywords", nextpage_startId, length)
+searchDistinct(box, "keywords", nextpage_startId, count)
 ```
 
 mostly, the nextpage_startId is posted from client browser when user reached the end of webpage, and set the default nextpage_startId=Long.MaxValue, in javascript the big number have to write as String ("'" + nextpage_startId + "'")
