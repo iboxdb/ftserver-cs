@@ -73,7 +73,7 @@ searchDistinct (... String keywords, long **startId**, long **count**)
 
 **startId** => which ID(the id when you called IndexText(,**id**,text)) to start, use (startId=Long.MaxValue) to read from the top, descending order
 
-**count** => records to read,  **important parameter**, the search speed depends on this parameter, not how big the data.
+**count** => records to read,  **important parameter**, the search speed depends on this parameter, not how big the data is.
 
 ##### Next Page
 set the startId as the last id from the results of searchDistinct() minus one
