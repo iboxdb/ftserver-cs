@@ -41,6 +41,7 @@
       <Link>FTSEngine.cs</Link>
     </Compile>
     <Compile Include="EngineTest.cs" />
+    <Compile Include="ObjectSearch.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
