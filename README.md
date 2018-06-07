@@ -16,6 +16,8 @@ xsp4
 
 [CsQuery](https://github.com/jamietre/CsQuery)
 
+[AngleSharp](https://github.com/AngleSharp/AngleSharp)
+
 [Semantic-UI](http://semantic-ui.com/)
 
 
