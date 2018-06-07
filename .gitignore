@@ -1,0 +1,15 @@
+Data/*
+Obj/*
+Bin/*
+data/*
+obj/*
+bin/*
+*_Bak
+FTServer/obj/*
+FTServer/bin/*
+FTServer/Data/*
+FTServer/data/*
+EngineConsole/obj/*
+EngineConsole/bin/*
+EngineConsole/Data/*
+EngineConsole/data/*
