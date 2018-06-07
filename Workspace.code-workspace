@@ -1,11 +1,11 @@
 {
 	"folders": [
 		{
-			"path": "./EngineConsole"
+			"path": "FTServer"
 		},
 		{
-			"path": "./FTServer"
+			"path": "EngineConsole"
 		}
 	],
-	"settings": {}
+	"settings": {},
 }
