@@ -21,18 +21,18 @@ namespace FTServer
         public readonly static Engine engine = new Engine();
         public static int commitCount = 200;
 
-        public static async Task<String> indexTextAsync(String name, bool isDelete)
+        public static async Task<String> indexTextAsync(String name, bool onlyDelete)
         {
             String url = getUrl(name);
-
-            foreach (Page p in App.Auto.Select<Page>("from Page where url==?", url))
             {
-                engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content.ToString(), true);
-                engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), true);
-                App.Auto.Delete("Page", p.id);
+                foreach (Page p in App.Auto.Select<Page>("from Page where url==?", url))
+                {
+                    engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content.ToString(), true);
+                    engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), true);
+                    App.Auto.Delete("Page", p.id);
+                }
             }
-
-            if (isDelete)
+            if (onlyDelete)
             {
                 return "deleted";
             }
@@ -75,7 +75,7 @@ namespace FTServer
         }
     }
 
-    public class Page
+    public partial class Page
     {
         public const int MAX_URL_LENGTH = 100;
         public long id;
@@ -84,6 +84,11 @@ namespace FTServer
         public String description;
         public UString content;
 
+        [NotColumn]
+        public KeyWord keyWord;
+    }
+    public partial class Page
+    {
         [NotColumn]
         public long rankUpId()
         {
@@ -218,7 +223,7 @@ namespace FTServer
         }
 
 
-        internal static void removeTag(IDocument doc, string tag)
+        private static void removeTag(IDocument doc, string tag)
         {
             foreach (var c in doc.QuerySelectorAll(tag).ToArray())
             {
@@ -242,8 +247,6 @@ namespace FTServer
             }
         }
 
-        [NotColumn]
-        public KeyWord keyWord;
     }
 }
 

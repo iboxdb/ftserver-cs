@@ -803,7 +803,7 @@ namespace FTServer
         }
     }
     #endregion
-    #region Bridge
+    #region Transplanting Bridge
     internal static class CSharpBridge
     {
         public static int length(this String self)

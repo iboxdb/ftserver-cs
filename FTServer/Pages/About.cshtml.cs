@@ -10,9 +10,10 @@ namespace FTServer.Pages
     {
         public string Message { get; set; }
 
-        public void OnGet()
+        public async Task OnGetAsync(string q)
         {
-            Message = "Your application description page.";
+            SearchResource.searchList.Enqueue(q);
+            Message = "Your application description page: " + q;
         }
     }
 }

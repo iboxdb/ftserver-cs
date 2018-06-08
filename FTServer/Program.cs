@@ -23,8 +23,8 @@ namespace FTServer
             {
                 #region Path
                 bool isVM = false;
-                String dir = "/ftsdata91/";
-                String path = System.Environment.GetFolderPath(Environment.SpecialFolder.Personal) + dir;
+                String dir = "ftsdata91";
+                String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
                 try
                 {
                     Directory.CreateDirectory(path);
@@ -32,7 +32,7 @@ namespace FTServer
                 catch (UnauthorizedAccessException)
                 {
                     isVM = true;
-                    path = Path.Combine(System.Environment.CurrentDirectory, "Data");
+                    path = Path.Combine(System.Environment.CurrentDirectory, "Data", dir);
                     Directory.CreateDirectory(path);
                 }
                 Console.WriteLine("DBPath=" + path);
@@ -41,22 +41,11 @@ namespace FTServer
 
                 #region Config
                 DB db = new DB(1);
-                var cfg = db.GetConfig();
-                if (isVM)
-                {
-                    cfg.DBConfig.CacheLength
-                    = cfg.DBConfig.MB(16);
-                }
-                else
-                {
-                    cfg.DBConfig.CacheLength
-                        = cfg.DBConfig.MB(512);
-                }
-                cfg.DBConfig.SwapFileBuffer
-                    = (int)cfg.DBConfig.MB(4);
-                cfg.DBConfig.FileIncSize
-                    = (int)cfg.DBConfig.MB(16);
-                new Engine().Config(cfg.DBConfig);
+                var cfg = db.GetConfig().DBConfig;
+                cfg.CacheLength = cfg.MB(isVM ? 16 : 512);
+                cfg.FileIncSize = (int)cfg.MB(16);
+
+                new Engine().Config(cfg);
                 cfg.EnsureTable<Page>("Page", "id");
                 cfg.EnsureIndex<Page>("Page", true, "url(" + Page.MAX_URL_LENGTH + ")");
                 #endregion
