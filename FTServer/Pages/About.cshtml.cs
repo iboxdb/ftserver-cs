@@ -29,10 +29,12 @@ namespace FTServer.Pages
             return await SearchResource.indexTextAsync(name, onlyDelete);
         }
 
-
+        public string Name { get; set; }
         public async Task OnGetAsync(string q)
         {
             var name = q;
+            this.Name = name;
+
 
             bool? isdelete = null;
 
