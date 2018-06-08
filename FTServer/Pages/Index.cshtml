@@ -1,5 +1,4 @@
 ﻿@page
-@model IndexModel
 @using System.Text.Encodings.Web
 @{
     ViewData["Title"] = "Home page";
@@ -52,20 +51,20 @@
                     Input [KeyWord] to search,  input [URL] to index <br /> 
                     Input [delete URL] to delete.
                   	<br />Recent Searches:<br />
-                    @foreach (String str in SearchResource.searchList) {
+                    @foreach (String str in AboutModel.searchList) {
                     @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp; 
                     }
                     
 
                     <br>Recent Records:<br>
-                    @foreach (String str in SearchResource.urlList) {                    
+                    @foreach (String str in AboutModel.urlList) {                    
                     @:<a href="@str" target="_blank" >@str</a>. &nbsp; <br /> 
                     }
                     
                 
                     
                     <br /><a  href="./">Refresh Discoveries</a>:&nbsp; 
-   					@foreach (String str in @Model.Discoveries) {
+   					@foreach (String str in @AboutModel.GetDiscoveries()) {
                     @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp; 
                     }
  

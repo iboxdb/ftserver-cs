@@ -13,11 +13,6 @@ namespace FTServer
 {
     public class SearchResource
     {
-
-        public static ConcurrentQueue<String> searchList
-            = new ConcurrentQueue<String>();
-        public static ConcurrentQueue<String> urlList
-            = new ConcurrentQueue<String>();
         public readonly static Engine engine = new Engine();
         public static int commitCount = 200;
 

@@ -38,6 +38,12 @@ namespace FTServer
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Append("Cache-Control", "non-cache, no-store, must-revalidate");
+                await next();
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -53,6 +59,7 @@ namespace FTServer
             app.UseCookiePolicy();
 
             app.UseMvc();
+
         }
     }
 }
