@@ -5,7 +5,7 @@
 ```
 Download Project
 cd FTServer
-xsp4
+dotnet run -c Release
 ```
 
 
@@ -13,8 +13,6 @@ xsp4
 
 ### Dependencies
 [iBoxDB](http://www.iboxdb.com/)
-
-[CsQuery](https://github.com/jamietre/CsQuery)
 
 [AngleSharp](https://github.com/AngleSharp/AngleSharp)
 
@@ -120,12 +118,8 @@ indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
 
 
 #### Known Issues
-1: if using MonoDevelop v4.0.12,  use "Start Without Debugging" to start the project, don't use "Start Debugging". the Debugging causes the XSP4 to be unexpected. 
-
-2: set FTServer as startup project and set runtime to .NET4+
-
-3: use new version engine to read old version data may get unexpected result, remove old data, use new version engine to re-index text
+use new version engine to read old version data may get unexpected result, remove old data, use new version engine to re-index text
 
 
 #### More
-[Full Text Search Java JSP Version](https://github.com/iboxdb/ftserver)
+[Transplant from Full Text Search Java JSP Version](https://github.com/iboxdb/ftserver)

@@ -5,11 +5,10 @@
             "label": "build",
             "command": "dotnet",
             "type": "process",
+            //// "-c", "Release"
             "args": [
                 "build",
-                "${workspaceFolder}/EngineConsole.csproj",
-                // "-c",
-                // "Release"
+                "${workspaceFolder}/EngineConsole.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
