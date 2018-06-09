@@ -2,7 +2,7 @@
 @model AboutModel
  
 @{
-    ViewData["Title"] = Model.Name.Replace("\"", "") + ",";
+    ViewData["Title"] = Model.Result.Query.Replace("\"", "") + ",";
 }
 
 @section Styles{
@@ -90,14 +90,14 @@
                                 }
                             }
                         }
-                        var url = "spart.aspx?<%= queryString %>" + "&s=" + startId;
+                        var url = "Result?q=@Html.Raw(UrlEncoder.Default.Encode(Model.Result.Query))" + "&s=" + startId;
                         xhr.open('GET', url, true);
                         xhr.send(null);
                     }
                 }
             }
             function onload_event(){
-               onscroll_loaddiv('maindiv',  '<%=long.MaxValue %>' );
+               onscroll_loaddiv('maindiv',  '@long.MaxValue' );
             }
         </script>
 }
@@ -110,7 +110,7 @@
 
                         <div class="ui action input">
                             <a href="./"><i class="teal disk outline icon" style="font-size:42px"></i> </a>
-                            <input name="q"  value="@Model.Name.Replace("\"","&quot;")" required onfocus="formfocus()" />
+                            <input name="q"  value="@Model.Result.Query" required onfocus="formfocus()" />
                             <input id="btnsearch" type="submit"  class="ui teal right button" value="Search" /> 
                         </div>
                     </div>
@@ -128,7 +128,7 @@
 
         <div class="ui grid">
             <div class="ten wide column" style="max-width: 600px;" id="maindiv">
-               @Html.Partial( "_SPartial", @Model );
+               @Html.Partial( "ResultPartial",  @Model.Result )
 
             </div>
             <div class="six wide column" style="max-width: 200px;">
@@ -142,6 +142,11 @@
                     <h4>Full Text Search</h4> 
                 </div> 
 
+@if (App.IsDevelopment){
+                <div class="ui segment">
+                    <h5>Development Mode</h5> 
+                </div> 
+}
 
             </div>
         </div>

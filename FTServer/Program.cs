@@ -71,6 +71,8 @@ namespace FTServer
     public class App
     {
         public static AutoBox Auto;
+
+        public static bool IsDevelopment;
     }
 
 

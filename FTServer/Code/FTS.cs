@@ -72,7 +72,7 @@ namespace FTServer
 
     public partial class Page
     {
-        public const int MAX_URL_LENGTH = 100;
+        public const int MAX_URL_LENGTH = 150;
         public long id;
         public String url;
         public String title;
@@ -173,10 +173,23 @@ namespace FTServer
                     return null;
                 }
 
-                page.description = doc.QuerySelector("meta[name='description']").Attributes["content"].Value;
-                if (page.description == null)
+                try
                 {
-                    page.description = doc.QuerySelector("meta[name='Description']").Attributes["content"].Value;
+                    page.description = doc.QuerySelector("meta[name=\"description\"]").Attributes["content"].Value;
+                }
+                catch
+                {
+                }
+                try
+                {
+                    if (page.description == null)
+                    {
+                        page.description = doc.QuerySelector("meta[name=\"Description\"]").Attributes["content"].Value;
+                    }
+                }
+                catch
+                {
+
                 }
                 if (page.description == null)
                 {

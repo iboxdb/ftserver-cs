@@ -1,0 +1,74 @@
+@model ResultPartialModel
+
+@{
+    Model.Init();
+}
+ 
+
+<div id='@Html.Raw( "ldiv" + @Model.StartId )'>
+ @{ 
+     var pages = Model.pages;
+     var isFirstLoad = Model.isFirstLoad;
+     var pageCount = Model.pageCount;
+
+                     foreach (var p in pages) {
+                        String content = null;
+                        if ( (pages.Count == 1 && isFirstLoad)|| p.keyWord == null) {
+                        	content = p.description + "...";
+                            content += p.content.ToString();
+                        } else if (p.id != p.keyWord.ID) {
+                            content = p.description;
+                            if (content.Length < 20) {
+                                content += p.getRandomContent();
+                            }
+                        } else {
+                            content = SearchResource.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
+                            if (content.Length < 100) {
+                                content += p.getRandomContent();
+                            }
+                            if (content.Length < 100) {
+                                content += p.description;
+                            }
+                            if (content.Length > 200) {
+                                content = content.Substring(0, 200) + "..";
+                            }
+                           
+                        }
+
+<h3>
+ <a class="stext" target="_blank"   href="@p.url" >@p.title</a></h3> 
+<span class="stext"> @content </span>
+ <div class="gt">
+        @p.url 
+</div>
+                
+ }
+}
+</div>
+                
+ <div class="ui teal message" id='@Html.Raw("s" + @Model.StartId)'>
+    @{
+       String tcontent = (DateTime.Now - Model.begin).TotalSeconds + "s, "
+                            + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
+    
+    @: @Model.Query,  TIME: @tcontent,
+      <a href="#btnsearch" ><b>
+        @if (pages.Count >= pageCount){
+             @:"HEAD" 
+        }else{
+             @:"END"
+        }      
+      </b></a> 
+    }       
+</div>            
+
+<script>
+    setTimeout(function () {
+        highlight( '@Html.Raw( "ldiv" + @Model.StartId )' ); 
+     @if (pages.Count >= @pageCount) {
+        //startId is a big number, in javascript, have to write big number as a 'String'
+        @: onscroll_loaddiv('@Html.Raw( "s" + @Model.StartId )', '@Model.StartId');
+     }
+    }, 100);
+</script>      
+      

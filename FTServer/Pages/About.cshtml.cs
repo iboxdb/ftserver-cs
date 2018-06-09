@@ -19,7 +19,7 @@ namespace FTServer.Pages
         {
             using (var box = App.Auto.Cube())
             {
-                return SearchResource.engine.discover(box, 'a', 'z', 4,
+                return SearchResource.engine.discover(box, 'a', 'z', 2,
                     '\u2E80', '\u9fa5', 1).ToList();
             }
         }
@@ -29,28 +29,31 @@ namespace FTServer.Pages
             return await SearchResource.indexTextAsync(name, onlyDelete);
         }
 
-        public string Name { get; set; }
+        public ResultPartialModel Result { get; set; }
         public async Task OnGetAsync(string q)
         {
-            var name = q;
-            this.Name = name;
+            q = q.Replace("<", "").Replace(">", "").Trim();
 
+            Result = new ResultPartialModel
+            {
+                Query = q,
+                StartId = null
+            };
 
             bool? isdelete = null;
 
-            if (name.StartsWith("http://") || name.StartsWith("https://"))
+            if (q.StartsWith("http://") || q.StartsWith("https://"))
             {
                 isdelete = false;
             }
-            else if (name.StartsWith("delete")
-              && (name.Contains("http://") || name.Contains("https://")))
+            else if (q.StartsWith("delete")
+              && (q.Contains("http://") || q.Contains("https://")))
             {
                 isdelete = true;
             }
             if (!isdelete.HasValue)
             {
-
-                searchList.Enqueue(name.Replace("<", ""));
+                searchList.Enqueue(q);
                 while (searchList.Count > 15)
                 {
                     String t;
@@ -59,8 +62,8 @@ namespace FTServer.Pages
             }
             else
             {
-                await IndexTextAsync(name, isdelete.Value);
-                urlList.Enqueue(name.Replace("<", ""));
+                await IndexTextAsync(q, isdelete.Value);
+                urlList.Enqueue(q);
                 while (urlList.Count > 3)
                 {
                     String t;

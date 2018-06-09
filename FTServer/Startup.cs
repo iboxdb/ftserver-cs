@@ -44,6 +44,7 @@ namespace FTServer
                 await next();
             });
 
+            App.IsDevelopment = env.IsDevelopment();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
