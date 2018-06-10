@@ -118,7 +118,7 @@ indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
 ````
 
 #### Tools
-Ubuntu 18.04 + Visual Studio Code
+Ubuntu 18.04 + Visual Studio Code + ASP.NET Core
 
 #### More
 [Transplant from Full Text Search Java JSP Version](https://github.com/iboxdb/ftserver)
