@@ -2,8 +2,8 @@
 
 ### Setup
 
-```
-Download Project
+```s
+Download Project / git clone https://github.com/iboxdb/ftserver-cs.git
 cd FTServer
 dotnet run -c Release
 ```
