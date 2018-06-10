@@ -24,13 +24,13 @@ dotnet run -c Release
 the results order based on the ID number in IndexTextNoTran(.. **long id**, ...),  descending order.
 
 every page has two index-IDs, normal-id and rankup-id, the rankup-id is a big number and used to keep the important text on the **top**.  (the front results from SearchDistinct(IBox, String) )
-````
+````cs
 Engine.IndexTextNoTran(..., p.Id, p.Content, ...);
 Engine.IndexTextNoTran(..., p.RankUpId(), p.RankUpDescription(), ...);
 ````					
 
 the RankUpId()
-````
+````cs
 public long RankUpId()
 {
     return id | (1L << 60);
@@ -38,13 +38,13 @@ public long RankUpId()
 ````
 
 if you have more more important text , you can add one more index-id
-````
+````cs
 public long AdvertisingId()
 {
     return id | (1L << 61);
 }
 ````
-````
+````cs
 public static long RankDownId(long id)
 {
     return id & (~(1L << 60 | 1L << 61)) ;
@@ -78,7 +78,7 @@ searchDistinct (... String keywords, long **startId**, long **count**)
 ##### Next Page
 set the startId as the last id from the results of searchDistinct() minus one
 
-```
+```cs
 keywords = function(searchDistinct(box, "keywords", startId, count));
 nextpage_startId = keywords[last].ID - 1 
 ...
@@ -94,7 +94,7 @@ mostly, the nextpage_startId is posted from client browser when user reached the
 When Insert
 
 1.insert page --> 2.insert index
-````
+````cs
 DB.Insert ("Page", page);
 Engine.IndexTextNoTran( IsRemove = false );
 ...IndexTextNoTran...
@@ -104,18 +104,18 @@ Engine.IndexTextNoTran( IsRemove = false );
 When Delete  
 
 1.delete index --> 2.delete page
-````
+````cs
 Engine.IndexTextNoTran( IsRemove = true );
 ...IndexTextNoTran...
 DB.Delete("Page", page.Id);
 ````				
 
 #### Memory
-
+````cs
 indexText(IBox, id, String, bool) // faster, more memories
 
 indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
-
+````
 
 #### Tools
 Ubuntu 18.04 + Visual Studio Code
