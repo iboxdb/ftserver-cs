@@ -14,8 +14,12 @@ namespace FTServer.Pages
 
         public List<FTServer.Page> pages;
         public DateTime begin;
-        public readonly long pageCount = 12;
+
         public bool isFirstLoad;
+
+        // reset in ResultPartial.cshtml
+        public long pageCount = 12;
+
 
         public void Init()
         {

@@ -128,8 +128,9 @@
 
         <div class="ui grid">
             <div class="ten wide column" style="max-width: 600px;" id="maindiv">
-               @Html.Partial( "ResultPartial",  @Model.Result )
-
+               @{
+                   await Html.RenderPartialAsync( "ResultPartial",  @Model.Result );
+                }
             </div>
             <div class="six wide column" style="max-width: 200px;">
 

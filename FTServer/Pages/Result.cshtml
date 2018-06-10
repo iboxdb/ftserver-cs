@@ -1,0 +1,19 @@
+@page
+@{
+   Layout = null;
+}
+
+
+@{
+   var q = HttpContext.Request.Query["q"].First();
+   var s = HttpContext.Request.Query["s"].First();
+
+   q = q.Replace("<", "").Replace(">", "").Trim();
+
+   var Result = new ResultPartialModel{
+      Query = q,
+      StartId = long.Parse(s)
+   };
+   await Html.RenderPartialAsync( "ResultPartial",  Result );
+}
+ 

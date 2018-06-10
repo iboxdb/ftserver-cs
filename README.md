@@ -117,9 +117,8 @@ indexText(IBox, id, String, bool) // faster, more memories
 indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
 
 
-#### Known Issues
-use new version engine to read old version data may get unexpected result, remove old data, use new version engine to re-index text
-
+#### Tools
+Ubuntu 18.04 + Visual Studio Code
 
 #### More
 [Transplant from Full Text Search Java JSP Version](https://github.com/iboxdb/ftserver)

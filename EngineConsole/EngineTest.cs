@@ -178,14 +178,16 @@ namespace FTServer
             }
         }
 
+        //150 seconds test
         public static void test_big_n()
         {
             String book = "/hero.txt";
             long dbid = 1;
             char split = '。';
 
-            bool rebuild = false;
-            int notranCount = 10;
+            //set this true
+            bool rebuild = true;
+            int notranCount = -1;//10;
             String strkw = "黄蓉 郭靖 洪七公";
             //strkw = "洪七公 黄蓉 郭靖";
             //strkw = "黄蓉 郭靖 公";
@@ -203,17 +205,19 @@ namespace FTServer
             test_big(book, dbid, rebuild, split, strkw, notranCount);
         }
 
+        //30 seconds test
         public static void test_big_e()
         {
             String book = "/phoenix.txt";
             long dbid = 2;
             char split = '.';
 
-            bool rebuild = false;
-            int notranCount = 10;
+            //set true
+            bool rebuild = true;
+            int notranCount = 10; //-1;
 
             String strkw = "Harry";
-            //strkw = "Harry Philosopher";
+            strkw = "Harry Philosopher";
             //strkw = "Philosopher";
             //strkw = "\"Harry Philosopher\"";
             //strkw = "\"He looks\"";
@@ -242,6 +246,8 @@ namespace FTServer
 
             String[] tstmp = File.OpenText(System.Environment.GetFolderPath(Environment.SpecialFolder.Personal) +
                 book).ReadToEnd().Split(split);
+
+                //three times data
             List<String> list = new List<String>();
             for (int i = 0; i < 2; i++)
             {
@@ -296,7 +302,7 @@ namespace FTServer
                         c++;
                     }
                 }
-                Console.WriteLine(c + " , " + (DateTime.Now - b).TotalSeconds);
+                Console.WriteLine("DB: " + c + " , " + (DateTime.Now - b).TotalSeconds + "s");
             }
 
 
@@ -374,7 +380,7 @@ namespace FTServer
                 c++;
 
             }
-            Console.WriteLine(c + " , " + (DateTime.Now - b).TotalSeconds + " -" + ts.Length);
+            Console.WriteLine( "MEM: " + c + " , " + (DateTime.Now - b).TotalSeconds + "s -" + ts.Length);
 
             auto.GetDatabase().Dispose();
         }

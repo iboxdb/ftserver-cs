@@ -22,7 +22,7 @@ namespace FTServer
             var task = Task.Run<AutoBox>(() =>
             {
                 #region Path
-                bool isVM = false;
+                App.IsVM = false;
                 String dir = "ftsdata91";
                 String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
                 try
@@ -31,7 +31,7 @@ namespace FTServer
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    isVM = true;
+                    App.IsVM = true;
                     path = Path.Combine(System.Environment.CurrentDirectory, "Data", dir);
                     Directory.CreateDirectory(path);
                 }
@@ -42,7 +42,7 @@ namespace FTServer
                 #region Config
                 DB db = new DB(1);
                 var cfg = db.GetConfig().DBConfig;
-                cfg.CacheLength = cfg.MB(isVM ? 16 : 512);
+                cfg.CacheLength = cfg.MB(App.IsVM ? 16 : 512);
                 cfg.FileIncSize = (int)cfg.MB(16);
 
                 new Engine().Config(cfg);
@@ -73,6 +73,7 @@ namespace FTServer
         public static AutoBox Auto;
 
         public static bool IsDevelopment;
+        public static bool IsVM;
     }
 
 
