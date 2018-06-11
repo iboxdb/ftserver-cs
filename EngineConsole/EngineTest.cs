@@ -249,7 +249,7 @@ namespace FTServer
 
                 //three times data
             List<String> list = new List<String>();
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
             {
                 foreach (String str in tstmp)
                 {
