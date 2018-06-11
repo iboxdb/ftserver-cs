@@ -48,6 +48,7 @@ namespace FTServer
                 new Engine().Config(cfg);
                 cfg.EnsureTable<Page>("Page", "id");
                 cfg.EnsureIndex<Page>("Page", true, "url(" + Page.MAX_URL_LENGTH + ")");
+                cfg.EnsureTable<PageLock>("PageLock", "url(" + Page.MAX_URL_LENGTH + ")");
                 #endregion
 
                 return db.Open();

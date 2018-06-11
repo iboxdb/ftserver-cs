@@ -19,6 +19,28 @@ namespace FTServer
         public static async Task<String> indexTextAsync(String name, bool onlyDelete)
         {
             String url = getUrl(name);
+            using (var box = App.Auto.Cube())
+            {
+                PageLock pl = box["PageLock", url].Select<PageLock>();
+                if (pl == null)
+                {
+                    pl = new PageLock { url = url, time = DateTime.Now };
+                }
+                else if ((DateTime.Now - pl.time).TotalSeconds > 120)
+                {
+                    pl.time = DateTime.Now;
+                }
+                else
+                {
+                    return "Running";
+                }
+                box["PageLock"].Replace(pl);
+                if (box.Commit() != CommitResult.OK)
+                {
+                    return "Running";
+                }
+            }
+            try
             {
                 foreach (Page p in App.Auto.Select<Page>("from Page where url==?", url))
                 {
@@ -26,26 +48,31 @@ namespace FTServer
                     engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), true);
                     App.Auto.Delete("Page", p.id);
                 }
-            }
-            if (onlyDelete)
-            {
-                return "deleted";
-            }
-            {
-                Page p = await Page.GetAsync(url);
-                if (p == null)
-                {
-                    return "temporarily unreachable";
-                }
-                else
-                {
-                    p.id = App.Auto.NewId();
-                    App.Auto.Insert("Page", p);
-                    engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content.ToString(), false);
-                    engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), false);
 
-                    return p.url;
+                if (onlyDelete)
+                {
+                    return "deleted";
                 }
+                {
+                    Page p = await Page.GetAsync(url);
+                    if (p == null)
+                    {
+                        return "temporarily unreachable";
+                    }
+                    else
+                    {
+                        p.id = App.Auto.NewId();
+                        App.Auto.Insert("Page", p);
+                        engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content.ToString(), false);
+                        engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), false);
+
+                        return p.url;
+                    }
+                }
+            }
+            finally
+            {
+                App.Auto.Delete("PageLock", url);
             }
         }
 
@@ -69,7 +96,11 @@ namespace FTServer
             return "";
         }
     }
-
+    public class PageLock
+    {
+        public String url;
+        public DateTime time;
+    }
     public partial class Page
     {
         public const int MAX_URL_LENGTH = 150;
