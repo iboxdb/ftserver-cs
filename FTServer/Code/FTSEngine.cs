@@ -400,7 +400,27 @@ namespace FTServer
         public StringUtil()
         {
             viet_set = new HashSet<char>();
-            foreach (var c in "ẮẰẲẴẶĂẤẦẨẪẬÂÁÀÃẢẠĐẾỀỂỄỆÊÉÈẺẼẸÍÌỈĨỊỐỒỔỖỘÔỚỜỞỠỢƠÓÒÕỎỌỨỪỬỮỰƯÚÙỦŨỤÝỲỶỸỴAĂÂBCDĐEÊGHIKLMNOÔƠPQRSTUƯVXYaăâbcdđeêghiklmnoôơpqrstuưvxy")
+            var vv = "ẮẰẲẴẶĂẤẦẨẪẬÂÁÀÃẢẠĐẾỀỂỄỆÊÉÈẺẼẸÍÌỈĨỊỐỒỔỖỘÔỚỜỞỠỢƠÓÒÕỎỌỨỪỬỮỰƯÚÙỦŨỤÝỲỶỸỴAĂÂBCDĐEÊGHIKLMNOÔƠPQRSTUƯVXYaăâbcdđeêghiklmnoôơpqrstuưvxy";
+            vv += "A a Ă ă Â â E e Ê ê I i O o Ơ ơ Ô ô U u Ư ư Y y";
+            vv += "À à Ằ ằ Ầ ầ È è Ề ề Ì ì Ò ò Ờ ờ Ồ ồ Ù ù Ừ ừ Ỳ ỳ";
+            vv += "Ả ả Ẳ ẳ Ẩ ẩ Ẻ ẻ Ể ể Ỉ ỉ Ỏ ỏ Ở ở Ổ ổ Ủ ủ Ử ử Ỷ ỷ";
+            vv += "Ã ã Ẵ ẵ Ẫ ẫ Ẽ ẽ Ễ ễ Ĩ ĩ Õ õ Ỡ ỡ Ỗ ỗ Ũ ũ Ữ ữ Ỹ ỹ";
+            vv += "Á á Ắ ắ Ấ ấ É é Ế ế Í í Ó ó Ớ ớ Ỗ ỗ Ú ú Ứ ứ Ý ý";
+            vv += "Ạ ạ Ặ ặ Ậ ậ Ẹ ẹ Ệ ệ Ị ị Ọ ọ Ợ ợ Ộ ộ Ụ ụ Ự ự Ỵ ỵ";
+            vv += (char)0x1DC4;
+            /*
+            The Vietnamese alphabets are listed in several noncontiguous Unicode ranges: Basic Latin {U+0000..U+007F}, Latin-1 Supplement {U+0080..U+00FF}, Latin Extended-A, -B {U+0100..U+024F}, Latin Extended Additional {U+1E00..U+1EFF}, and Combining Diacritical Marks {U+0300.. U+036F}. The Vietnamese đồng currency symbol is ₫ (U+20AB).
+             */
+            foreach (var c in vv)
+            {
+                viet_set.add(c);
+            }
+            viet_set.Remove(' ');
+            for (char c = (char)0x0300; c <= (char)0x036F; c++)
+            {
+                viet_set.add(c);
+            }
+            for (char c = (char)0x1E00; c <= (char)0x1EFF; c++)
             {
                 viet_set.add(c);
             }
