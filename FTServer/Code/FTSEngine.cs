@@ -396,9 +396,15 @@ namespace FTServer
     class StringUtil
     {
         HashSet<Char> set;
-
+        HashSet<Char> viet_set;
         public StringUtil()
         {
+            viet_set = new HashSet<char>();
+            foreach (var c in "ẮẰẲẴẶĂẤẦẨẪẬÂÁÀÃẢẠĐẾỀỂỄỆÊÉÈẺẼẸÍÌỈĨỊỐỒỔỖỘÔỚỜỞỠỢƠÓÒÕỎỌỨỪỬỮỰƯÚÙỦŨỤÝỲỶỸỴ")
+            {
+                viet_set.add(c);
+            }
+
             String s = "!\"@$%&'()*+,./:;<=>?[\\]^_`{|}~\r\n"; //@-
             s += "， 　，《。》、？；：‘’“”【｛】｝——=+、｜·～！￥%……&*（）"; //@-#
             s += "｀～！＠￥％……—×（）——＋－＝【】｛｝：；’＇”＂，．／＜＞？’‘”“";//＃
@@ -417,7 +423,11 @@ namespace FTServer
             }
             set.add((char)0);
             set.add((char)8203);
+            set.add((char)0x0E00);//Thai
+
         }
+
+        //https://unicode-table.com/
         //Chinese  [\u2E80-\u9fa5]
         //Japanese [\u0800-\u4e00]|
         //Korean   [\uAC00-\uD7A3] [\u3130-\u318F] 
@@ -439,6 +449,11 @@ namespace FTServer
             }
             //Germen
             if (c >= 0xc0 && c <= 0xff)
+            {
+                return true;
+            }
+            //Vietnamese
+            if (viet_set.contains(c))
             {
                 return true;
             }

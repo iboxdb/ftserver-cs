@@ -23,7 +23,7 @@ namespace FTServer
             {
                 #region Path
                 App.IsVM = false;
-                String dir = "ftsdata91";
+                String dir = "ftsdata92";
                 String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
                 try
                 {

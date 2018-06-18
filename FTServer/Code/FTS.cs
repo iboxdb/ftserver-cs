@@ -26,7 +26,7 @@ namespace FTServer
                 {
                     pl = new PageLock { url = url, time = DateTime.Now };
                 }
-                else if ((DateTime.Now - pl.time).TotalSeconds > 120)
+                else if ((DateTime.Now - pl.time).TotalSeconds > (60 * 5))
                 {
                     pl.time = DateTime.Now;
                 }
@@ -42,11 +42,13 @@ namespace FTServer
             }
             try
             {
+                Page defaultPage = null;
                 foreach (Page p in App.Auto.Select<Page>("from Page where url==?", url))
                 {
-                    engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content.ToString(), true);
+                    engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content, true);
                     engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), true);
                     App.Auto.Delete("Page", p.id);
+                    defaultPage = p;
                 }
 
                 if (onlyDelete)
@@ -57,13 +59,20 @@ namespace FTServer
                     Page p = await Page.GetAsync(url);
                     if (p == null)
                     {
+                        p = defaultPage;
+                    }
+                    if (p == null)
+                    {
                         return "temporarily unreachable";
                     }
                     else
                     {
-                        p.id = App.Auto.NewId();
+                        if (p.id == 0)
+                        {
+                            p.id = App.Auto.NewId();
+                        }
                         App.Auto.Insert("Page", p);
-                        engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content.ToString(), false);
+                        engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content, false);
                         engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), false);
 
                         return p.url;
@@ -108,7 +117,7 @@ namespace FTServer
         public String url;
         public String title;
         public String description;
-        public UString content;
+        public String content;
 
         [NotColumn]
         public KeyWord keyWord;
@@ -138,10 +147,10 @@ namespace FTServer
         [NotColumn]
         public String getRandomContent()
         {
-            int len = content.ToString().Length - 100;
+            int len = content.Length - 100;
             if (len <= 20)
             {
-                return content.ToString();
+                return content;
             }
             int s = cran.Next(len);
             if (s < 0)
@@ -153,12 +162,12 @@ namespace FTServer
                 s = len;
             }
 
-            int count = content.ToString().Length - s;
+            int count = content.Length - s;
             if (count > 200)
             {
                 count = 200;
             }
-            return content.ToString().Substring(s, count);
+            return content.Substring(s, count);
         }
 
         [NotColumn]
