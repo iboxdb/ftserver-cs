@@ -40,10 +40,11 @@ namespace FTServer
                 #endregion
 
                 #region Config
+                //System.Diagnostics.Process.GetCurrentProcess()
                 DB db = new DB(1);
                 var cfg = db.GetConfig().DBConfig;
                 cfg.CacheLength = cfg.MB(App.IsVM ? 16 : 512);
-                cfg.FileIncSize = (int)cfg.MB(16);
+                cfg.FileIncSize = (int)cfg.MB(4);
 
                 new Engine().Config(cfg);
                 cfg.EnsureTable<Page>("Page", "id");
