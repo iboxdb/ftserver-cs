@@ -15,38 +15,121 @@ namespace FTServer
     {
         public readonly static Engine engine = new Engine();
 
-
-        public static async Task<String> indexTextAsync(String name, bool onlyDelete)
+        public static long search(List<Page> pages,
+                String name, long startId, long pageCount)
         {
-
-            const int commitCount = 200;
-            String url = getUrl(name);
+            name = name.Trim();
             using (var box = App.Auto.Cube())
             {
-                PageLock pl = box["PageLock", url].Select<PageLock>();
-                if (pl == null)
+                foreach (KeyWord kw in engine.searchDistinct(box, name, startId, pageCount))
                 {
-                    pl = new PageLock
-                    {
-                        url = url,
-                        time = DateTime.Now
-                    };
+                    startId = kw.ID - 1;
+
+                    long id = kw.ID;
+                    id = FTServer.Page.rankDownId(id);
+                    var p = box["Page", id].Select<FTServer.Page>();
+                    p.keyWord = kw;
+                    pages.Add(p);
+
                 }
-                else if ((DateTime.Now - pl.time).TotalSeconds > (60 * 5))
+            }
+
+
+            //Recommend
+            if (pages.Count == 0 && name.length() > 1)
+            {
+                if (!engine.isWord(name[0]) && name[0] != '"')
                 {
-                    pl.time = DateTime.Now;
+                    //only search one char, if full search is empty
+                    search(pages, name.substring(0, 1), long.MaxValue, pageCount);
                 }
                 else
                 {
-                    return "Running";
+                    int pos = name.IndexOf(' ');
+                    if (pos > 0)
+                    {
+                        name = name.substring(0, pos);
+                        search(pages, name, long.MaxValue, pageCount);
+                    }
                 }
-                box["PageLock"].Replace(pl);
-                if (box.Commit() != CommitResult.OK)
+                if (pages.Count == 0)
                 {
-                    return "Running";
+                    return startId;
                 }
+                return -1;
             }
-            try
+            return startId;
+        }
+        public static async Task<String> indexTextAsync(String url, bool deleteOnly)
+        {
+            bool tran = true;
+            if (tran)
+            {
+                return await indexTextWithTranAsync(Html.getUrl(url), deleteOnly);
+            }
+            return await indexTextNoTranAsync(Html.getUrl(url), deleteOnly);
+        }
+
+
+        //with transaction, faster
+        private static async Task<String> indexTextWithTranAsync(String url, bool onlyDelete)
+        {
+            return await pageLockAsync(url, async () =>
+            {
+                using (var box = App.Auto.Cube())
+                {
+                    Page defaultPage = null;
+                    foreach (Page p in box.Select<Page>("from Page where url==?", url).ToArray())
+                    {
+                        engine.indexText(box, p.id, p.content, true);
+                        engine.indexText(box, p.rankUpId(), p.rankUpDescription(), true);
+                        box["Page", p.id].Delete();
+                        defaultPage = p;
+                    }
+
+                    if (onlyDelete)
+                    {
+                        return box.Commit() == CommitResult.OK ? "deleted" : "not deleted";
+                    }
+                    {
+                        Page p = await Html.GetAsync(url);
+                        if (p == null)
+                        {
+                            //p = defaultPage;
+                        }
+                        if (p == null)
+                        {
+                            return "temporarily unreachable";
+                        }
+                        else
+                        {
+                            if (p.id == 0)
+                            {
+                                p.id = box.NewId();
+                            }
+                            box["Page"].Insert(p);
+                            engine.indexText(box, p.id, p.content, false);
+                            engine.indexText(box, p.rankUpId(), p.rankUpDescription(), false);
+
+                            CommitResult cr = box.Commit();
+                            if (cr != CommitResult.OK)
+                            {
+                                return cr.GetErrorMsg(box);
+                            }
+                            return p.url;
+                        }
+                    }
+
+                }
+            });
+        }
+
+        //no transaction, less memory
+        private static async Task<String> indexTextNoTranAsync(String url, bool onlyDelete)
+        {
+
+            const int commitCount = 200;
+            return await pageLockAsync(url, async () =>
             {
                 Page defaultPage = null;
                 foreach (Page p in App.Auto.Select<Page>("from Page where url==?", url))
@@ -84,6 +167,39 @@ namespace FTServer
                         return p.url;
                     }
                 }
+            });
+        }
+
+        private static async Task<String> pageLockAsync(String url, Func<Task<string>> run)
+        {
+            using (var box = App.Auto.Cube())
+            {
+                PageLock pl = box["PageLock", url].Select<PageLock>();
+                if (pl == null)
+                {
+                    pl = new PageLock
+                    {
+                        url = url,
+                        time = DateTime.Now
+                    };
+                }
+                else if ((DateTime.Now - pl.time).TotalSeconds > (60 * 5))
+                {
+                    pl.time = DateTime.Now;
+                }
+                else
+                {
+                    return "Running";
+                }
+                box["PageLock"].Replace(pl);
+                if (box.Commit() != CommitResult.OK)
+                {
+                    return "Running";
+                }
+            }
+            try
+            {
+                return await run();
             }
             finally
             {
@@ -91,11 +207,15 @@ namespace FTServer
             }
         }
 
-        private static String pageLock(final String url, final Callable<String> run)
-        {
-        }
 
-        private static String getUrl(String name)
+    }
+
+
+
+
+    public class Html
+    {
+        public static String getUrl(String name)
         {
             int p = name.IndexOf("http://");
             if (p < 0)
@@ -114,17 +234,11 @@ namespace FTServer
             }
             return "";
         }
-    }
-
-
-    public class Html
-    {
-        [NotColumn]
         public static async Task<Page> GetAsync(String url)
         {
             try
             {
-                if (url == null || url.Length > MAX_URL_LENGTH || url.Length < 8)
+                if (url == null || url.Length > Page.MAX_URL_LENGTH || url.Length < 8)
                 {
                     return null;
                 }

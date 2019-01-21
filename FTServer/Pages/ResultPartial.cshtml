@@ -5,7 +5,9 @@
     Model.Init();
 }
  
-
+@if(Model.StartId.Value == -1){
+  <h3>Recommend</h3>
+}
 <div id='@Html.Raw( "ldiv" + @Model.StartId )'>
  @{ 
      var pages = Model.pages;
@@ -14,16 +16,17 @@
 
                      foreach (var p in pages) {
                         String content = null;
-                        if ( (pages.Count == 1 && isFirstLoad)|| p.keyWord == null) {
+                        if ( p.keyWord == null) {
                         	content = p.description + "...";
-                            content += p.content.ToString();
+                            content += p.content;                        
+                             
                         } else if (p.id != p.keyWord.ID) {
                             content = p.description;
                             if (content.Length < 20) {
                                 content += p.getRandomContent();
                             }
                         } else {
-                            content = SearchResource.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
+                            content = IndexAPI.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
                             if (content.Length < 100) {
                                 content += p.getRandomContent();
                             }
@@ -66,7 +69,7 @@
 <script>
     setTimeout(function () {
         highlight( '@Html.Raw( "ldiv" + @Model.StartId )' ); 
-     @if (pages.Count >= @pageCount) {
+     @if (pages.Count >= @pageCount && @Model.StartId.Value >-1 ) {
         //startId is a big number, in javascript, have to write big number as a 'String'
         @: onscroll_loaddiv('@Html.Raw( "s" + @Model.StartId )', '@Model.StartId');
      }

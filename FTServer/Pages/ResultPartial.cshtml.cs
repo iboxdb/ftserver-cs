@@ -31,27 +31,14 @@ namespace FTServer.Pages
 
             begin = DateTime.Now;
 
-            using (var box = App.Auto.Cube())
-            {
-                foreach (KeyWord kw in SearchResource.engine.searchDistinct(box, Query, StartId.Value, pageCount))
-                {
-                    StartId = kw.ID - 1;
-
-                    long id = kw.ID;
-                    id = FTServer.Page.rankDownId(id);
-                    var p = box["Page", id].Select<FTServer.Page>();
-                    p.keyWord = kw;
-                    pages.Add(p);
-
-                }
-            }
+            StartId = IndexAPI.search(pages, Query, StartId.Value, pageCount);
 
             if (StartId == long.MaxValue)
             {
                 Page p = new Page();
                 p.title = "NotFound";
                 p.description = "";
-                p.content = "input URL to index";
+                p.content = "input URL(http or https) to index";
                 p.url = "./";
                 pages.Add(p);
             }

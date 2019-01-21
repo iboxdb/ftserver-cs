@@ -19,14 +19,14 @@ namespace FTServer.Pages
         {
             using (var box = App.Auto.Cube())
             {
-                return SearchResource.engine.discover(box, 'a', 'z', 2,
+                return IndexAPI.engine.discover(box, 'a', 'z', 2,
                     '\u2E80', '\u9fa5', 1).ToList();
             }
         }
 
         public static async Task<String> IndexTextAsync(String name, bool onlyDelete)
         {
-            return await SearchResource.indexTextAsync(name, onlyDelete);
+            return await IndexAPI.indexTextAsync(name, onlyDelete);
         }
 
         public ResultPartialModel Result { get; set; }
