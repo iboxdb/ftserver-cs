@@ -73,7 +73,10 @@ namespace FTServer
     public class App
     {
         public static AutoBox Auto;
-
+        public static IBox Cube()
+        {
+            return Auto.Cube();
+        }
         public static bool IsDevelopment;
         public static bool IsVM;
     }

@@ -19,7 +19,7 @@ namespace FTServer
                 String name, long startId, long pageCount)
         {
             name = name.Trim();
-            using (var box = App.Auto.Cube())
+            using (var box = App.Cube())
             {
                 foreach (KeyWord kw in engine.searchDistinct(box, name, startId, pageCount))
                 {
