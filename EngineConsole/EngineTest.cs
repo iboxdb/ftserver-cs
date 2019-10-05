@@ -387,6 +387,12 @@ namespace FTServer
 
         private static bool onlyPart(String str, String wd, int p)
         {
+            char last = wd[wd.Length - 1];
+            if (last > 256)
+            {
+                return false;
+            }
+
             char pc = str[p + wd.length()];
             if (pc >= 'a' && pc <= 'z')
             {
