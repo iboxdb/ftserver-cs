@@ -17,7 +17,7 @@ namespace FTServer
             DB.Root("/tmp/");
 
 
-            iBoxDB.DBDebug.DDebug.DeleteDBFiles(3);
+            BoxSystem.DBDebug.DeleteDBFiles(3);
             DB db = new DB(3);
             Engine engine = new Engine();
             engine.Config(db.GetConfig().DBConfig);
@@ -126,7 +126,7 @@ namespace FTServer
             };
             for (int tran = 0; tran < 2; tran++)
             {
-                iBoxDB.DBDebug.DDebug.DeleteDBFiles(3);
+                BoxSystem.DBDebug.DeleteDBFiles(3);
                 DB db = new DB(3);
                 Engine engine = new Engine();
                 engine.Config(db.GetConfig().DBConfig);
@@ -240,14 +240,14 @@ namespace FTServer
 
             if (rebuild)
             {
-                iBoxDB.DBDebug.DDebug.DeleteDBFiles(dbid);
+                BoxSystem.DBDebug.DeleteDBFiles(dbid);
             }
             DB db = new DB(dbid);
 
             String[] tstmp = File.OpenText(System.Environment.GetFolderPath(Environment.SpecialFolder.Personal) +
                 book).ReadToEnd().Split(split);
 
-                //three times data
+            //three times data
             List<String> list = new List<String>();
             for (int i = 0; i < 3; i++)
             {
@@ -380,7 +380,7 @@ namespace FTServer
                 c++;
 
             }
-            Console.WriteLine( "MEM: " + c + " , " + (DateTime.Now - b).TotalSeconds + "s -" + ts.Length);
+            Console.WriteLine("MEM: " + c + " , " + (DateTime.Now - b).TotalSeconds + "s -" + ts.Length);
 
             auto.GetDatabase().Dispose();
         }

@@ -9,8 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using iBoxDB.LocalServer;
-using AngleSharp.Parser.Html;
-using AngleSharp.Extensions;
 
 namespace FTServer
 {

@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/bin/Debug/netcoreapp2.1/FTServer.dll",
+            "program": "${workspaceRoot}/bin/Debug/netcoreapp2.2/FTServer.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
             "stopAtEntry": false,
