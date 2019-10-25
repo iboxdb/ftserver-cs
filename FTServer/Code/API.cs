@@ -22,9 +22,9 @@ namespace FTServer
             {
                 foreach (KeyWord kw in engine.searchDistinct(box, name, startId, pageCount))
                 {
-                    startId = kw.ID - 1;
+                    startId = kw.I - 1;
 
-                    long id = kw.ID;
+                    long id = kw.I;
                     id = FTServer.Page.rankDownId(id);
                     var p = box["Page", id].Select<FTServer.Page>();
                     p.keyWord = kw;

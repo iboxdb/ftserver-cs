@@ -79,11 +79,11 @@ namespace FTServer
             Binder binder;
             if (kw is KeyWordE)
             {
-                binder = box["/E", kw.getKeyWord(), kw.getID(), kw.getPosition()];
+                binder = box["/E", kw.getKeyWord(), kw.I, kw.P];
             }
             else
             {
-                binder = box["/N", kw.getKeyWord(), kw.getID(), kw.getPosition()];
+                binder = box["/N", kw.getKeyWord(), kw.I, kw.P];
             }
             if (isRemove)
             {
@@ -177,11 +177,11 @@ namespace FTServer
                 {
                     break;
                 }
-                if (kw.getID() == c_id)
+                if (kw.I == c_id)
                 {
                     continue;
                 }
-                c_id = kw.getID();
+                c_id = kw.I;
                 len--;
                 yield return kw;
             }
@@ -255,13 +255,13 @@ namespace FTServer
                         {
                             r1_con = cd.Current;
 
-                            if (r1_id == r1_con.getID())
+                            if (r1_id == r1_con.I)
                             {
                                 continue;
                             }
                             if (!nw.isLinked)
                             {
-                                r1_id = r1_con.getID();
+                                r1_id = r1_con.I;
                             }
 
                             r1 = search(box, nw, r1_con, maxId).GetEnumerator();
@@ -295,7 +295,7 @@ namespace FTServer
                     : "from /N where K==? & I<=?";
 
 
-            int linkPos = kw.isLinked ? (con.getPosition() + con.size()
+            int linkPos = kw.isLinked ? (con.P + con.size()
                 + (kw is KeyWordE ? 1 : 0)) : -1;
 
             long currentMaxId = long.MaxValue;
@@ -329,7 +329,7 @@ namespace FTServer
 
                             cache = iter.Current;
 
-                            maxId.id = cache.getID();
+                            maxId.id = cache.I;
                             currentMaxId = maxId.id;
                             if (con != null && con.I != maxId.id)
                             {
@@ -346,7 +346,7 @@ namespace FTServer
                                 return true;
                             }
 
-                            int cpos = cache.getPosition();
+                            int cpos = cache.P;
                             if (cpos > linkPos)
                             {
                                 continue;
@@ -548,9 +548,9 @@ namespace FTServer
                     if (k == null && c != '-' && c != '#')
                     {
                         k = new KeyWordE();
-                        k.setID(id);
+                        k.I = id;
                         k.setKeyWord("");
-                        k.setPosition(i);
+                        k.P = i;
                         if (linkedCount > 0)
                         {
                             linkedCount++;
@@ -574,8 +574,8 @@ namespace FTServer
                     k = null;
 
                     KeyWordN n = new KeyWordN();
-                    n.setID(id);
-                    n.setPosition(i);
+                    n.I = id;
+                    n.P = i;
                     n.longKeyWord(c, (char)0, (char)0);
                     n.isLinked = i == (lastNPos + 1);
                     kws.add(n);
@@ -584,8 +584,8 @@ namespace FTServer
                     if ((c1 != ' ' && c1 != '"') && (!isWord(c1)))
                     {
                         n = new KeyWordN();
-                        n.setID(id);
-                        n.setPosition(i);
+                        n.I = id;
+                        n.P = i;
                         n.longKeyWord(c, c1, (char)0);
                         n.isLinked = i == (lastNPos + 1);
                         kws.add(n);
@@ -633,7 +633,7 @@ namespace FTServer
             KeyWord[] ps = list.toArray();
             Array.Sort(ps, (KeyWord o1, KeyWord o2) =>
             {
-                return o1.getPosition() - o2.getPosition();
+                return o1.P - o2.P;
             });
 
 
@@ -644,12 +644,12 @@ namespace FTServer
             {
                 int len = ps[i] is KeyWordE ? ps[i].getKeyWord()
                     .ToString().length() : ((KeyWordN)ps[i]).size();
-                if ((ps[i].getPosition() + len) <= end)
+                if ((ps[i].P + len) <= end)
                 {
                     continue;
                 }
-                start = ps[i].getPosition();
-                end = ps[i].getPosition() + length;
+                start = ps[i].P;
+                end = ps[i].P + length;
                 if (end > str.length())
                 {
                     end = str.length();
@@ -686,27 +686,8 @@ namespace FTServer
         //Position
         public int P;
 
-        public int getPosition()
-        {
-            return P;
-        }
-
-        public void setPosition(int p)
-        {
-            P = p;
-        }
         //Document ID
         public long I;
-
-        public long getID()
-        {
-            return I;
-        }
-
-        public void setID(long i)
-        {
-            I = i;
-        }
 
         [NotColumn]
         public KeyWord previous;
@@ -720,26 +701,7 @@ namespace FTServer
             return (previous != null ? previous.ToFullString() + " -> " : "") + ToString();
         }
 
-        [NotColumn]
-        public object KWord
-        {
-            get { return getKeyWord(); }
-            set { setKeyWord(value); }
-        }
 
-        [NotColumn]
-        public int Position
-        {
-            get { return getPosition(); }
-            set { setPosition(value); }
-        }
-
-        [NotColumn]
-        public long ID
-        {
-            get { return getID(); }
-            set { setID(value); }
-        }
     }
 
     public sealed class KeyWordE : KeyWord
