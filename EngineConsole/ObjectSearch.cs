@@ -55,14 +55,14 @@ namespace FTServer
                 String searchText = "SE-" + 2018;
                 foreach (var kw in engine.searchDistinct(box, searchText, long.MaxValue, 200))
                 {
-                    Console.WriteLine(box["TextObject", kw.getID()].Select<TextObject>());
+                    Console.WriteLine(box["TextObject", kw.I].Select<TextObject>());
                 }
 
                 Console.WriteLine("\r\nSearch: KVDesc={ \"Name\", \"X-MAN\" } , Keys={COOL}");
                 searchText = "KV-" + "Name" + "-" + "X-MAN" + " KE-" + "COOL";
                 foreach (var kw in engine.searchDistinct(box, searchText, long.MaxValue, 200))
                 {
-                    Console.WriteLine(box["TextObject", kw.getID()].Select<TextObject>());
+                    Console.WriteLine(box["TextObject", kw.I].Select<TextObject>());
                 }
             }
 
@@ -76,13 +76,13 @@ namespace FTServer
                 String searchText = "TI-" + TextObject.DateTimeToStringShort(new DateTime(2018, 3, 6));
                 foreach (var kw in engine.searchDistinct(box, searchText, long.MaxValue, 200))
                 {
-                    ids.add(kw.getID());
+                    ids.add(kw.I);
                 }
 
                 searchText = "KV-" + "Name" + "-" + "X-MAN" + " KE-" + "COOL";
                 foreach (var kw in engine.searchDistinct(box, searchText, long.MaxValue, 200))
                 {
-                    ids.add(kw.getID());
+                    ids.add(kw.I);
                 }
 
                 long[] idslong = new long[ids.Count];
