@@ -25,7 +25,7 @@ namespace FTServer
             if (startId[0] > 0)
             {
                 startId[0] = Search(outputPages, name, startId[0], pageCount);
-                if (outputPages.Count >= pageCount)
+                if (outputPages.Count >= pageCount && startId[0] > 0)
                 {
                     return startId;
                 }
