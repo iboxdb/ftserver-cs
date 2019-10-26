@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace FTServer.Pages
 {
@@ -50,6 +51,38 @@ namespace FTServer.Pages
             }
             return true;
         }
+
+
+        public String ToKeyWordString()
+        {
+            HashSet<string> hc = new HashSet<string>();
+            foreach (var pg in pages)
+            {
+                if (pg.keyWord is KeyWordE e)
+                {
+                    hc.Add(e.K);
+                }
+                if (pg.keyWord is KeyWordN n)
+                {
+                    hc.Add(n.toKString());
+                }
+            }
+
+
+            var ids = hc.ToArray();
+            char p = ' ';
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < ids.Length; i++)
+            {
+                if (i > 0)
+                {
+                    sb.Append(p);
+                }
+                sb.Append(ids[i]);
+            }
+            return sb.ToString();
+        }
+
         public void Init()
         {
             if (StartId == null) { StartId = new long[] { long.MaxValue }; }

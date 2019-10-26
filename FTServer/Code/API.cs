@@ -20,7 +20,7 @@ namespace FTServer
         public static long[] Search(List<Page> outputPages,
                 String name, long[] startId, long pageCount)
         {
-
+            name = name.Trim();
             //And
             if (startId[0] > 0)
             {
@@ -92,18 +92,16 @@ namespace FTServer
                 startId[0] = -1;
                 for (int i = 1; i < startId.Length; i++)
                 {
-                    if (ors[1].Equals(ors[2]))
-                    {
-                        startId[i] = -1;
-                    }
-                    else
-                    {
-                        startId[i] = long.MaxValue;
-                    }
+                    startId[i] = long.MaxValue;
                 }
             }
+
             if (ors[1].Equals(ors[2]))
             {
+                for (int i = 1; i < startId.Length; i++)
+                {
+                    startId[i] = -1;
+                }
                 return startId;
             }
 
@@ -123,7 +121,7 @@ namespace FTServer
                         continue;
                     }
 
-                    iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], pageCount).GetEnumerator();
+                    iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], long.MaxValue).GetEnumerator();
                 }
 
                 KeyWord[] kws = new KeyWord[iters.Length];
@@ -150,6 +148,11 @@ namespace FTServer
                         }
                     }
 
+                    if (outputPages.Count >= pageCount)
+                    {
+                        break;
+                    }
+
                     mPos = maxPos(startId);
 
                     if (mPos > 1)
@@ -162,11 +165,6 @@ namespace FTServer
                         p.keyWord = kw;
                         p.isAnd = false;
                         outputPages.Add(p);
-                        if (outputPages.Count >= pageCount)
-                        {
-                            startId[mPos] -= 1;
-                            break;
-                        }
                     }
 
                     long maxId = startId[mPos];

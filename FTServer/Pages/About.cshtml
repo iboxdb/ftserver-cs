@@ -31,10 +31,11 @@
 
 @section Scripts{
             <script>
+                var extitle = "";
             function highlight(loadedDivId) {
 
                 var txt = document.title.substr(0, document.title.indexOf(','));
-
+                txt +=  (" " + extitle);
                 var div = document.getElementById(loadedDivId);
                 var ts = div.getElementsByClassName("stext");
 
@@ -139,12 +140,7 @@
                 <div class="ui segment">
                     <h4>Full Text Search</h4> 
                 </div> 
-
-@if (App.IsDevelopment){
-                <div class="ui segment">
-                    <h5>Development Mode</h5> 
-                </div> 
-}
+ 
 
             </div>
         </div>
