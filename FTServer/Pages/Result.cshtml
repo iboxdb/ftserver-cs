@@ -10,9 +10,18 @@
 
    q = q.Replace("<", "").Replace(">", "").Trim();
 
+long[] ids = new long[]{long.MaxValue};
+    if (s != null) {
+        String[] ss = s.Trim().Split("_");
+        ids = new long[ss.Length];
+        for (int i = 0; i < ss.Length; i++) {
+            ids[i] = long.Parse(ss[i]);
+        }
+    }
+
    var Result = new ResultPartialModel{
       Query = q,
-      StartId = long.Parse(s)
+      StartId = ids
    };
    await Html.RenderPartialAsync( "ResultPartial",  Result );
 }

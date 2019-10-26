@@ -25,6 +25,9 @@ namespace FTServer
         public String content;
 
         [NotColumn]
+        public bool isAnd = true;
+
+        [NotColumn]
         public KeyWord keyWord;
     }
     public partial class Page

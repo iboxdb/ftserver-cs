@@ -4,11 +4,8 @@
     //Model.pageCount = 2;
     Model.Init();
 }
- 
-@if(Model.StartId.Value == -1){
-  <h3>Recommend</h3>
-}
-<div id='@Html.Raw( "ldiv" + @Model.StartId )'>
+  
+<div id='@Html.Raw( "ldiv" + @Model.IdToString() )'>
  @{ 
      var pages = Model.pages;
      var isFirstLoad = Model.isFirstLoad;
@@ -16,6 +13,7 @@
 
                      foreach (var p in pages) {
                         String content = null;
+                         bool isdesc = false;
                         if ( p.keyWord == null) {
                         	content = p.description + "...";
                             content += p.content;                        
@@ -25,6 +23,7 @@
                             if (content.Length < 20) {
                                 content += p.getRandomContent();
                             }
+                              isdesc = true;
                         } else {
                             content = IndexAPI.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
                             if (content.Length < 100) {
@@ -42,15 +41,22 @@
 <h3>
  <a class="stext" target="_blank"   href="@p.url" >@p.title</a></h3> 
 <span class="stext"> @content </span>
- <div class="gt">
-        @p.url 
+
+  var css = isdesc ? "gt" : "gtt";
+
+ <div class="@css">
+    @if(p.isAnd) { 
+    } else {
+      <text>:</text>
+    }
+    @p.url 
 </div>
                 
  }
 }
 </div>
                 
- <div class="ui teal message" id='@Html.Raw("s" + @Model.StartId)'>
+ <div class="ui teal message" id='@Html.Raw("s" + @Model.IdToString())'>
     @{
        String tcontent = (DateTime.Now - Model.begin).TotalSeconds + "s, "
                             + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
@@ -68,10 +74,10 @@
 
 <script>
     setTimeout(function () {
-        highlight( '@Html.Raw( "ldiv" + @Model.StartId )' ); 
-     @if (pages.Count >= @pageCount && @Model.StartId.Value >-1 ) {
+        highlight( '@Html.Raw( "ldiv" + @Model.IdToString() )' ); 
+     @if (!@Model.IsEnd()) {
         //startId is a big number, in javascript, have to write big number as a 'String'
-        @: onscroll_loaddiv('@Html.Raw( "s" + @Model.StartId )', '@Model.StartId');
+        @: onscroll_loaddiv('@Html.Raw( "s" + @Model.IdToString() )', '@Model.IdToString()');
      }
     }, 100);
 </script>      

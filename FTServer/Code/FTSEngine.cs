@@ -9,7 +9,7 @@ namespace FTServer
     public class Engine
     {
 
-        readonly StringUtil sUtil = new StringUtil();
+        internal readonly StringUtil sUtil = new StringUtil();
 
         public void Config(DatabaseConfig config)
         {
@@ -876,6 +876,11 @@ namespace FTServer
         public void add(T t)
         {
             this.Add(t);
+        }
+
+        public void add(int index, T p)
+        {
+            this.Insert(index, p);
         }
     }
 

@@ -7,14 +7,198 @@ using AngleSharp;
 using AngleSharp.Dom;
 using iBoxDB.LocalServer;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace FTServer
 {
     public class IndexAPI
     {
         public readonly static Engine engine = new Engine();
+        static Engine ENGINE => engine;
 
-        public static long search(List<Page> pages,
+
+        public static long[] Search(List<Page> outputPages,
+                String name, long[] startId, long pageCount)
+        {
+
+            //And
+            if (startId[0] > 0)
+            {
+                startId[0] = Search(outputPages, name, startId[0], pageCount);
+                if (outputPages.Count >= pageCount)
+                {
+                    return startId;
+                }
+            }
+
+            //Or
+            String orName = new String(ENGINE.sUtil.clear(name));
+            orName = orName.Replace("\"", " ").Trim();
+
+            ArrayList<StringBuilder> ors = new ArrayList<StringBuilder>();
+            ors.add(new StringBuilder());
+            for (int i = 0; i < orName.length(); i++)
+            {
+                char c = orName[i];
+                StringBuilder last = ors.get(ors.size() - 1);
+
+                if (c == ' ')
+                {
+                    if (last.Length > 0)
+                    {
+                        ors.add(new StringBuilder());
+                    }
+                }
+                else if (last.Length == 0)
+                {
+                    last.Append(c);
+                }
+                else if (!ENGINE.sUtil.isWord(c))
+                {
+                    if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
+                    {
+                        last.Append(c);
+                        ors.add(new StringBuilder());
+                    }
+                    else
+                    {
+                        last = new StringBuilder();
+                        last.Append(c);
+                        ors.add(last);
+                    }
+                }
+                else
+                {
+                    if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
+                    {
+                        last = new StringBuilder();
+                        last.Append(c);
+                        ors.add(last);
+                    }
+                    else
+                    {
+                        last.Append(c);
+                    }
+                }
+            }
+
+            ors.add(0, null);
+            ors.add(1, new StringBuilder(name));
+
+
+            if (startId.Length < ors.size())
+            {
+                startId = new long[ors.size()];
+                startId[0] = -1;
+                for (int i = 1; i < startId.Length; i++)
+                {
+                    if (ors[1].Equals(ors[2]))
+                    {
+                        startId[i] = -1;
+                    }
+                    else
+                    {
+                        startId[i] = long.MaxValue;
+                    }
+                }
+            }
+            if (ors[1].Equals(ors[2]))
+            {
+                return startId;
+            }
+
+
+            using (IBox box = App.Cube())
+            {
+
+                IEnumerator<KeyWord>[] iters = new IEnumerator<KeyWord>[ors.size()];
+
+                for (int i = 0; i < ors.size(); i++)
+                {
+                    StringBuilder sbkw = ors.get(i);
+                    if (startId[i] <= 0 || sbkw == null || sbkw.Length < 2)
+                    {
+                        iters[i] = null;
+                        startId[i] = -1;
+                        continue;
+                    }
+
+                    iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], pageCount).GetEnumerator();
+                }
+
+                KeyWord[] kws = new KeyWord[iters.Length];
+
+                int mPos = maxPos(startId);
+                while (mPos > 0)
+                {
+
+                    for (int i = 0; i < iters.Length; i++)
+                    {
+                        if (kws[i] == null)
+                        {
+                            if (iters[i] != null && iters[i].MoveNext())
+                            {
+                                kws[i] = iters[i].Current;
+                                startId[i] = kws[i].I;
+                            }
+                            else
+                            {
+                                iters[i] = null;
+                                kws[i] = null;
+                                startId[i] = -1;
+                            }
+                        }
+                    }
+
+                    mPos = maxPos(startId);
+
+                    if (mPos > 1)
+                    {
+                        KeyWord kw = kws[mPos];
+
+                        long id = kw.I;
+                        id = Page.rankDownId(id);
+                        Page p = box["Page", id].Select<Page>();
+                        p.keyWord = kw;
+                        p.isAnd = false;
+                        outputPages.Add(p);
+                        if (outputPages.Count >= pageCount)
+                        {
+                            startId[mPos] -= 1;
+                            break;
+                        }
+                    }
+
+                    long maxId = startId[mPos];
+                    for (int i = 0; i < startId.Length; i++)
+                    {
+                        if (startId[i] == maxId)
+                        {
+                            kws[i] = null;
+                        }
+                    }
+
+                }
+
+            }
+            return startId;
+        }
+
+        private static int maxPos(long[] ids)
+        {
+            int pos = 0;
+            for (int i = 0; i < ids.Length; i++)
+            {
+                if (ids[i] > ids[pos])
+                {
+                    pos = i;
+                }
+            }
+            return pos;
+        }
+
+
+        public static long Search(List<Page> pages,
                 String name, long startId, long pageCount)
         {
             name = name.Trim();
@@ -29,12 +213,13 @@ namespace FTServer
                     var p = box["Page", id].Select<FTServer.Page>();
                     p.keyWord = kw;
                     pages.Add(p);
-
+                    pageCount--;
                 }
             }
 
 
             //Recommend
+            /*
             if (pages.Count == 0 && name.length() > 1)
             {
                 if (!engine.isWord(name[0]) && name[0] != '"')
@@ -57,7 +242,8 @@ namespace FTServer
                 }
                 return -1;
             }
-            return startId;
+            */
+            return pageCount == 0 ? startId : -1;
         }
         public static async Task<String> indexTextAsync(String url, bool deleteOnly)
         {
