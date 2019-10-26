@@ -58,6 +58,7 @@ namespace FTServer.Pages
             HashSet<string> hc = new HashSet<string>();
             foreach (var pg in pages)
             {
+                if (pg.keyWord.previous != null) { continue; }
                 if (pg.keyWord is KeyWordE e)
                 {
                     hc.Add(e.K);
