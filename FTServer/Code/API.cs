@@ -97,7 +97,7 @@ namespace FTServer
                 }
             }
 
-            if (ors.Count > 16 || stringEquaal(ors[1].ToString(), ors[2].ToString()))
+            if (ors.Count > 16 || stringEqual(ors[1].ToString(), ors[2].ToString()))
             {
                 for (int i = 1; i < startId.Length; i++)
                 {
@@ -198,7 +198,7 @@ namespace FTServer
             return pos;
         }
 
-        private static bool stringEquaal(String a, String b)
+        private static bool stringEqual(String a, String b)
         {
             if (a.Equals(b)) { return true; }
             if (a.Equals("\"" + b + "\"")) { return true; }
