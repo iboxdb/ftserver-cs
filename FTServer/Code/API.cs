@@ -96,7 +96,7 @@ namespace FTServer
                 }
             }
 
-            if (ors[1].Equals(ors[2]))
+            if (stringEquaal(ors[1].ToString(), ors[2].ToString()))
             {
                 for (int i = 1; i < startId.Length; i++)
                 {
@@ -120,8 +120,9 @@ namespace FTServer
                         startId[i] = -1;
                         continue;
                     }
-
-                    iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], long.MaxValue).GetEnumerator();
+                    //never set Long.MAX 
+                    long subCount = pageCount * 2;
+                    iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], subCount).GetEnumerator();
                 }
 
                 KeyWord[] kws = new KeyWord[iters.Length];
@@ -182,6 +183,7 @@ namespace FTServer
             return startId;
         }
 
+
         private static int maxPos(long[] ids)
         {
             int pos = 0;
@@ -195,7 +197,13 @@ namespace FTServer
             return pos;
         }
 
-
+        private static bool stringEquaal(String a, String b)
+        {
+            if (a.Equals(b)) { return true; }
+            if (a.Equals("\"" + b + "\"")) { return true; }
+            if (b.Equals("\"" + a + "\"")) { return true; }
+            return false;
+        }
         public static long Search(List<Page> pages,
                 String name, long startId, long pageCount)
         {
