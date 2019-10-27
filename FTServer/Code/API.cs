@@ -21,6 +21,7 @@ namespace FTServer
                 String name, long[] startId, long pageCount)
         {
             name = name.Trim();
+            if (name.Length > 100) { return new long[] { -1 }; }
             //And
             if (startId[0] > 0)
             {
@@ -96,7 +97,7 @@ namespace FTServer
                 }
             }
 
-            if (stringEquaal(ors[1].ToString(), ors[2].ToString()))
+            if (ors.Count > 16 || stringEquaal(ors[1].ToString(), ors[2].ToString()))
             {
                 for (int i = 1; i < startId.Length; i++)
                 {
@@ -121,7 +122,7 @@ namespace FTServer
                         continue;
                     }
                     //never set Long.MAX 
-                    long subCount = pageCount * 2;
+                    long subCount = pageCount * 10;
                     iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], subCount).GetEnumerator();
                 }
 
@@ -222,33 +223,6 @@ namespace FTServer
                     pageCount--;
                 }
             }
-
-
-            //Recommend
-            /*
-            if (pages.Count == 0 && name.length() > 1)
-            {
-                if (!engine.isWord(name[0]) && name[0] != '"')
-                {
-                    //only search one char, if full search is empty
-                    search(pages, name.substring(0, 1), long.MaxValue, pageCount);
-                }
-                else
-                {
-                    int pos = name.IndexOf(' ');
-                    if (pos > 0)
-                    {
-                        name = name.substring(0, pos);
-                        search(pages, name, long.MaxValue, pageCount);
-                    }
-                }
-                if (pages.Count == 0)
-                {
-                    return startId;
-                }
-                return -1;
-            }
-            */
             return pageCount == 0 ? startId : -1;
         }
         public static async Task<String> indexTextAsync(String url, bool deleteOnly)
