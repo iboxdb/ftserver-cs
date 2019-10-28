@@ -416,7 +416,14 @@ namespace FTServer
 
                 fixSpan(doc);
 
-                page.title = doc.QuerySelector("title").Text();
+                try
+                {
+                    page.title = doc.QuerySelector("title").Text();
+                }
+                catch
+                {
+
+                }
                 if (page.title == null)
                 {
                     page.title = url;
@@ -459,6 +466,19 @@ namespace FTServer
                 {
 
                 }
+
+                try
+                {
+                    if (page.description == null)
+                    {
+                        page.description = doc.QuerySelector("meta[property=\"og:description\"]").Attributes["content"].Value;
+                    }
+                }
+                catch
+                {
+
+                }
+
                 if (page.description == null)
                 {
                     page.description = "";
