@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-       <PackageReference Include="iBoxDB" Version="2.21"/>
+       <PackageReference Include="iBoxDB" Version="2.21.0"/>
     <PackageReference Include="AngleSharp" Version="0.13"/>
   </ItemGroup>
 
