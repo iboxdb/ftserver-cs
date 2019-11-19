@@ -21,13 +21,13 @@ dotnet run -c Release
 
 
 ### The Results Order
-the results order based on the ID number in IndexTextNoTran(.. **long id**, ...),  descending order.
+the results order based on the ID number in IndexText(.. **long id**, ...),  descending order.
 
 every page has two index-IDs, normal-id and rankup-id, the rankup-id is a big number and used to keep the important text on the **top**.  (the front results from SearchDistinct(IBox, String) )
 ````cs
-Engine.IndexTextNoTran(..., p.Id, p.Content, ...);
-Engine.IndexTextNoTran(..., p.RankUpId(), p.RankUpDescription(), ...);
-````					
+Engine.IndexText(..., p.Id, p.Content, ...);
+Engine.IndexText(..., p.RankUpId(), p.RankUpDescription(), ...);
+````
 
 the RankUpId()
 ````cs
@@ -53,7 +53,7 @@ public static bool IsAdvertisingId(long id)
 {
     return id > (1L << 61) ;
 }
-````		
+````
 
 
 the Page.GetRandomContent() method is used to keep the Search-Page-Content always changing, doesn't affect the real page order.
@@ -96,25 +96,25 @@ When Insert
 1.insert page --> 2.insert index
 ````cs
 DB.Insert ("Page", page);
-Engine.IndexTextNoTran( IsRemove = false );
-...IndexTextNoTran...
+Engine.IndexText( IsRemove = false );
+...IndexText...
 ````
 
 
-When Delete  
+When Delete
 
 1.delete index --> 2.delete page
 ````cs
-Engine.IndexTextNoTran( IsRemove = true );
-...IndexTextNoTran...
+Engine.IndexText( IsRemove = true );
+...IndexText...
 DB.Delete("Page", page.Id);
-````				
+````
 
 #### Memory
 ````cs
 indexText(IBox, id, String, bool) // faster, more memories
 
-indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory
+indexTextNoTran(AutoBox, commitCount, id, String, bool) // less memory, not recommended
 ````
 
 #### Tools
