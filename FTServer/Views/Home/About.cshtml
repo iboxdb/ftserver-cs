@@ -1,5 +1,4 @@
-﻿@page 
-@model AboutModel
+﻿@model AboutModel
  
 @{
     ViewData["Title"] = Model.Result.Query.Replace("\"", "") + ",";
@@ -139,7 +138,7 @@
         <div class="ui grid">
             <div class="ten wide column" style="max-width: 600px;" id="maindiv">
                @{
-                   await Html.RenderPartialAsync( "ResultPartial",  @Model.Result );
+                   Html.RenderPartial( "ResultPartial",  @Model.Result );
                 }
             </div>
             <div class="six wide column" style="max-width: 200px;">

@@ -244,7 +244,7 @@ namespace FTServer
                 using (var box = App.Auto.Cube())
                 {
                     Page defaultPage = null;
-                    foreach (Page p in box.Select<Page>("from Page where url==?", url).ToArray())
+                    foreach (Page p in box.Select<Page>("from Page where url==?", url).All())
                     {
                         engine.indexText(box, p.id, p.content, true);
                         engine.indexText(box, p.rankUpId(), p.rankUpDescription(), true);

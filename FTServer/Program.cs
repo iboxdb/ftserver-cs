@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using iBoxDB.LocalServer;
+using Microsoft.Extensions.Hosting;
 
 namespace FTServer
 {
@@ -40,7 +41,7 @@ namespace FTServer
                 #region Config
                 //System.Diagnostics.Process.GetCurrentProcess()
                 DB db = new DB(1);
-                var cfg = db.GetConfig().DBConfig;
+                var cfg = db.GetConfig();
                 cfg.CacheLength = cfg.MB(App.IsVM ? 16 : 512);
                 cfg.FileIncSize = (int)cfg.MB(4);
 
@@ -54,7 +55,7 @@ namespace FTServer
 
             });
 
-            var host = CreateWebHostBuilder(args).Build();
+            var host = CreateHostBuilder(args).Build();
 
             App.Auto = task.GetAwaiter().GetResult();
             using (App.Auto.GetDatabase())
@@ -63,9 +64,12 @@ namespace FTServer
             }
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+           Host.CreateDefaultBuilder(args)
+               .ConfigureWebHostDefaults(webBuilder =>
+               {
+                   webBuilder.UseStartup<Startup>();
+               });
     }
 
     public class App

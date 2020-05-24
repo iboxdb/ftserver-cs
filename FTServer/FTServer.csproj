@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-       <PackageReference Include="iBoxDB" Version="2.21.0"/>
+  <ItemGroup> 
+       <PackageReference Include="iBoxDB" Version="2.33.0"/>
     <PackageReference Include="AngleSharp" Version="0.13"/>
   </ItemGroup>
 

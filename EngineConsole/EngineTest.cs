@@ -20,7 +20,7 @@ namespace FTServer
             BoxSystem.DBDebug.DeleteDBFiles(3);
             DB db = new DB(3);
             Engine engine = new Engine();
-            engine.Config(db.GetConfig().DBConfig);
+            engine.Config(db.GetConfig());
 
             AutoBox auto = db.Open();
 
@@ -129,7 +129,7 @@ namespace FTServer
                 BoxSystem.DBDebug.DeleteDBFiles(3);
                 DB db = new DB(3);
                 Engine engine = new Engine();
-                engine.Config(db.GetConfig().DBConfig);
+                engine.Config(db.GetConfig());
 
                 AutoBox auto = db.Open();
 
@@ -260,7 +260,7 @@ namespace FTServer
 
 
             Engine engine = new Engine();
-            engine.Config(db.GetConfig().DBConfig);
+            engine.Config(db.GetConfig());
             //engine.maxSearchTime = 1000;
 
             AutoBox auto = db.Open();

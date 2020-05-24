@@ -13,10 +13,10 @@ namespace FTServer
             BoxSystem.DBDebug.DeleteDBFiles(7);
             DB db = new DB(7);
 
-            db.GetConfig().DBConfig.EnsureTable<TextObject>("TextObject", "ID");
+            db.GetConfig().EnsureTable<TextObject>("TextObject", "ID");
 
             Engine engine = new Engine();
-            engine.Config(db.GetConfig().DBConfig);
+            engine.Config(db.GetConfig());
 
             AutoBox auto = db.Open();
 
