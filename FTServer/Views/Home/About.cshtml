@@ -138,8 +138,9 @@
         <div class="ui grid">
             <div class="ten wide column" style="max-width: 600px;" id="maindiv">
                @{
-                   Html.RenderPartial( "ResultPartial",  @Model.Result );
+                   //Html.RenderPartial( "ResultPartial",  @Model.Result );
                 }
+                <partial name="ResultPartial" for="Result"></partial>
             </div>
             <div class="six wide column" style="max-width: 200px;">
                 <div class="ui segment">

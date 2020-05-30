@@ -60,8 +60,9 @@ namespace FTServer.Controllers
             }
             else
             {
-                await IndexAPI.indexTextAsync(q, isdelete.Value);
-                AboutModel.urlList.Enqueue(q);
+                m.Result.Query = await IndexAPI.indexTextAsync(q, isdelete.Value);
+                if (m.Result.Query.StartsWith("http"))
+                    AboutModel.urlList.Enqueue(q);
                 while (AboutModel.urlList.Count > 3)
                 {
                     String t;
