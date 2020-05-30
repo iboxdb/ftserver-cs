@@ -32,13 +32,13 @@ namespace FTServer
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("Cache-Control", "non-cache, no-store, must-revalidate");
-                await next();
-            });
-
+            /*
+                        app.Use(async (context, next) =>
+                        {
+                            context.Response.Headers.Add("Cache-Control", "non-cache, no-store, must-revalidate");
+                            await next();
+                        });
+            */
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

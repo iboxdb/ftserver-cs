@@ -16,13 +16,16 @@ namespace FTServer.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+
         }
 
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Index()
         {
             return View();
         }
 
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> About(string q)
         {
 
@@ -68,6 +71,7 @@ namespace FTServer.Controllers
             return View(m);
         }
 
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Result(String q, String s)
         {
             q = q.Replace("<", "").Replace(">", "").Trim();

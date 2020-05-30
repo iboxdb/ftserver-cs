@@ -20,7 +20,7 @@ namespace FTServer.Models
             using (var box = App.Auto.Cube())
             {
                 return IndexAPI.engine.discover(box, 'a', 'z', 2,
-                    '\u2E80', '\u9fa5', 1).ToList();
+                    '\u2E80', '\u9fa5', 2).ToList();
             }
         }
 
