@@ -36,6 +36,17 @@ namespace FTServer
                 }
                 Console.WriteLine("DBPath=" + path);
                 DB.Root(path);
+                //for get more os memory
+                Console.WriteLine("Loading Memory...");
+                foreach (var p in Directory.GetFiles(path))
+                {
+                    Console.WriteLine(p);
+                    var bs = new byte[1024 * 1024 * 32];
+                    using (var fs = new FileStream(p, FileMode.Open))
+                    {
+                        while (fs.Read(bs) > 0) { }
+                    }
+                }
                 #endregion
 
                 #region Config
@@ -43,6 +54,9 @@ namespace FTServer
                 DB db = new DB(1);
                 var cfg = db.GetConfig();
                 cfg.CacheLength = cfg.MB(App.IsVM ? 16 : 512);
+                //if update metadata, use low cache
+                //cfg.CacheLength = cfg.MB(128);
+
                 cfg.FileIncSize = (int)cfg.MB(4);
 
                 new Engine().Config(cfg);
