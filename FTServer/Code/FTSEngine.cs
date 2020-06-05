@@ -644,12 +644,17 @@ namespace FTServer
             {
                 int len = ps[i] is KeyWordE ? ps[i].getKeyWord()
                     .ToString().length() : ((KeyWordN)ps[i]).size();
-                if ((ps[i].P + len) <= end)
+                start = ps[i].P;
+                if ((start + len) <= end)
                 {
                     continue;
                 }
-                start = ps[i].P;
-                end = ps[i].P + length;
+                if ((start + len) >= str.length())
+                {
+                    continue;
+                }
+
+                end = start + length;
                 if (end > str.length())
                 {
                     end = str.length();

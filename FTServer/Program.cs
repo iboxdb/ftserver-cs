@@ -60,9 +60,17 @@ namespace FTServer
                 cfg.FileIncSize = (int)cfg.MB(4);
 
                 new Engine().Config(cfg);
-                cfg.EnsureTable<Page>("Page", "id");
-                cfg.EnsureIndex<Page>("Page", true, "url(" + Page.MAX_URL_LENGTH + ")");
-                cfg.EnsureTable<PageLock>("PageLock", "url(" + Page.MAX_URL_LENGTH + ")");
+
+
+                cfg.EnsureTable<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")");
+                cfg.EnsureIndex<Page>("Page", true, "textOrder");
+
+                cfg.EnsureTable<PageText>("PageText", "id");
+                cfg.EnsureIndex<PageText>("PageText", false, "textOrder");
+                cfg.EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
+
+
+
                 #endregion
 
                 return db.Open();
