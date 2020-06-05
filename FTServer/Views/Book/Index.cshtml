@@ -1,0 +1,35 @@
+@model BookModel
+
+@{
+  Layout = "";
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>@Model.Title</title>
+        <meta name="description" content="@Model.Description">
+        <meta name="keywords" content="@Model.Keywords">        
+
+    </head>
+    <body>
+        <h1>Hello World!</h1>
+        <p>@Model.Text</p>
+<br>
+@{
+    Random ran = new Random();
+    String[] books = BookController.Books;
+    int bbase = BookController.Base;
+        for (int i = 0; i < 2000; i++) {
+                int book = ran.Next(books.Length);
+                int start = ran.Next(bbase);
+                int length = ran.Next(200) * 100 + 100;
+                String url = "?book=" + book + "&start=" + start + "&length=" + length;
+                <a  href="@Html.Raw(@url)">_</a><br>
+    
+        }
+}
+        
+    </body>
+</html>

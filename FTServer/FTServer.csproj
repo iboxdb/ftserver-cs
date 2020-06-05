@@ -6,7 +6,7 @@
 
   <ItemGroup> 
        <PackageReference Include="iBoxDB" Version="2.33.0"/>
-    <PackageReference Include="AngleSharp" Version="0.13"/>
+    <PackageReference Include="AngleSharp" Version="0.14"/>
   </ItemGroup>
 
 </Project>
