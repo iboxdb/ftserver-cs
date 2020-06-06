@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using iBoxDB.LocalServer;
 using System.IO;
+using System.Collections.Concurrent;
 
 namespace FTServer
 {
@@ -815,6 +816,14 @@ namespace FTServer
     #region Transplanting Bridge
     internal static class CSharpBridge
     {
+        public static String toString<T>(this T o)
+        {
+            return o.ToString();
+        }
+        public static bool equals<T>(this T o, T o2)
+        {
+            return o.Equals(o2);
+        }
         public static int length(this String self)
         {
             return self.Length;
@@ -834,12 +843,35 @@ namespace FTServer
         {
             return self.Substring(start, end - start);
         }
+        public static string substring(this String self, int start)
+        {
+            return self.Substring(start);
+        }
+        public static string trim(this string self)
+        {
+            return self.Trim();
+        }
+        public static char charAt(this string self, int index)
+        {
+            return self.charAt(index);
+        }
+        public static int lastIndexOf(this string self, char c, int index)
+        {
+            return self.LastIndexOf(c, index);
+        }
+        public static int nextInt(this Random self, int value)
+        {
+            return self.Next(value);
+        }
 
         public static bool add<T>(this HashSet<T> self, T v)
         {
             return self.Add(v);
         }
-
+        public static bool remove<T>(this HashSet<T> self, T v)
+        {
+            return self.Remove(v);
+        }
         public static bool contains<T>(this HashSet<T> self, T v)
         {
             return self.Contains(v);
@@ -865,6 +897,19 @@ namespace FTServer
             return self[pos];
         }
 
+        public static void add<T>(this ConcurrentQueue<T> self, T obj)
+        {
+            self.Enqueue(obj);
+        }
+        public static void remove<T>(this ConcurrentQueue<T> self)
+        {
+            T o;
+            self.TryDequeue(out o);
+        }
+        public static int size<T>(this ConcurrentQueue<T> self)
+        {
+            return self.Count;
+        }
         public static StringBuilder append(this StringBuilder self, string str)
         {
             return self.Append(str);

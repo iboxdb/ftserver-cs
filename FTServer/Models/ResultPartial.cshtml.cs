@@ -14,7 +14,7 @@ namespace FTServer.Models
 
 
 
-        public List<FTServer.Page> pages;
+        public List<PageText> pages;
         public DateTime begin;
 
         public bool isFirstLoad;
@@ -90,7 +90,7 @@ namespace FTServer.Models
 
             isFirstLoad = StartId[0] == long.MaxValue;
 
-            pages = new List<FTServer.Page>();
+            pages = new List<PageText>();
 
             begin = DateTime.Now;
 
@@ -99,11 +99,12 @@ namespace FTServer.Models
             if (isFirstLoad && pages.Count == 0)
             {
                 {
-                    Page p = new Page();
+                    PageText p = new PageText();
                     p.title = "NotFound";
-                    p.description = "";
-                    p.content = "input URL(http or https) to index";
+                    p.text = "input URL(http or https) to index";
                     p.url = "./";
+                    p.textOrder = 0;
+                    p.keyWord = new KeyWordE() { I = 0, P = 0 };
                     pages.Add(p);
                 }
             }

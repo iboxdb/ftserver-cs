@@ -8,16 +8,177 @@ using AngleSharp.Dom;
 using iBoxDB.LocalServer;
 using System.Threading.Tasks;
 using System.Text;
+using AngleSharp.Html.Dom;
+using System.Threading;
 
 namespace FTServer
 {
+
+    public class IndexPage
+    {
+        private static Task backgroundTasks = Task.Run(() => { });
+        private static int backgroundThreadCount = 0;
+
+        public static ConcurrentQueue<String> urlList
+            = new ConcurrentQueue<String>();
+
+        public static void addSearchTerm(String keywords)
+        {
+            if (keywords.length() < PageSearchTerm.MAX_TERM_LENGTH)
+            {
+                PageSearchTerm pst = new PageSearchTerm();
+                pst.time = DateTime.Now;
+                pst.keywords = keywords;
+                pst.uid = Guid.NewGuid();
+                App.Auto.Insert("/PageSearchTerm", pst);
+            }
+        }
+
+
+        public static List<PageSearchTerm> getSearchTerm(int len)
+        {
+            return App.Auto.Select<PageSearchTerm>("from /PageSearchTerm limit 0 , ?", len);
+        }
+
+        public static Page getPage(String url)
+        {
+            return App.Auto.Get<Page>("Page", url);
+        }
+
+        private static void addUrlList(String url)
+        {
+            urlList.add(url.Replace("<", ""));
+            while (urlList.size() > 3)
+            {
+                urlList.remove();
+            }
+        }
+
+        public static void removePage(String url)
+        {
+            IndexAPI.removePage(url);
+        }
+
+        public static async Task<String> addPage(String url, bool isKeyPage)
+        {
+            if (!isKeyPage)
+            {
+                if (App.Auto.Get<Object>("Page", url) != null)
+                {
+                    return null;
+                }
+            }
+
+            HashSet<String> subUrls = new HashSet<String>();
+
+            DateTime begin = DateTime.Now;
+            Page p = await Html.GetAsync(url, subUrls);
+            DateTime ioend = DateTime.Now;
+
+            if (p == null)
+            {
+                return "temporarily unreachable";
+            }
+            else
+            {
+                IndexAPI.removePage(url);
+                p.isKeyPage = isKeyPage;
+                IndexAPI.addPage(p);
+                IndexAPI.addPageIndex(url);
+
+                long textOrder = App.Auto.NewId(0, 0);
+                DateTime indexend = DateTime.Now;
+                Console.WriteLine("TIME IO:" + (ioend - begin).TotalSeconds
+                    + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " " + url);
+
+                subUrls.remove(url);
+                subUrls.remove(url + "/");
+                subUrls.remove(url.substring(0, url.length() - 1));
+
+                addUrlList(url);
+                runBGTask(subUrls);
+
+                return url;
+            }
+        }
+
+        public static void addPageCustomText(String url, String title, String content)
+        {
+            if (url == null || title == null || content == null)
+            {
+                return;
+            }
+            Page page = App.Auto.Get<Page>("Page", url);
+
+            PageText text = new PageText();
+            text.textOrder = page.textOrder;
+            text.priority = PageText.userPriority;
+            text.url = page.url;
+            text.title = title;
+            text.text = content;
+            text.keywords = "";
+
+            IndexAPI.addPageTextIndex(text);
+        }
+
+        private static void runBGTask(HashSet<String> subUrls)
+        {
+            lock (typeof(IndexPage))
+            {
+                bool atNight = true;
+
+                int max_background = atNight ? 1000 : 0;
+
+                int SLEEP_TIME = 2000;
+
+                if (backgroundThreadCount < max_background)
+                {
+                    foreach (String vurl in subUrls)
+                    {
+                        Interlocked.Increment(ref backgroundThreadCount);
+                        backgroundTasks = backgroundTasks.ContinueWith(async (_, url) =>
+                      {
+
+                          Interlocked.Decrement(ref backgroundThreadCount);
+
+                          Console.WriteLine("For:" + url + " ," + backgroundThreadCount);
+                          String r = await addPage((string)url, false);
+                          backgroundLog((string)url, r);
+
+                          int sleep = SLEEP_TIME;
+                          await Task.Delay(sleep);
+
+                      }, vurl);
+                    }
+                }
+            }
+        }
+
+        public static void backgroundLog(String url, String output)
+        {
+            if (output == null)
+            {
+                Console.WriteLine("Has indexed:" + url);
+            }
+            else if (url.equals(output))
+            {
+                Console.WriteLine("Indexed:" + url);
+            }
+            else
+            {
+                Console.WriteLine("Retry:" + url);
+            }
+        }
+
+
+    }
     public class IndexAPI
     {
         public readonly static Engine engine = new Engine();
-        static Engine ENGINE => engine;
+        public static Engine ENGINE => engine;
 
 
-        public static long[] Search(List<Page> outputPages,
+        public static long[] Search(List<PageText> outputPages,
                 String name, long[] startId, long pageCount)
         {
             name = name.Trim();
@@ -162,10 +323,9 @@ namespace FTServer
                         KeyWord kw = kws[mPos];
 
                         long id = kw.I;
-                        id = Page.rankDownId(id);
-                        Page p = box["Page", id].Select<Page>();
+                        var p = box["PageText", id].Select<PageText>();
                         p.keyWord = kw;
-                        p.isAnd = false;
+                        p.isAndSearch = false;
                         outputPages.Add(p);
                     }
 
@@ -205,7 +365,7 @@ namespace FTServer
             if (b.Equals("\"" + a + "\"")) { return true; }
             return false;
         }
-        public static long Search(List<Page> pages,
+        public static long Search(List<PageText> pages,
                 String name, long startId, long pageCount)
         {
             name = name.Trim();
@@ -216,8 +376,7 @@ namespace FTServer
                     startId = kw.I - 1;
 
                     long id = kw.I;
-                    id = FTServer.Page.rankDownId(id);
-                    var p = box["Page", id].Select<FTServer.Page>();
+                    var p = box["Page", id].Select<PageText>();
                     p.keyWord = kw;
                     pages.Add(p);
                     pageCount--;
@@ -225,152 +384,87 @@ namespace FTServer
             }
             return pageCount == 0 ? startId : -1;
         }
-        public static async Task<String> indexTextAsync(String url, bool deleteOnly)
-        {
-            bool tran = true;
-            if (tran)
-            {
-                return await indexTextWithTranAsync(Html.getUrl(url), deleteOnly);
-            }
-            return await indexTextNoTranAsync(Html.getUrl(url), deleteOnly);
-        }
 
 
-        //with transaction, faster
-        private static async Task<String> indexTextWithTranAsync(String url, bool onlyDelete)
-        {
-            return await pageLockAsync(url, async () =>
-            {
-                using (var box = App.Auto.Cube())
-                {
-                    Page defaultPage = null;
-                    foreach (Page p in box.Select<Page>("from Page where url==?", url).All())
-                    {
-                        engine.indexText(box, p.id, p.content, true);
-                        engine.indexText(box, p.rankUpId(), p.rankUpDescription(), true);
-                        box["Page", p.id].Delete();
-                        defaultPage = p;
-                    }
-
-                    if (onlyDelete)
-                    {
-                        return box.Commit() == CommitResult.OK ? "deleted" : "not deleted";
-                    }
-                    {
-                        Page p = await Html.GetAsync(url);
-                        if (p == null)
-                        {
-                            //p = defaultPage;
-                        }
-                        if (p == null)
-                        {
-                            return "temporarily unreachable";
-                        }
-                        else
-                        {
-                            if (p.id == 0)
-                            {
-                                p.id = box.NewId();
-                            }
-                            box["Page"].Insert(p);
-                            engine.indexText(box, p.id, p.content, false);
-                            engine.indexText(box, p.rankUpId(), p.rankUpDescription(), false);
-
-                            CommitResult cr = box.Commit();
-                            if (cr != CommitResult.OK)
-                            {
-                                return cr.GetErrorMsg(box);
-                            }
-                            return p.url;
-                        }
-                    }
-
-                }
-            });
-        }
-
-        //no transaction, less memory
-        private static async Task<String> indexTextNoTranAsync(String url, bool onlyDelete)
-        {
-
-            const int commitCount = 200;
-            return await pageLockAsync(url, async () =>
-            {
-                Page defaultPage = null;
-                foreach (Page p in App.Auto.Select<Page>("from Page where url==?", url))
-                {
-                    engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content, true);
-                    engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), true);
-                    App.Auto.Delete("Page", p.id);
-                    defaultPage = p;
-                }
-
-                if (onlyDelete)
-                {
-                    return "deleted";
-                }
-                {
-                    Page p = await Html.GetAsync(url);
-                    if (p == null)
-                    {
-                        p = defaultPage;
-                    }
-                    if (p == null)
-                    {
-                        return "temporarily unreachable";
-                    }
-                    else
-                    {
-                        if (p.id == 0)
-                        {
-                            p.id = App.Auto.NewId();
-                        }
-                        App.Auto.Insert("Page", p);
-                        engine.indexTextNoTran(App.Auto, commitCount, p.id, p.content, false);
-                        engine.indexTextNoTran(App.Auto, commitCount, p.rankUpId(), p.rankUpDescription(), false);
-
-                        return p.url;
-                    }
-                }
-            });
-        }
-
-        private static async Task<String> pageLockAsync(String url, Func<Task<string>> run)
+        public static List<String> discover()
         {
             using (var box = App.Auto.Cube())
             {
-                PageLock pl = box["PageLock", url].Select<PageLock>();
-                if (pl == null)
-                {
-                    pl = new PageLock
-                    {
-                        url = url,
-                        time = DateTime.Now
-                    };
-                }
-                else if ((DateTime.Now - pl.time).TotalSeconds > (60 * 5))
-                {
-                    pl.time = DateTime.Now;
-                }
-                else
-                {
-                    return "Running";
-                }
-                box["PageLock"].Replace(pl);
-                if (box.Commit() != CommitResult.OK)
-                {
-                    return "Running";
-                }
-            }
-            try
-            {
-                return await run();
-            }
-            finally
-            {
-                App.Auto.Delete("PageLock", url);
+                return IndexAPI.engine.discover(box, 'a', 'z', 2,
+                    '\u2E80', '\u9fa5', 2).ToList();
             }
         }
+
+        public static bool? addPage(Page page)
+        {
+
+            if (App.Auto.Get<Object>("Page", page.url) != null)
+            {
+                //call removePage first
+                return null;
+            }
+
+            page.createTime = DateTime.Now;
+            page.textOrder = App.Auto.NewId();
+            return App.Auto.Insert("Page", page);
+        }
+
+        public static bool addPageIndex(String url)
+        {
+
+            Page page = App.Auto.Get<Page>("Page", url);
+            if (page == null)
+            {
+                return false;
+            }
+
+            List<PageText> ptlist = Html.getDefaultTexts(page);
+
+            foreach (PageText pt in ptlist)
+            {
+                addPageTextIndex(pt);
+            }
+            return true;
+        }
+
+        public static void addPageTextIndex(PageText pt)
+        {
+            using (IBox box = App.Auto.Cube())
+            {
+                if (box["PageText", pt.id].Select<Object>() != null)
+                {
+                    return;
+                }
+                box["PageText"].Insert(pt);
+                ENGINE.indexText(box, pt.id, pt.indexedText(), false);
+                box.Commit();
+            }
+        }
+
+        public static void removePage(String url)
+        {
+
+            Page page = App.Auto.Get<Page>("Page", url);
+            if (page == null)
+            {
+                return;
+            }
+
+            List<PageText> ptlist = App.Auto.Select<PageText>("from PageText where textOrder==?", page.textOrder);
+
+            foreach (PageText pt in ptlist)
+            {
+                using (IBox box = App.Auto.Cube())
+                {
+                    ENGINE.indexText(box, pt.id, pt.indexedText(), true);
+                    box["PageText", pt.id].Delete();
+                    box.Commit();
+                }
+            }
+
+            App.Auto.Delete("Page", url);
+        }
+
 
 
     }
@@ -389,17 +483,63 @@ namespace FTServer
             }
             if (p >= 0)
             {
-                name = name.Substring(p).Trim();
+                name = name.substring(p).Trim();
                 var t = name.IndexOf("#");
                 if (t > 0)
                 {
-                    name = name.Substring(0, t);
+                    name = name.substring(0, t);
                 }
                 return name;
             }
             return "";
         }
-        public static async Task<Page> GetAsync(String url)
+
+        private static String getMetaContentByName(IDocument doc, String name)
+        {
+            String description = null;
+            try
+            {
+                description = doc.QuerySelector("meta[name='" + name + "']").Attributes["content"].Value;
+            }
+            catch
+            {
+
+            }
+
+            try
+            {
+                if (description == null)
+                {
+                    description = doc.QuerySelector("meta[property='og:" + name + "']").Attributes["content"].Value;
+                }
+            }
+            catch
+            {
+
+            }
+
+            name = name.substring(0, 1).ToUpper() + name.substring(1);
+            try
+            {
+                if (description == null)
+                {
+                    description = doc.QuerySelector("meta[name='" + name + "']").Attributes["content"].Value;
+                }
+            }
+            catch
+            {
+
+            }
+
+            if (description == null)
+            {
+                description = "";
+            }
+
+            return replace(description);
+        }
+        static String splitWords = " ,.　，。";
+        public static async Task<Page> GetAsync(String url, HashSet<String> subUrls)
         {
             try
             {
@@ -407,107 +547,82 @@ namespace FTServer
                 {
                     return null;
                 }
-                Page page = new Page();
-                page.url = url;
 
                 var config = Configuration.Default.WithDefaultLoader();
                 var doc = await BrowsingContext.New(config).OpenAsync(url);
-
-
+                if (!doc.HasTextNodes())
+                {
+                    return null;
+                }
                 fixSpan(doc);
 
-                try
-                {
-                    page.title = doc.QuerySelector("title").Text();
-                }
-                catch
-                {
-
-                }
-                if (page.title == null)
-                {
-                    page.title = url;
-                }
-                page.title = page.title.Trim();
-                if (page.title.Length < 2)
-                {
-                    page.title = url;
-                }
-                if (page.title.Length > 80)
-                {
-                    page.title = page.title.Substring(0, 80);
-                }
-                page.title = page.title.Replace("<", " ")
-                    .Replace(">", " ").Replace("$", " ");
-
-                removeTag(doc, "title");
-
-                if (page.title.Contains("�"))
-                {
-                    //encode ??
-                    return null;
-                }
-
-                try
-                {
-                    page.description = doc.QuerySelector("meta[name=\"description\"]").Attributes["content"].Value;
-                }
-                catch
-                {
-                }
-                try
-                {
-                    if (page.description == null)
-                    {
-                        page.description = doc.QuerySelector("meta[name=\"Description\"]").Attributes["content"].Value;
-                    }
-                }
-                catch
-                {
-
-                }
-
-                try
-                {
-                    if (page.description == null)
-                    {
-                        page.description = doc.QuerySelector("meta[property=\"og:description\"]").Attributes["content"].Value;
-                    }
-                }
-                catch
-                {
-
-                }
-
-                if (page.description == null)
-                {
-                    page.description = "";
-                }
-                if (page.description.Length > 200)
-                {
-                    page.description = page.description.Substring(0, 200);
-                }
-                page.description = page.description.Replace("<", " ")
-                    .Replace(">", " ").Replace("$", " ").Replace(((char)8203).ToString(), "");
-
-
-
-                String content = doc.Body.Text().Replace("　", " ").Replace(((char)8203).ToString(), "");
-                content = Regex.Replace(content, "\t|\r|\n|�|<|>", " ");
-                content = Regex.Replace(content, "\\$", " ");
-                content = Regex.Replace(content, "\\s+", " ");
-                content = content.Trim();
-
-                if (content.Length < 50)
+                Page page = new Page();
+                page.url = url;
+                page.text = replace(doc.Body.TextContent);
+                if (page.text.length() < 10)
                 {
                     return null;
                 }
-                if (content.Length > 5000)
+
+                if (subUrls != null)
                 {
-                    content = content.Substring(0, 5000);
+                    var links = doc.QuerySelectorAll<IHtmlAnchorElement>("a[href]");
+                    foreach (var link in links)
+                    {
+                        String ss = link.Href;
+                        if (ss != null && ss.length() > 8)
+                        {
+                            ss = getUrl(ss);
+                            subUrls.add(ss);
+                        }
+                    }
                 }
 
-                page.content = content + " " + page.url;
+                String title = null;
+                String keywords = null;
+                String description = null;
+
+                try
+                {
+                    title = doc.Title;
+                }
+                catch
+                {
+
+                }
+                if (title == null)
+                {
+                    title = "";
+                }
+                if (title.length() < 1)
+                {
+                    title = url;
+                }
+                title = replace(title);
+                if (title.length() > 100)
+                {
+                    title = title.substring(0, 100);
+                }
+
+                keywords = getMetaContentByName(doc, "keywords");
+                foreach (char c in splitWords)
+                {
+                    keywords = keywords.Replace(c, ' ');
+                }
+                if (keywords.length() > 50)
+                {
+                    keywords = keywords.substring(0, 50);
+                }
+
+                description = getMetaContentByName(doc, "description");
+                if (description.length() > 300)
+                {
+                    description = description.substring(0, 300);
+                }
+
+                page.title = title;
+                page.keywords = keywords;
+                page.description = description;
 
                 return page;
             }
@@ -517,28 +632,128 @@ namespace FTServer
                 return null;
             }
         }
-
-
-        private static void removeTag(IDocument doc, string tag)
+        public static List<PageText> getDefaultTexts(Page page)
         {
-            foreach (var c in doc.QuerySelectorAll(tag).ToArray())
+            if (page.textOrder < 1)
             {
-                c.Parent.RemoveElement(c);
+                //no id;
+                return null;
             }
+
+            ArrayList<PageText> result = new ArrayList<PageText>();
+
+            String title = page.title;
+            String keywords = page.keywords;
+
+            String url = page.url;
+            long textOrder = page.textOrder;
+
+            PageText description = new PageText();
+
+            description.textOrder = textOrder;
+            description.url = url;
+            description.title = title;
+            description.keywords = keywords;
+
+            description.text = page.description;
+
+            description.priority = PageText.descriptionPriority;
+            if (page.isKeyPage)
+            {
+                description.priority = PageText.descriptionKeyPriority;
+            }
+            result.add(description);
+
+            String content = page.text.trim() + "..";
+            int maxLength = PageText.max_text_length;
+
+            int wordCount = 0;
+            for (int i = 0; i < content.length(); i++)
+            {
+                char c = content.charAt(i);
+                if (c < 256)
+                {
+                    wordCount++;
+                }
+                else
+                {
+                    bool isword = IndexAPI.ENGINE.sUtil.isWord(c);
+                    if (isword)
+                    {
+                        wordCount++;
+                    }
+                }
+            }
+            if (((double)wordCount / (double)content.length()) > 0.8)
+            {
+                maxLength *= 4;
+            }
+
+            long startPriority = PageText.descriptionPriority - 1;
+            while (startPriority > 0 && content.length() > 0)
+            {
+
+                PageText text = new PageText();
+                text.textOrder = textOrder;
+                text.url = url;
+                text.title = title;
+                text.keywords = "";
+
+                text.text = null;
+                StringBuilder texttext = new StringBuilder(maxLength + 100);
+
+                int last = Math.Min(maxLength, content.length() - 1);
+                int p1 = 0;
+                foreach (char c in splitWords.toCharArray())
+                {
+                    int t = content.lastIndexOf(c, last);
+                    if (t >= 0)
+                    {
+                        p1 = Math.Max(p1, t);
+                    }
+                }
+                if (p1 == 0)
+                {
+                    p1 = last;
+                }
+
+                texttext.append(content.substring(0, p1 + 1));
+
+                content = content.substring(p1 + 1);
+
+                if (content.length() > 0 && content.length() < 100)
+                {
+                    texttext.append(" ").append(content);
+                    content = "";
+                }
+
+                text.text = texttext.toString();
+                text.priority = startPriority;
+                result.add(text);
+                startPriority--;
+            }
+
+            return result;
+
+        }
+
+
+        private static string replace(String content)
+        {
+            content = content.Replace("　", " ").Replace(((char)8203).ToString(), "");
+            content = Regex.Replace(content, "\t|\r|\n|�|<|>", " ");
+            content = Regex.Replace(content, "\\$", " ");
+            content = Regex.Replace(content, "\\s+", " ");
+            content = content.Trim();
+            return content;
         }
         private static void fixSpan(IDocument doc)
         {
-
-            foreach (var s in new string[] { "script", "style", "textarea", "noscript" })
-            {
-                removeTag(doc, s);
-            }
-
-            foreach (var c in doc.QuerySelectorAll("span"))
+            foreach (var c in doc.GetElementsByTagName("span"))
             {
                 if (c.ChildNodes.Length == 1)
                 {
-                    c.TextContent += " ";
+                    c.TextContent += " " + c.TextContent + " ";
                 }
             }
         }

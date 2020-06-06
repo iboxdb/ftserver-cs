@@ -28,15 +28,10 @@ namespace FTServer.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> About(string q)
         {
+            await Task.Yield();
 
             var m = new AboutModel();
             q = q.Replace("<", "").Replace(">", "").Trim();
-
-            m.Result = new ResultPartialModel
-            {
-                Query = q,
-                StartId = null
-            };
 
             bool? isdelete = null;
 
@@ -51,24 +46,46 @@ namespace FTServer.Controllers
             }
             if (!isdelete.HasValue)
             {
-                AboutModel.searchList.Enqueue(q);
-                while (AboutModel.searchList.Count > 15)
+                try
                 {
-                    String t;
-                    AboutModel.searchList.TryDequeue(out t);
+                    IndexPage.addSearchTerm(q);
                 }
+                catch
+                {
+
+                }
+            }
+            else if (isdelete.Value)
+            {
+                IndexPage.removePage(q);
+                q = "deleted";
             }
             else
             {
-                m.Result.Query = await IndexAPI.indexTextAsync(q, isdelete.Value);
-                if (m.Result.Query.StartsWith("http"))
-                    AboutModel.urlList.Enqueue(q);
-                while (AboutModel.urlList.Count > 3)
+
+                String[] fresult = new String[] { "background running" };
+                String furl = Html.getUrl(q);
+
+                Task.Run(async () =>
                 {
-                    String t;
-                    AboutModel.urlList.TryDequeue(out t);
-                }
+                    Console.WriteLine("For:" + furl);
+                    String rurl = await IndexPage.addPage(furl, true);
+                    IndexPage.backgroundLog(furl, rurl);
+
+                    //IndexPage.addPageCustomText(furl, ttitle, tmsg);
+
+                    fresult[0] = rurl;
+
+                    q = fresult[0];
+                }).Wait(3000);
+
             }
+
+            m.Result = new ResultPartialModel
+            {
+                Query = q,
+                StartId = null
+            };
             return View(m);
         }
 

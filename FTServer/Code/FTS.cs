@@ -8,6 +8,7 @@ using AngleSharp.Dom;
 using iBoxDB.LocalServer;
 using System.Threading.Tasks;
 
+//the db classes
 namespace FTServer
 {
     public class PageSearchTerm
@@ -114,17 +115,17 @@ namespace FTServer
     public partial class Page
     {
 
-        private static readonly Random cran = new Random();
+        private static Random RAN = new Random();
 
-        [NotColumn]
+
         public String getRandomContent(int length)
         {
-            int len = text.Length - 100;
+            int len = text.length() - 100;
             if (len <= 20)
             {
                 return text;
             }
-            int s = cran.Next(len);
+            int s = RAN.nextInt(len);
             if (s < 0)
             {
                 s = 0;
@@ -134,15 +135,17 @@ namespace FTServer
                 s = len;
             }
 
-            int count = text.Length - s;
-            if (count > length)
+            int end = s + length;
+            if (end > text.length())
             {
-                count = length;
+                end = text.length();
             }
-            return text.Substring(s, count);
+
+            return text.substring(s, end);
         }
-
-
     }
+
+
+}
 }
 
