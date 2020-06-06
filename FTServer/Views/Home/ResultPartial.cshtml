@@ -16,31 +16,21 @@
      var pageCount = Model.pageCount;
 
                      foreach (var p in pages) {
-                        String content = null;
-                         bool isdesc = false;
-                        if ( p.keyWord == null) {
-                        	content = p.description + "...";
-                            content += p.content;                        
-                             
-                        } else if (p.id != p.keyWord.I) {
-                            content = p.description;
-                            if (content.Length < 20) {
-                                content += p.getRandomContent();
-                            }
-                              isdesc = true;
-                        } else {
-                            content = IndexAPI.engine.getDesc(p.content.ToString(), p.keyWord, 80); 
-                            if (content.Length < 100) {
-                                content += p.getRandomContent();
-                            }
-                            if (content.Length < 100) {
-                                content += p.description;
-                            }
-                            if (content.Length > 200) {
-                                content = content.Substring(0, 200) + "..";
-                            }
-                           
-                        }
+                         if (p.priority == 0) {
+
+                continue;
+            }
+            bool isdesc = p.priority >= PageText.descriptionPriority;
+            String content = isdesc ? p.text
+                    : IndexPage.getDesc(p.text, p.keyWord, 80);
+            if (content.Length < 100) {
+                Page fpage = IndexPage.getPage(p.url);
+                if ( fpage != null){
+                  content += " " + fpage.getRandomContent(100);
+                }
+            }
+            String[] keywords = p.keywords.Split(" ");
+
 
 <h3><div class="spartcss"><a class="stext" target="_blank"   href="@p.url" >@p.title</a></div></h3> 
 <span class="stext"> @content </span>
@@ -48,7 +38,7 @@
   var css = isdesc ? "gt" : "gtt";
 
  <div class="@css">
-    @if(p.isAnd) { 
+    @if(p.isAndSearch) { 
     } else {
       <text>*</text>
     }

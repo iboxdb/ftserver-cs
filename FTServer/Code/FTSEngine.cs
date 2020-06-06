@@ -853,7 +853,7 @@ namespace FTServer
         }
         public static char charAt(this string self, int index)
         {
-            return self.charAt(index);
+            return self[index];
         }
         public static int lastIndexOf(this string self, char c, int index)
         {

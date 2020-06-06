@@ -100,11 +100,13 @@ namespace FTServer.Models
             {
                 {
                     PageText p = new PageText();
+                    p.priority = PageText.descriptionPriority;
                     p.title = "NotFound";
                     p.text = "input URL(http or https) to index";
                     p.url = "./";
                     p.textOrder = 0;
                     p.keyWord = new KeyWordE() { I = 0, P = 0 };
+                    p.keywords = "";
                     pages.Add(p);
                 }
             }

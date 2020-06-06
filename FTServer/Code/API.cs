@@ -40,6 +40,23 @@ namespace FTServer
             return App.Auto.Select<PageSearchTerm>("from /PageSearchTerm limit 0 , ?", len);
         }
 
+        public static String getDesc(String str, KeyWord kw, int length)
+        {
+            if (kw.I == -1)
+            {
+                return str;
+            }
+            return IndexAPI.ENGINE.getDesc(str, kw, length);
+        }
+        public static List<String> discover()
+        {
+            using (var box = App.Auto.Cube())
+            {
+                return IndexAPI.engine.discover(box, 'a', 'z', 2,
+                    '\u2E80', '\u9fa5', 2).ToList();
+            }
+        }
+
         public static Page getPage(String url)
         {
             return App.Auto.Get<Page>("Page", url);
@@ -148,7 +165,7 @@ namespace FTServer
                           int sleep = SLEEP_TIME;
                           await Task.Delay(sleep);
 
-                      }, vurl);
+                      }, vurl, TaskContinuationOptions.ExecuteSynchronously);
                     }
                 }
             }
@@ -376,7 +393,7 @@ namespace FTServer
                     startId = kw.I - 1;
 
                     long id = kw.I;
-                    var p = box["Page", id].Select<PageText>();
+                    var p = box["PageText", id].Select<PageText>();
                     p.keyWord = kw;
                     pages.Add(p);
                     pageCount--;
@@ -386,14 +403,7 @@ namespace FTServer
         }
 
 
-        public static List<String> discover()
-        {
-            using (var box = App.Auto.Cube())
-            {
-                return IndexAPI.engine.discover(box, 'a', 'z', 2,
-                    '\u2E80', '\u9fa5', 2).ToList();
-            }
-        }
+
 
         public static bool? addPage(Page page)
         {
@@ -550,10 +560,7 @@ namespace FTServer
 
                 var config = Configuration.Default.WithDefaultLoader();
                 var doc = await BrowsingContext.New(config).OpenAsync(url);
-                if (!doc.HasTextNodes())
-                {
-                    return null;
-                }
+
                 fixSpan(doc);
 
                 Page page = new Page();

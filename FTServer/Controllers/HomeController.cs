@@ -76,9 +76,8 @@ namespace FTServer.Controllers
 
                     fresult[0] = rurl;
 
-                    q = fresult[0];
                 }).Wait(3000);
-
+                q = fresult[0];
             }
 
             m.Result = new ResultPartialModel
