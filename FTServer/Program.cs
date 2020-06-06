@@ -90,6 +90,13 @@ namespace FTServer
            Host.CreateDefaultBuilder(args)
                .ConfigureWebHostDefaults(webBuilder =>
                {
+                   webBuilder.ConfigureLogging(logging =>
+               {
+                   logging.AddFilter((name, lev) =>
+                   {
+                       return false;
+                   });
+               });
                    webBuilder.UseStartup<Startup>();
                });
     }

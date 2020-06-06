@@ -16,8 +16,27 @@ namespace FTServer
 
     public class IndexPage
     {
-        private static Task backgroundTasks = Task.Run(() => { });
-        private static int backgroundThreadCount = 0;
+
+        private static volatile ConcurrentQueue<Func<Task>> backgroundThreadQueue = new ConcurrentQueue<Func<Task>>();
+        private static Task backgroundTasks = Task.Run(async () =>
+       {
+           int SLEEP_TIME = 2000;
+
+           ConcurrentQueue<Func<Task>> tmp = backgroundThreadQueue;
+           while (tmp != null)
+           {
+               if (!backgroundThreadQueue.IsEmpty)
+               {
+                   Func<Task> act;
+                   backgroundThreadQueue.TryDequeue(out act);
+                   await act();
+               }
+               await Task.Delay(SLEEP_TIME);
+               tmp = backgroundThreadQueue;
+
+           }
+
+       });
 
         public static ConcurrentQueue<String> urlList
             = new ConcurrentQueue<String>();
@@ -146,26 +165,17 @@ namespace FTServer
 
                 int max_background = atNight ? 1000 : 0;
 
-                int SLEEP_TIME = 2000;
-
-                if (backgroundThreadCount < max_background)
+                if (backgroundThreadQueue.Count < max_background)
                 {
                     foreach (String vurl in subUrls)
                     {
-                        Interlocked.Increment(ref backgroundThreadCount);
-                        backgroundTasks = backgroundTasks.ContinueWith(async (_, url) =>
-                      {
-
-                          Interlocked.Decrement(ref backgroundThreadCount);
-
-                          Console.WriteLine("For:" + url + " ," + backgroundThreadCount);
-                          String r = await addPage((string)url, false);
-                          backgroundLog((string)url, r);
-
-                          int sleep = SLEEP_TIME;
-                          await Task.Delay(sleep);
-
-                      }, vurl, TaskContinuationOptions.ExecuteSynchronously);
+                        var url = vurl;
+                        backgroundThreadQueue.Enqueue(async () =>
+                        {
+                            Console.WriteLine("For:" + url + " ," + backgroundThreadQueue.Count);
+                            String r = await addPage(url, false);
+                            backgroundLog(url, r);
+                        });
                     }
                 }
             }
@@ -185,6 +195,7 @@ namespace FTServer
             {
                 Console.WriteLine("Retry:" + url);
             }
+            Console.WriteLine("");
         }
 
 
