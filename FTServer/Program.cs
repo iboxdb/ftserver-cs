@@ -40,13 +40,14 @@ namespace FTServer
                 Console.WriteLine("Loading Memory...");
                 foreach (var p in Directory.GetFiles(path))
                 {
-                    Console.WriteLine(p);
+                    Console.WriteLine("Loading " + p);
                     var bs = new byte[1024 * 1024 * 32];
                     using (var fs = new FileStream(p, FileMode.Open))
                     {
                         while (fs.Read(bs) > 0) { }
                     }
                 }
+                Console.WriteLine("Loaded Memory");
                 #endregion
 
                 #region Config
@@ -58,6 +59,7 @@ namespace FTServer
                 //cfg.CacheLength = cfg.MB(128);
 
                 cfg.FileIncSize = (int)cfg.MB(4);
+                cfg.SwapFileBuffer = (int)cfg.MB(4);
 
                 new Engine().Config(cfg);
 
@@ -83,6 +85,7 @@ namespace FTServer
             using (App.Auto.GetDatabase())
             {
                 host.Run();
+                IndexPage.Shutdown();
             }
         }
 

@@ -15,11 +15,10 @@
      var isFirstLoad = Model.isFirstLoad;
      var pageCount = Model.pageCount;
 
-                     foreach (var p in pages) {
-                         if (p.priority == 0) {
-
-                continue;
-            }
+     foreach (var p in pages) {
+        if (p.priority == 0) {
+          continue;
+        }
             bool isdesc = p.priority >= PageText.descriptionPriority;
             String content = isdesc ? p.text
                     : IndexPage.getDesc(p.text, p.keyWord, 80);
@@ -42,7 +41,16 @@
     } else {
       <text>*</text>
     }
-    @p.url 
+    @p.url  
+    @p.createTime
+    <br>
+    @foreach (var tkw in keywords)
+    {
+      var kw = tkw.Trim();
+      if ( kw ==null || kw.Length < 1){ continue;} 
+      <a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(kw))"  class="@css kw"> &nbsp;  @kw  &nbsp; </a> 
+      <text>  &nbsp; </text>  
+    }
 </div>
                 
  }
@@ -57,7 +65,7 @@
     @: @Model.Query,  TIME: @tcontent,
       <a href="#btnsearch" ><b>
         @if (!@Model.IsEnd()){
-             @:"HEAD" 
+             @:"CONTINUING" 
         }else{
              @:"END"
         }      

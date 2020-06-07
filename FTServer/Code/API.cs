@@ -17,13 +17,13 @@ namespace FTServer
     public class IndexPage
     {
 
-        private static volatile ConcurrentQueue<Func<Task>> backgroundThreadQueue = new ConcurrentQueue<Func<Task>>();
+        private static ConcurrentQueue<Func<Task>> backgroundThreadQueue = new ConcurrentQueue<Func<Task>>();
+        private static bool isshutdown = false;
         private static Task backgroundTasks = Task.Run(async () =>
        {
-           int SLEEP_TIME = 2000;
+           int SLEEP_TIME = 0;
 
-           ConcurrentQueue<Func<Task>> tmp = backgroundThreadQueue;
-           while (tmp != null)
+           while (!isshutdown)
            {
                if (!backgroundThreadQueue.IsEmpty)
                {
@@ -32,11 +32,16 @@ namespace FTServer
                    await act();
                }
                await Task.Delay(SLEEP_TIME);
-               tmp = backgroundThreadQueue;
-
            }
 
        });
+
+        public static void Shutdown()
+        {
+            isshutdown = true;
+            backgroundTasks.Wait();
+            Console.WriteLine("Background Task Ended");
+        }
 
         public static ConcurrentQueue<String> urlList
             = new ConcurrentQueue<String>();
@@ -125,7 +130,7 @@ namespace FTServer
                 long textOrder = App.Auto.NewId(0, 0);
                 DateTime indexend = DateTime.Now;
                 Console.WriteLine("TIME IO:" + (ioend - begin).TotalSeconds
-                    + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " " + url);
+                    + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " ");
 
                 subUrls.remove(url);
                 subUrls.remove(url + "/");

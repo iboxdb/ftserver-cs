@@ -30,6 +30,9 @@
                 overflow: hidden;
                 text-overflow:ellipsis;
             }
+            .kw{
+                background-color: #eee;
+            }
         </style>
 }
 
@@ -80,6 +83,8 @@
                 if (div_load !== null) {
                     var top = div_load.getBoundingClientRect().top;
                     var se = document.documentElement.clientHeight;
+
+                    top = top - 1000;
                     if (top <= se) {
                         var startId = div_load.startId;
                         div_load = null;
