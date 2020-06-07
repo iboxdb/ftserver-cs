@@ -629,6 +629,9 @@ namespace FTServer
                 if (title.length() < 1)
                 {
                     title = url;
+                    //ignore no title
+                    Console.WriteLine("No Title " + url);
+                    return null;
                 }
                 title = replace(title);
                 if (title.length() > 100)
