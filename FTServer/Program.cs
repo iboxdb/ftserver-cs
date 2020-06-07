@@ -26,20 +26,12 @@ namespace FTServer
             };
             var task = Task.Run<AutoBox>(() =>
             {
-                #region Path
-                App.IsVM = false;
+                #region Path 
                 String dir = "ftsdata130c";
                 String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
-                try
-                {
-                    Directory.CreateDirectory(path);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    App.IsVM = true;
-                    path = Path.Combine(System.Environment.CurrentDirectory, "Data", dir);
-                    Directory.CreateDirectory(path);
-                }
+                Directory.CreateDirectory(path);
+                //catch (UnauthorizedAccessException)
+
                 Console.WriteLine("DBPath=" + path);
                 DB.Root(path);
                 //for get more os memory
@@ -60,13 +52,14 @@ namespace FTServer
                 //System.Diagnostics.Process.GetCurrentProcess()
                 DB db = new DB(1);
                 var cfg = db.GetConfig();
-                cfg.CacheLength = cfg.MB(App.IsVM ? 16 : 512);
+                cfg.CacheLength = cfg.MB(2048);
                 //if update metadata, use low cache
                 //cfg.CacheLength = cfg.MB(128);
 
                 cfg.FileIncSize = (int)cfg.MB(4);
                 cfg.SwapFileBuffer = (int)cfg.MB(4);
 
+                Console.WriteLine("DB Cache = " + (cfg.CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(cfg);
 
 
@@ -117,8 +110,6 @@ namespace FTServer
         {
             return Auto.Cube();
         }
-        public static bool IsDevelopment;
-        public static bool IsVM;
     }
 
 
