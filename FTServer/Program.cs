@@ -20,6 +20,10 @@ namespace FTServer
         public static void Main(string[] args)
         {
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+            {
+                return true;
+            };
             var task = Task.Run<AutoBox>(() =>
             {
                 #region Path
