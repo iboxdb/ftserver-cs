@@ -10,7 +10,7 @@
             }
 
             body {
-                margin-top: 100px;
+                margin-top: 10px;
                 overflow:hidden;
             }
      
@@ -56,7 +56,7 @@
                     
 
                     <br>Recent Records:<br>
-                    @foreach (String str in IndexPage.urlList) {                    
+                    @foreach (String str in IndexPage.urlList.Reverse()) {                    
                     @:<a href="@str" target="_blank" >@str</a>. &nbsp; <br /> 
                     }
                     
