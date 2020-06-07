@@ -42,6 +42,7 @@ namespace FTServer.Controllers
             else if (q.StartsWith("delete")
               && (q.Contains("http://") || q.Contains("https://")))
             {
+                q = q.substring(6).trim();
                 isdelete = true;
             }
             if (!isdelete.HasValue)

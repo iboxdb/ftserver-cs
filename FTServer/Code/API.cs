@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Text;
 using AngleSharp.Html.Dom;
 using System.Threading;
+using AngleSharp.Io;
 
 namespace FTServer
 {
@@ -574,7 +575,9 @@ namespace FTServer
                     return null;
                 }
 
-                var config = Configuration.Default.WithDefaultLoader();
+                var config = Configuration.Default.WithDefaultLoader(
+                    new LoaderOptions() { IsResourceLoadingEnabled = false }
+                );
                 var doc = await BrowsingContext.New(config).OpenAsync(url);
                 if (doc == null)
                 {
