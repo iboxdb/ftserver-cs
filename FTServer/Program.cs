@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 
 using iBoxDB.LocalServer;
 using Microsoft.Extensions.Hosting;
+using System.Net;
 
 namespace FTServer
 {
@@ -18,6 +19,7 @@ namespace FTServer
 
         public static void Main(string[] args)
         {
+            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             var task = Task.Run<AutoBox>(() =>
             {
                 #region Path

@@ -21,7 +21,7 @@ namespace FTServer
         private static bool isshutdown = false;
         private static Task backgroundTasks = Task.Run(async () =>
        {
-           int SLEEP_TIME = 0;
+           int SLEEP_TIME = 2000;
 
            while (!isshutdown)
            {
@@ -576,7 +576,11 @@ namespace FTServer
 
                 var config = Configuration.Default.WithDefaultLoader();
                 var doc = await BrowsingContext.New(config).OpenAsync(url);
-
+                if (doc == null)
+                {
+                    return null;
+                }
+                //Console.WriteLine(doc.ToHtml());
                 fixSpan(doc);
 
                 Page page = new Page();
@@ -584,6 +588,8 @@ namespace FTServer
                 page.text = replace(doc.Body.TextContent);
                 if (page.text.length() < 10)
                 {
+                    Console.WriteLine("this page doesn't want to be read");
+                    Console.WriteLine(url);
                     return null;
                 }
 
@@ -772,6 +778,13 @@ namespace FTServer
         }
         private static void fixSpan(IDocument doc)
         {
+            foreach (var s in new string[] { "script", "style", "textarea", "noscript" })
+            {
+                foreach (var c in doc.GetElementsByTagName(s).ToArray())
+                {
+                    c.Parent.RemoveElement(c);
+                }
+            }
             foreach (var c in doc.GetElementsByTagName("span"))
             {
                 if (c.ChildNodes.Length == 1)
