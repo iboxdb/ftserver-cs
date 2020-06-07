@@ -591,8 +591,8 @@ namespace FTServer
                 page.text = replace(doc.Body.TextContent);
                 if (page.text.length() < 10)
                 {
-                    Console.WriteLine("this page doesn't want to be read");
-                    Console.WriteLine(url);
+                    //some website can't get html
+                    Console.WriteLine("No HTML " + url);
                     return null;
                 }
 
