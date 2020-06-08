@@ -82,12 +82,6 @@ When Delete
 IndexAPI.removePage(url);
 ````
 
-#### Memory
-````cs
-//Bigger, faster, more memories.
-//Smaller, less memory.
-int PageText.max_text_length ;
-````
 
 #### Add Custom information to Page
 ```cs
@@ -110,6 +104,13 @@ return page;
 ```
 
 
+#### Memory
+````cs
+//Bigger, faster, more memories.
+//Smaller, less memory.
+int PageText.max_text_length ;
+````
+
 #### How to set big cache
 ```cs
 DatabaseConfig dbcfg = db.GetConfig(); 
@@ -124,7 +125,7 @@ dbcfg.CacheLength = 2048L * 1024L * 1024L;
 
 
 #### Tools
-Linux + Visual Studio Code + ASP.NET Core
+Linux + ASP.NET Core
 
 #### More
 [Transplant from Full Text Search Java JSP Version](https://github.com/iboxdb/ftserver)
