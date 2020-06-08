@@ -575,9 +575,7 @@ namespace FTServer
                     return null;
                 }
 
-                var config = Configuration.Default.WithDefaultLoader(
-                    new LoaderOptions() { IsResourceLoadingEnabled = false }
-                );
+                var config = Configuration.Default.WithDefaultLoader();
                 var doc = await BrowsingContext.New(config).OpenAsync(url);
                 if (doc == null)
                 {
@@ -598,14 +596,18 @@ namespace FTServer
 
                 if (subUrls != null)
                 {
+                    var host = doc.BaseUrl.Host;
                     var links = doc.QuerySelectorAll<IHtmlAnchorElement>("a[href]");
                     foreach (var link in links)
                     {
-                        String ss = link.Href;
-                        if (ss != null && ss.length() > 8)
+                        if (link.Host.Equals(host))
                         {
-                            ss = getUrl(ss);
-                            subUrls.add(ss);
+                            String ss = link.Href;
+                            if (ss != null && ss.length() > 8)
+                            {
+                                ss = getUrl(ss);
+                                subUrls.add(ss);
+                            }
                         }
                     }
                 }
