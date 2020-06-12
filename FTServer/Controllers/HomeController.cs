@@ -58,7 +58,10 @@ namespace FTServer.Controllers
             }
             else if (isdelete.Value)
             {
-                IndexPage.removePage(q);
+                lock (typeof(App))
+                {
+                    IndexPage.removePage(q);
+                }
                 q = "deleted";
             }
             else
@@ -67,16 +70,18 @@ namespace FTServer.Controllers
                 String[] fresult = new String[] { "background running" };
                 String furl = Html.getUrl(q);
 
-                Task.Run(async () =>
+                Task.Run(() =>
                 {
-                    Console.WriteLine("For:" + furl);
-                    String rurl = await IndexPage.addPage(furl, true);
-                    IndexPage.backgroundLog(furl, rurl);
+                    lock (typeof(App))
+                    {
+                        Console.WriteLine("For:" + furl);
+                        String rurl = IndexPage.addPage(furl, true).GetAwaiter().GetResult();
+                        IndexPage.backgroundLog(furl, rurl);
 
-                    //IndexPage.addPageCustomText(furl, ttitle, tmsg);
+                        //IndexPage.addPageCustomText(furl, ttitle, tmsg);
 
-                    fresult[0] = rurl;
-
+                        fresult[0] = rurl;
+                    }
                 }).Wait(3000);
                 q = fresult[0];
             }
