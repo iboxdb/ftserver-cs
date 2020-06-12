@@ -18,7 +18,7 @@ namespace FTServer
     public class IndexPage
     {
 
-        private static ConcurrentQueue<Func<Task>> backgroundThreadQueue = new ConcurrentQueue<Func<Task>>();
+        private static ConcurrentQueue<ThreadStart> backgroundThreadQueue = new ConcurrentQueue<ThreadStart>();
         private static bool isshutdown = false;
         private static Task backgroundTasks = Task.Run(async () =>
        {
@@ -28,9 +28,12 @@ namespace FTServer
            {
                if (!backgroundThreadQueue.IsEmpty)
                {
-                   Func<Task> act;
+                   ThreadStart act;
                    backgroundThreadQueue.TryDequeue(out act);
-                   await act();
+                   lock (typeof(App))
+                   {
+                       act();
+                   }
                }
                await Task.Delay(SLEEP_TIME);
            }
@@ -101,7 +104,7 @@ namespace FTServer
             IndexAPI.removePage(url);
         }
 
-        public static async Task<String> addPage(String url, bool isKeyPage)
+        public static String addPage(String url, bool isKeyPage)
         {
             if (!isKeyPage)
             {
@@ -114,7 +117,7 @@ namespace FTServer
             HashSet<String> subUrls = new HashSet<String>();
 
             DateTime begin = DateTime.Now;
-            Page p = await Html.GetAsync(url, subUrls);
+            Page p = Html.Get(url, subUrls);
             DateTime ioend = DateTime.Now;
 
             if (p == null)
@@ -176,10 +179,10 @@ namespace FTServer
                     foreach (String vurl in subUrls)
                     {
                         var url = vurl;
-                        backgroundThreadQueue.Enqueue(async () =>
+                        backgroundThreadQueue.Enqueue(() =>
                         {
                             Console.WriteLine("For:" + url + " ," + backgroundThreadQueue.Count);
-                            String r = await addPage(url, false);
+                            String r = addPage(url, false);
                             backgroundLog(url, r);
                         });
                     }
@@ -566,7 +569,7 @@ namespace FTServer
             return replace(description);
         }
         static String splitWords = " ,.　，。";
-        public static async Task<Page> GetAsync(String url, HashSet<String> subUrls)
+        public static Page Get(String url, HashSet<String> subUrls)
         {
             try
             {
@@ -576,7 +579,7 @@ namespace FTServer
                 }
 
                 var config = Configuration.Default.WithDefaultLoader();
-                var doc = await BrowsingContext.New(config).OpenAsync(url);
+                var doc = BrowsingContext.New(config).OpenAsync(url).GetAwaiter().GetResult();
                 if (doc == null)
                 {
                     return null;

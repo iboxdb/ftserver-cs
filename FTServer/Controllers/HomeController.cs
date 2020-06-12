@@ -75,7 +75,7 @@ namespace FTServer.Controllers
                     lock (typeof(App))
                     {
                         Console.WriteLine("For:" + furl);
-                        String rurl = IndexPage.addPage(furl, true).GetAwaiter().GetResult();
+                        String rurl = IndexPage.addPage(furl, true);
                         IndexPage.backgroundLog(furl, rurl);
 
                         //IndexPage.addPageCustomText(furl, ttitle, tmsg);
