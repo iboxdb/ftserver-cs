@@ -12,8 +12,24 @@ using iBoxDB.LocalServer;
 using Microsoft.Extensions.Hosting;
 using System.Net;
 
+
 namespace FTServer
 {
+    /*
+    Turn off virtual memory for 8G+ RAM Machine
+    use DatabaseConfig.CacheLength and PageText.max_text_length to Control Memory
+
+    Linux:
+     # free -h
+     # sudo swapoff -a
+     # free -h 
+
+    Windows:
+    System Properties(Win+Pause) - Advanced system settings - Advanced
+    - Performance Settings - Advanced - Virtual Memory Change -
+    uncheck Automatically manage paging file - select No paging file - 
+    click Set - OK restart
+    */
     public class Program
     {
 
@@ -35,6 +51,7 @@ namespace FTServer
                 Console.WriteLine("DBPath=" + path);
                 DB.Root(path);
                 //for get more os memory
+                /*
                 Console.WriteLine("Loading Memory...");
                 foreach (var p in Directory.GetFiles(path))
                 {
@@ -46,6 +63,7 @@ namespace FTServer
                     }
                 }
                 Console.WriteLine("Loaded Memory");
+                */
                 #endregion
 
                 #region Config
