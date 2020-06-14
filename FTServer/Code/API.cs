@@ -20,30 +20,33 @@ namespace FTServer
 
         private static ConcurrentQueue<ThreadStart> backgroundThreadQueue = new ConcurrentQueue<ThreadStart>();
         private static bool isshutdown = false;
-        private static Task backgroundTasks = Task.Run(async () =>
-       {
-           int SLEEP_TIME = 2000;
-
-           while (!isshutdown)
-           {
-               if (!backgroundThreadQueue.IsEmpty)
-               {
-                   ThreadStart act;
-                   backgroundThreadQueue.TryDequeue(out act);
-                   lock (typeof(App))
-                   {
-                       act();
-                   }
-               }
-               await Task.Delay(SLEEP_TIME);
-           }
-
-       });
+        private static Thread backgroundTasks = new Func<Thread>(() =>
+        {
+            var t = new Thread(() =>
+            {
+                int SLEEP_TIME = 2000;
+                while (!isshutdown)
+                {
+                    if (!backgroundThreadQueue.IsEmpty)
+                    {
+                        ThreadStart act;
+                        backgroundThreadQueue.TryDequeue(out act);
+                        if (act != null)
+                            act();
+                    }
+                    Thread.Sleep(SLEEP_TIME);
+                }
+            });
+            t.Priority = ThreadPriority.Lowest;
+            t.IsBackground = true;
+            t.Start();
+            return t;
+        })();
 
         public static void Shutdown()
         {
             isshutdown = true;
-            backgroundTasks.Wait();
+            backgroundTasks.Join();
             Console.WriteLine("Background Task Ended");
         }
 
@@ -181,9 +184,12 @@ namespace FTServer
                         var url = vurl;
                         backgroundThreadQueue.Enqueue(() =>
                         {
-                            Console.WriteLine("For:" + url + " ," + backgroundThreadQueue.Count);
-                            String r = addPage(url, false);
-                            backgroundLog(url, r);
+                            lock (typeof(App))
+                            {
+                                Console.WriteLine("For:" + url + " ," + backgroundThreadQueue.Count);
+                                String r = addPage(url, false);
+                                backgroundLog(url, r);
+                            }
                         });
                     }
                 }
@@ -439,6 +445,18 @@ namespace FTServer
             return App.Auto.Insert("Page", page);
         }
 
+        public static DateTime pageIndexDelay = DateTime.MinValue;
+        private static void delay()
+        {
+            if (pageIndexDelay == DateTime.MinValue) { return; }
+            while (DateTime.Now < pageIndexDelay)
+            {
+                var d = (DateTime.Now - pageIndexDelay).TotalSeconds;
+                if (d < 0) { d = 0; }
+                if (d > 5) { d = 5; }
+                Thread.Sleep((int)(d * 1000));
+            }
+        }
         public static bool addPageIndex(String url)
         {
 
@@ -450,10 +468,13 @@ namespace FTServer
 
             List<PageText> ptlist = Html.getDefaultTexts(page);
 
+
             foreach (PageText pt in ptlist)
             {
+                delay();
                 addPageTextIndex(pt);
             }
+
             return true;
         }
 
@@ -467,6 +488,7 @@ namespace FTServer
                 }
                 box["PageText"].Insert(pt);
                 ENGINE.indexText(box, pt.id, pt.indexedText(), false);
+                delay();
                 box.Commit();
             }
         }

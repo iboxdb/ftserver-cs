@@ -22,7 +22,6 @@ namespace FTServer
     Linux:
      # free -h
      # sudo swapoff -a
-     # free -h 
 
     Windows:
     System Properties(Win+Pause) - Advanced system settings - Advanced
@@ -67,10 +66,10 @@ namespace FTServer
                 #endregion
 
                 #region Config
-                //System.Diagnostics.Process.GetCurrentProcess()
+                //System.Diagnostics.Process.GetCurrentProcess() 
                 DB db = new DB(1);
                 var cfg = db.GetConfig();
-                cfg.CacheLength = cfg.MB(2048);
+                cfg.CacheLength = cfg.MB(1024);
                 //if update metadata, use low cache
                 //cfg.CacheLength = cfg.MB(128);
 
