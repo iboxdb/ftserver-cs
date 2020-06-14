@@ -451,7 +451,7 @@ namespace FTServer
             if (pageIndexDelay == DateTime.MinValue) { return; }
             while (DateTime.Now < pageIndexDelay)
             {
-                var d = (DateTime.Now - pageIndexDelay).TotalSeconds;
+                var d = (pageIndexDelay - DateTime.Now).TotalSeconds;
                 if (d < 0) { d = 0; }
                 if (d > 5) { d = 5; }
                 Thread.Sleep((int)(d * 1000));
