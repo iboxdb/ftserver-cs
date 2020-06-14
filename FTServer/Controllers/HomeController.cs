@@ -116,6 +116,7 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = ids
             };
+            IndexAPI.pageIndexDelay = DateTime.Now.AddSeconds(5);
             return View("ResultPartial", Result);
         }
 
