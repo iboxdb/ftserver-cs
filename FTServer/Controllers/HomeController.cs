@@ -93,7 +93,10 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = null
             };
-            IndexAPI.delayIndex();
+            if (!isdelete.HasValue)
+            {
+                DelayService.delayIndex();
+            }
             return View(m);
         }
 
@@ -118,7 +121,7 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = ids
             };
-            IndexAPI.delayIndex();
+            DelayService.delayIndex();
             return View("ResultPartial", Result);
         }
 

@@ -35,10 +35,7 @@ namespace FTServer
 
             foreach (KeyWord kw in map)
             {
-                if (delay != null)
-                {
-                    delay();
-                }
+                delay?.Invoke();
                 insertToBox(box, kw, isRemove);
                 itCount++;
             }

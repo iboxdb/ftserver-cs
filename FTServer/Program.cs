@@ -35,18 +35,16 @@ namespace FTServer
 
         public static void Main(string[] args)
         {
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
             {
                 return true;
             };
-            var task = Task.Run<AutoBox>(() =>
+            var task = Task.Run<IndexServer>(() =>
             {
                 #region Path 
                 String dir = "ftsdata130c";
                 String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
                 Directory.CreateDirectory(path);
-                //catch (UnauthorizedAccessException)
 
                 Log("DBPath=" + path);
                 DB.Root(path);
@@ -66,40 +64,15 @@ namespace FTServer
                 */
                 #endregion
 
-                #region Config
-                //System.Diagnostics.Process.GetCurrentProcess() 
-                DB db = new DB(1);
-                var cfg = db.GetConfig();
-                cfg.CacheLength = cfg.MB(1024);
-                //if update metadata, use low cache
-                //cfg.CacheLength = cfg.MB(128);
-
-                cfg.FileIncSize = (int)cfg.MB(4);
-                cfg.SwapFileBuffer = (int)cfg.MB(4);
-
-                Log("DB Cache = " + (cfg.CacheLength / 1024 / 1024) + " MB");
-                new Engine().Config(cfg);
-
-
-                cfg.EnsureTable<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")");
-                cfg.EnsureIndex<Page>("Page", true, "textOrder");
-
-                cfg.EnsureTable<PageText>("PageText", "id");
-                cfg.EnsureIndex<PageText>("PageText", false, "textOrder");
-                cfg.EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
-
-
-
-                #endregion
-
-                return db.Open();
-
+                var db = new IndexServer();
+                App.Auto = db.GetInstance(1).Get();
+                App.Item = db.GetInstance(2).Get();
+                return db;
             });
 
             var host = CreateHostBuilder(args).Build();
 
-            App.Auto = task.GetAwaiter().GetResult();
-            using (App.Auto.GetDatabase())
+            using (task.GetAwaiter().GetResult())
             {
                 host.Run();
                 IndexPage.Shutdown();
@@ -123,6 +96,10 @@ namespace FTServer
 
     public class App
     {
+        //for Application
+        public static AutoBox Item;
+
+        //for PageIndex
         public static AutoBox Auto;
         public static IBox Cube()
         {

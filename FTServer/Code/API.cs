@@ -25,7 +25,7 @@ namespace FTServer
         {
             var t = new Thread(() =>
             {
-                int SLEEP_TIME = 2000;
+                int SLEEP_TIME = 1000;
                 while (!isshutdown)
                 {
                     if (!backgroundThreadQueue.IsEmpty)
@@ -47,7 +47,6 @@ namespace FTServer
         public static void Shutdown()
         {
             isshutdown = true;
-            IndexAPI.shutdownIndex();
             backgroundTasks.Join();
             Log("Background Task Ended");
         }
@@ -63,14 +62,14 @@ namespace FTServer
                 pst.time = DateTime.Now;
                 pst.keywords = keywords;
                 pst.uid = Guid.NewGuid();
-                App.Auto.Insert("/PageSearchTerm", pst);
+                App.Item.Insert("/PageSearchTerm", pst);
             }
         }
 
 
         public static List<PageSearchTerm> getSearchTerm(int len)
         {
-            return App.Auto.Select<PageSearchTerm>("from /PageSearchTerm limit 0 , ?", len);
+            return App.Item.Select<PageSearchTerm>("from /PageSearchTerm limit 0 , ?", len);
         }
 
         public static String getDesc(String str, KeyWord kw, int length)
@@ -131,6 +130,7 @@ namespace FTServer
             }
             else
             {
+
                 IndexAPI.removePage(url);
                 p.isKeyPage = isKeyPage;
                 IndexAPI.addPage(p);
@@ -444,32 +444,13 @@ namespace FTServer
 
             page.createTime = DateTime.Now;
             page.textOrder = App.Auto.NewId();
+
+            //log last page
+            App.Item.Insert("/PageBegin", page);
             return App.Auto.Insert("Page", page);
         }
 
 
-
-        public static void delayIndex(int seconds = 30)
-        {
-            pageIndexDelay = DateTime.Now.AddSeconds(seconds);
-        }
-        public static void shutdownIndex()
-        {
-            pageIndexDelay = pageIndexDelayShutdown;
-        }
-        private static readonly DateTime pageIndexDelayShutdown = DateTime.MinValue.AddDays(1);
-        private static DateTime pageIndexDelay = DateTime.MinValue;
-        private static void delay()
-        {
-            if (pageIndexDelay == DateTime.MinValue) { return; }
-            while (DateTime.Now < pageIndexDelay)
-            {
-                var d = (pageIndexDelay - DateTime.Now).TotalSeconds;
-                if (d < 0) { d = 0; }
-                if (d > 120) { d = 120; }
-                Thread.Sleep((int)(d * 1000));
-            }
-        }
         public static bool addPageIndex(String url)
         {
 
@@ -481,15 +462,8 @@ namespace FTServer
 
             List<PageText> ptlist = Html.getDefaultTexts(page);
 
-
             foreach (PageText pt in ptlist)
             {
-                delay();
-                if (pageIndexDelay == pageIndexDelayShutdown)
-                {
-                    Log("Shutdown, url needs to re-index : " + url);
-                    return false;
-                }
                 addPageTextIndex(pt);
             }
 
@@ -505,8 +479,7 @@ namespace FTServer
                     return;
                 }
                 box["PageText"].Insert(pt);
-                ENGINE.indexText(box, pt.id, pt.indexedText(), false, delay);
-                delay();
+                ENGINE.indexText(box, pt.id, pt.indexedText(), false, DelayService.delay);
                 box.Commit();
             }
         }
