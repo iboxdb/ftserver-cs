@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using FTServer.Models;
 
+using static FTServer.App;
+
 namespace FTServer.Controllers
 {
     public class HomeController : Controller
@@ -74,7 +76,7 @@ namespace FTServer.Controllers
                 {
                     lock (typeof(App))
                     {
-                        Console.WriteLine("For:" + furl);
+                        Log("For:" + furl);
                         String rurl = IndexPage.addPage(furl, true);
                         IndexPage.backgroundLog(furl, rurl);
 
@@ -91,7 +93,7 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = null
             };
-            IndexAPI.pageIndexDelay = DateTime.Now.AddSeconds(5);
+            IndexAPI.delayIndex();
             return View(m);
         }
 
@@ -116,7 +118,7 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = ids
             };
-            IndexAPI.pageIndexDelay = DateTime.Now.AddSeconds(5);
+            IndexAPI.delayIndex();
             return View("ResultPartial", Result);
         }
 

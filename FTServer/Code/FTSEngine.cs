@@ -4,6 +4,7 @@ using System.Text;
 using iBoxDB.LocalServer;
 using System.IO;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace FTServer
 {
@@ -21,7 +22,7 @@ namespace FTServer
             return sUtil.isWord(c);
         }
 
-        public long indexText(IBox box, long id, String str, bool isRemove)
+        public long indexText(IBox box, long id, String str, bool isRemove, ThreadStart delay = null)
         {
             if (id == -1)
             {
@@ -34,6 +35,10 @@ namespace FTServer
 
             foreach (KeyWord kw in map)
             {
+                if (delay != null)
+                {
+                    delay();
+                }
                 insertToBox(box, kw, isRemove);
                 itCount++;
             }

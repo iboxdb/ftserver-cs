@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net;
+
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 using iBoxDB.LocalServer;
-using Microsoft.Extensions.Hosting;
-using System.Net;
-
+using static FTServer.App;
 
 namespace FTServer
 {
@@ -47,21 +48,21 @@ namespace FTServer
                 Directory.CreateDirectory(path);
                 //catch (UnauthorizedAccessException)
 
-                Console.WriteLine("DBPath=" + path);
+                Log("DBPath=" + path);
                 DB.Root(path);
                 //for get more os memory
                 /*
-                Console.WriteLine("Loading Memory...");
+                Log("Loading Memory...");
                 foreach (var p in Directory.GetFiles(path))
                 {
-                    Console.WriteLine("Loading " + p);
+                    Log("Loading " + p);
                     var bs = new byte[1024 * 1024 * 32];
                     using (var fs = new FileStream(p, FileMode.Open))
                     {
                         while (fs.Read(bs) > 0) { }
                     }
                 }
-                Console.WriteLine("Loaded Memory");
+                Log("Loaded Memory");
                 */
                 #endregion
 
@@ -76,7 +77,7 @@ namespace FTServer
                 cfg.FileIncSize = (int)cfg.MB(4);
                 cfg.SwapFileBuffer = (int)cfg.MB(4);
 
-                Console.WriteLine("DB Cache = " + (cfg.CacheLength / 1024 / 1024) + " MB");
+                Log("DB Cache = " + (cfg.CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(cfg);
 
 
@@ -126,6 +127,10 @@ namespace FTServer
         public static IBox Cube()
         {
             return Auto.Cube();
+        }
+        public static void Log(String msg)
+        {
+            Console.WriteLine(msg);
         }
     }
 

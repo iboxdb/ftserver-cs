@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Text;
+using System.Threading;
+
 using AngleSharp;
 using AngleSharp.Dom;
-using iBoxDB.LocalServer;
-using System.Threading.Tasks;
-using System.Text;
 using AngleSharp.Html.Dom;
-using System.Threading;
-using AngleSharp.Io;
+
+using iBoxDB.LocalServer;
+using static FTServer.App;
 
 namespace FTServer
 {
@@ -46,8 +47,9 @@ namespace FTServer
         public static void Shutdown()
         {
             isshutdown = true;
+            IndexAPI.shutdownIndex();
             backgroundTasks.Join();
-            Console.WriteLine("Background Task Ended");
+            Log("Background Task Ended");
         }
 
         public static ConcurrentQueue<String> urlList
@@ -136,7 +138,7 @@ namespace FTServer
 
                 long textOrder = App.Auto.NewId(0, 0);
                 DateTime indexend = DateTime.Now;
-                Console.WriteLine("TIME IO:" + (ioend - begin).TotalSeconds
+                Log("TIME IO:" + (ioend - begin).TotalSeconds
                     + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " ");
 
                 subUrls.remove(url);
@@ -186,7 +188,7 @@ namespace FTServer
                         {
                             lock (typeof(App))
                             {
-                                Console.WriteLine("For:" + url + " ," + backgroundThreadQueue.Count);
+                                Log("For:" + url + " ," + backgroundThreadQueue.Count);
                                 String r = addPage(url, false);
                                 backgroundLog(url, r);
                             }
@@ -200,17 +202,17 @@ namespace FTServer
         {
             if (output == null)
             {
-                Console.WriteLine("Has indexed:" + url);
+                Log("Has indexed:" + url);
             }
             else if (url.equals(output))
             {
-                Console.WriteLine("Indexed:" + url);
+                Log("Indexed:" + url);
             }
             else
             {
-                Console.WriteLine("Retry:" + url);
+                Log("Retry:" + url);
             }
-            Console.WriteLine("");
+            Log("");
         }
 
 
@@ -445,7 +447,18 @@ namespace FTServer
             return App.Auto.Insert("Page", page);
         }
 
-        public static DateTime pageIndexDelay = DateTime.MinValue;
+
+
+        public static void delayIndex(int seconds = 30)
+        {
+            pageIndexDelay = DateTime.Now.AddSeconds(seconds);
+        }
+        public static void shutdownIndex()
+        {
+            pageIndexDelay = pageIndexDelayShutdown;
+        }
+        private static readonly DateTime pageIndexDelayShutdown = DateTime.MinValue.AddDays(1);
+        private static DateTime pageIndexDelay = DateTime.MinValue;
         private static void delay()
         {
             if (pageIndexDelay == DateTime.MinValue) { return; }
@@ -453,7 +466,7 @@ namespace FTServer
             {
                 var d = (pageIndexDelay - DateTime.Now).TotalSeconds;
                 if (d < 0) { d = 0; }
-                if (d > 5) { d = 5; }
+                if (d > 120) { d = 120; }
                 Thread.Sleep((int)(d * 1000));
             }
         }
@@ -472,6 +485,11 @@ namespace FTServer
             foreach (PageText pt in ptlist)
             {
                 delay();
+                if (pageIndexDelay == pageIndexDelayShutdown)
+                {
+                    Log("Shutdown, url needs to re-index : " + url);
+                    return false;
+                }
                 addPageTextIndex(pt);
             }
 
@@ -487,7 +505,7 @@ namespace FTServer
                     return;
                 }
                 box["PageText"].Insert(pt);
-                ENGINE.indexText(box, pt.id, pt.indexedText(), false);
+                ENGINE.indexText(box, pt.id, pt.indexedText(), false, delay);
                 delay();
                 box.Commit();
             }
@@ -606,7 +624,7 @@ namespace FTServer
                 {
                     return null;
                 }
-                //Console.WriteLine(doc.ToHtml());
+                //Log(doc.ToHtml());
                 fixSpan(doc);
 
                 Page page = new Page();
@@ -615,7 +633,7 @@ namespace FTServer
                 if (page.text.length() < 10)
                 {
                     //some website can't get html
-                    Console.WriteLine("No HTML " + url);
+                    Log("No HTML " + url);
                     return null;
                 }
 
@@ -657,7 +675,7 @@ namespace FTServer
                 {
                     title = url;
                     //ignore no title
-                    Console.WriteLine("No Title " + url);
+                    Log("No Title " + url);
                     return null;
                 }
                 title = replace(title);
@@ -690,7 +708,7 @@ namespace FTServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log(ex.ToString());
                 return null;
             }
         }
