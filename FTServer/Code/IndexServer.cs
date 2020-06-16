@@ -97,7 +97,7 @@ namespace FTServer
                 {
                     return new IndexStream(s);
                 }
-                return s;
+                return new IndexStream(s);
             }
 
         }
@@ -120,8 +120,23 @@ namespace FTServer
                 s.Write(position, buffer, offset, count);
             }
 
+
+            int getmorecache = 1024 * 10;
+            byte[] buf = new byte[1024 * 1024 * 1];
             public int Read(long position, byte[] buffer, int offset, int count)
             {
+                if (buf != null)
+                {
+                    getmorecache--;
+                    if (getmorecache > 0)
+                    {
+                        s.Read(position, buf, 0, buf.Length);
+                    }
+                    else
+                    {
+                        buf = null;
+                    }
+                }
                 return s.Read(position, buffer, offset, count);
             }
 

@@ -25,7 +25,7 @@ namespace FTServer
         {
             var t = new Thread(() =>
             {
-                int SLEEP_TIME = 1000;
+                int SLEEP_TIME = 2000;
                 while (!isshutdown)
                 {
                     if (!backgroundThreadQueue.IsEmpty)

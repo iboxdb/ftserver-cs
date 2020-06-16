@@ -48,20 +48,7 @@ namespace FTServer
 
                 Log("DBPath=" + path);
                 DB.Root(path);
-                //for get more os memory
-                /*
-                Log("Loading Memory...");
-                foreach (var p in Directory.GetFiles(path))
-                {
-                    Log("Loading " + p);
-                    var bs = new byte[1024 * 1024 * 32];
-                    using (var fs = new FileStream(p, FileMode.Open))
-                    {
-                        while (fs.Read(bs) > 0) { }
-                    }
-                }
-                Log("Loaded Memory");
-                */
+
                 #endregion
 
                 var db = new IndexServer();
