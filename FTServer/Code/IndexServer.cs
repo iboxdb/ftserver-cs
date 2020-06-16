@@ -125,7 +125,7 @@ namespace FTServer
             byte[] buf = new byte[1024 * 1024 * 1];
             public int Read(long position, byte[] buffer, int offset, int count)
             {
-                if (buf != null)
+                if (buf != null && buf.Length > count)
                 {
                     getmorecache--;
                     if (getmorecache > 0)
