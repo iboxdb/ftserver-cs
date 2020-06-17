@@ -64,6 +64,7 @@ namespace FTServer
                 host.Run();
                 IndexPage.Shutdown();
             }
+            Log("DB Closed");
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

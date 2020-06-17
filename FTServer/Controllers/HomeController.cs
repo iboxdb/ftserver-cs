@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using FTServer.Models;
 
 using static FTServer.App;
+using System.Threading;
 
 namespace FTServer.Controllers
 {
@@ -72,7 +73,7 @@ namespace FTServer.Controllers
                 String[] fresult = new String[] { "background running" };
                 String furl = Html.getUrl(q);
 
-                Task.Run(() =>
+                Thread t = new Thread(() =>
                 {
                     lock (typeof(App))
                     {
@@ -84,7 +85,11 @@ namespace FTServer.Controllers
 
                         fresult[0] = rurl;
                     }
-                }).Wait(3000);
+                });
+                IndexPage.waitingTasks = t;
+                t.Start();
+                t.Join(3000);
+
                 q = fresult[0];
             }
 

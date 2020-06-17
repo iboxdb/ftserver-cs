@@ -12,44 +12,13 @@ using AngleSharp.Html.Dom;
 
 using iBoxDB.LocalServer;
 using static FTServer.App;
+using System.Runtime.CompilerServices;
 
 namespace FTServer
 {
 
     public class IndexPage
     {
-
-        private static ConcurrentQueue<ThreadStart> backgroundThreadQueue = new ConcurrentQueue<ThreadStart>();
-        private static bool isshutdown = false;
-        private static Thread backgroundTasks = new Func<Thread>(() =>
-        {
-            var t = new Thread(() =>
-            {
-                int SLEEP_TIME = 2000;
-                while (!isshutdown)
-                {
-                    if (!backgroundThreadQueue.IsEmpty)
-                    {
-                        ThreadStart act;
-                        backgroundThreadQueue.TryDequeue(out act);
-                        if (act != null)
-                            act();
-                    }
-                    Thread.Sleep(SLEEP_TIME);
-                }
-            });
-            t.Priority = ThreadPriority.Lowest;
-            t.IsBackground = true;
-            t.Start();
-            return t;
-        })();
-
-        public static void Shutdown()
-        {
-            isshutdown = true;
-            backgroundTasks.Join();
-            Log("Background Task Ended");
-        }
 
         public static ConcurrentQueue<String> urlList
             = new ConcurrentQueue<String>();
@@ -171,31 +140,55 @@ namespace FTServer
             IndexAPI.addPageTextIndex(text);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private static void runBGTask(HashSet<String> subUrls)
         {
-            lock (typeof(IndexPage))
+            if (subUrls == null || isshutdown)
             {
-                bool atNight = true;
+                return;
+            }
+            bool atNight = true;
 
-                int max_background = atNight ? 1000 : 0;
+            int max_background = atNight ? 1000 : 0;
+            int SLEEP_TIME = 2000;
 
-                if (backgroundThreadQueue.Count < max_background)
+            if (backgroundTasks == null)
+            {
+                backgroundTasks = new Thread(() =>
                 {
-                    foreach (String vurl in subUrls)
+                    while (!isshutdown)
                     {
-                        var url = vurl;
-                        backgroundThreadQueue.Enqueue(() =>
-                        {
-                            lock (typeof(App))
-                            {
-                                Log("For:" + url + " ," + backgroundThreadQueue.Count);
-                                String r = addPage(url, false);
-                                backgroundLog(url, r);
-                            }
-                        });
+                        ThreadStart act;
+                        backgroundThreadQueue.TryDequeue(out act);
+                        if (act != null)
+                            act();
+
+                        if (!isshutdown)
+                            Thread.Sleep(SLEEP_TIME);
                     }
+                });
+                backgroundTasks.Priority = ThreadPriority.Lowest;
+                backgroundTasks.IsBackground = true;
+                backgroundTasks.Start();
+            }
+
+            if (backgroundThreadQueue.Count < max_background)
+            {
+                foreach (String vurl in subUrls)
+                {
+                    var url = vurl;
+                    backgroundThreadQueue.Enqueue(() =>
+                    {
+                        lock (typeof(App))
+                        {
+                            Log("For:" + url + " ," + backgroundThreadQueue.Count);
+                            String r = addPage(url, false);
+                            backgroundLog(url, r);
+                        }
+                    });
                 }
             }
+
         }
 
         public static void backgroundLog(String url, String output)
@@ -216,6 +209,27 @@ namespace FTServer
         }
 
 
+        private static ConcurrentQueue<ThreadStart> backgroundThreadQueue = new ConcurrentQueue<ThreadStart>();
+        private static bool isshutdown = false;
+        private static Thread backgroundTasks = null;
+        public static Thread waitingTasks = null;
+
+        public static void Shutdown()
+        {
+            if (waitingTasks != null)
+            {
+                waitingTasks.Join();
+                waitingTasks = null;
+            }
+            if (backgroundTasks != null)
+            {
+                isshutdown = true;
+                backgroundTasks.Priority = ThreadPriority.Highest;
+                backgroundTasks.Join();
+                backgroundTasks = null;
+            }
+            Log("Background Task Ended");
+        }
     }
     public class IndexAPI
     {
