@@ -34,19 +34,16 @@ namespace FTServer.Controllers
             var m = new AboutModel();
             q = q.Replace("<", "").Replace(">", "").Trim();
 
-            bool? isdelete = null;
+            bool ishttp = false;
 
             if (q.StartsWith("http://") || q.StartsWith("https://"))
             {
-                isdelete = false;
+                ishttp = true;
             }
 
-            if (!isdelete.HasValue)
+            if (!ishttp)
             {
                 IndexPage.addSearchTerm(q);
-            }
-            else if (isdelete.Value)
-            {
             }
             else
             {
@@ -60,7 +57,7 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = null
             };
-            if (!isdelete.HasValue)
+            if (!ishttp)
             {
                 DelayService.delayIndex();
             }
