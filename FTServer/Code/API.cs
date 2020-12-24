@@ -114,8 +114,15 @@ namespace FTServer
             {
                 return;
             }
+            if (url.isEmpty() || title.isEmpty() || content.isEmpty())
+            {
+                return;
+            }
             Page page = App.Auto.Get<Page>("Page", url);
-
+            if (page == null)
+            {
+                return;
+            }
             PageText text = new PageText();
             text.textOrder = page.textOrder;
             text.priority = PageText.userPriority;

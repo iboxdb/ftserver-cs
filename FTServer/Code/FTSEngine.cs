@@ -826,6 +826,10 @@ namespace FTServer
         {
             return o.Equals(o2);
         }
+        public static bool isEmpty(this String self)
+        {
+            return self.Length == 0;
+        }
         public static int length(this String self)
         {
             return self.Length;
