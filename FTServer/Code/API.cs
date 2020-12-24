@@ -196,7 +196,7 @@ namespace FTServer
         private static bool isshutdown = false;
         private static Thread backgroundTasks = new Func<Thread>(() =>
         {
-            int SLEEP_TIME = 0; //2000;
+            int SLEEP_TIME = 2000;
             var bt = new Thread(() =>
             {
                 while (!isshutdown)
