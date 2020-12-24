@@ -20,9 +20,6 @@ namespace FTServer
     public class IndexPage
     {
 
-        public static ConcurrentQueue<String> urlList
-            = new ConcurrentQueue<String>();
-
         public static void addSearchTerm(String keywords)
         {
             if (keywords.length() < PageSearchTerm.MAX_TERM_LENGTH)
@@ -61,15 +58,6 @@ namespace FTServer
         public static Page getPage(String url)
         {
             return App.Auto.Get<Page>("Page", url);
-        }
-
-        private static void addUrlList(String url)
-        {
-            urlList.add(url.Replace("<", ""));
-            while (urlList.size() > 3)
-            {
-                urlList.remove();
-            }
         }
 
         public static void removePage(String url)
@@ -114,7 +102,6 @@ namespace FTServer
                 subUrls.remove(url + "/");
                 subUrls.remove(url.substring(0, url.length() - 1));
 
-                addUrlList(url);
                 runBGTask(subUrls);
 
                 return url;
@@ -141,6 +128,24 @@ namespace FTServer
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
+        public static void runBGTask(String url, String customTitle = null, String customContent = null)
+        {
+            backgroundThreadStack.Push(() =>
+             {
+                 lock (typeof(App))
+                 {
+                     var bc = Console.BackgroundColor;
+                     Console.BackgroundColor = ConsoleColor.DarkRed;
+                     Log("(KeyPage) For:" + url + " ," + backgroundThreadStack.Count);
+                     Console.BackgroundColor = bc;
+                     String r = addPage(url, true);
+                     //addPageCustomText(url, customTitle, customContent);
+                     backgroundLog(url, r);
+                 }
+             });
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private static void runBGTask(HashSet<String> subUrls)
         {
             if (subUrls == null || isshutdown)
@@ -148,40 +153,18 @@ namespace FTServer
                 return;
             }
             bool atNight = true;
+            int max_background = atNight ? 1000 : 1;
 
-            int max_background = atNight ? 1000 : 0;
-            int SLEEP_TIME = 2000;
-
-            if (backgroundTasks == null)
-            {
-                backgroundTasks = new Thread(() =>
-                {
-                    while (!isshutdown)
-                    {
-                        ThreadStart act;
-                        backgroundThreadQueue.TryDequeue(out act);
-                        if (act != null)
-                            act();
-
-                        if (!isshutdown)
-                            Thread.Sleep(SLEEP_TIME);
-                    }
-                });
-                backgroundTasks.Priority = ThreadPriority.Lowest;
-                backgroundTasks.IsBackground = true;
-                backgroundTasks.Start();
-            }
-
-            if (backgroundThreadQueue.Count < max_background)
+            if (backgroundThreadStack.Count < max_background)
             {
                 foreach (String vurl in subUrls)
                 {
                     var url = vurl;
-                    backgroundThreadQueue.Enqueue(() =>
+                    backgroundThreadStack.Push(() =>
                     {
                         lock (typeof(App))
                         {
-                            Log("For:" + url + " ," + backgroundThreadQueue.Count);
+                            Log("For:" + url + " ," + backgroundThreadStack.Count);
                             String r = addPage(url, false);
                             backgroundLog(url, r);
                         }
@@ -209,18 +192,39 @@ namespace FTServer
         }
 
 
-        private static ConcurrentQueue<ThreadStart> backgroundThreadQueue = new ConcurrentQueue<ThreadStart>();
+        private static ConcurrentStack<ThreadStart> backgroundThreadStack = new ConcurrentStack<ThreadStart>();
         private static bool isshutdown = false;
-        private static Thread backgroundTasks = null;
-        public static Thread waitingTasks = null;
+        private static Thread backgroundTasks = new Func<Thread>(() =>
+        {
+            int SLEEP_TIME = 0; //2000;
+            var bt = new Thread(() =>
+            {
+                while (!isshutdown)
+                {
+                    ThreadStart act;
+                    if (backgroundThreadStack.TryPop(out act))
+                    {
+                        try
+                        {
+                            act();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.ToString());
+                        }
+                    }
+                    if (!isshutdown)
+                        Thread.Sleep(SLEEP_TIME);
+                }
+            });
+            bt.Priority = ThreadPriority.Lowest;
+            bt.IsBackground = true;
+            bt.Start();
+            return bt;
+        })();
 
         public static void Shutdown()
         {
-            if (waitingTasks != null)
-            {
-                waitingTasks.Join();
-                waitingTasks = null;
-            }
             if (backgroundTasks != null)
             {
                 isshutdown = true;
@@ -676,15 +680,15 @@ namespace FTServer
                 {
                     keywords = keywords.Replace(c, ' ');
                 }
-                if (keywords.length() > 50)
+                if (keywords.length() > 200)
                 {
-                    keywords = keywords.substring(0, 50);
+                    keywords = keywords.substring(0, 200);
                 }
 
                 description = getMetaContentByName(doc, "description");
-                if (description.length() > 300)
+                if (description.length() > 400)
                 {
-                    description = description.substring(0, 300);
+                    description = description.substring(0, 400);
                 }
 
                 page.title = title;

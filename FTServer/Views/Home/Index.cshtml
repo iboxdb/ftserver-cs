@@ -47,22 +47,15 @@
 
                 <div class="ui message" style="text-align: left">
                     Input [KeyWord] to search,  input [URL http or https] to index <br /> 
-                    Input [delete URL] to delete.
-                  	<br />Recent Searches:<br />
+                    <br />Recent Searches:<br />
                     @foreach (var t in IndexPage.getSearchTerm(10)) {
                         var str = t.keywords;
                     @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp; 
                     }
                     
-
-                    <br>Recent Records:<br>
-                    @foreach (String str in IndexPage.urlList.Reverse()) {                    
-                    @:<a href="@str" target="_blank" >@str</a>. &nbsp; <br /> 
-                    }
+               
                     
-                
-                    
-                    <br /><a  href="./">Refresh Discoveries</a>:&nbsp; 
+                    <br /><br /><a  href="./">Refresh Discoveries</a>:&nbsp; 
    					@foreach (String str in IndexPage.discover()) {
                     @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp; 
                     }

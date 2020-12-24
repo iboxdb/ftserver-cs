@@ -15,10 +15,7 @@ namespace FTServer
 
         public static void delayIndex(int seconds = 5)
         {
-            lock (typeof(DelayService))
-            {
-                pageIndexDelay = DateTime.Now.AddSeconds(seconds);
-            }
+            pageIndexDelay = DateTime.Now.AddSeconds(seconds);
         }
 
         public static void delay()

@@ -111,6 +111,7 @@ namespace FTServer
         public String keywords;
         public String description;
 
+        public bool showInResults = true;
     }
     public partial class Page
     {

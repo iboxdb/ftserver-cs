@@ -29,10 +29,8 @@ namespace FTServer.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public async Task<IActionResult> About(string q)
+        public IActionResult About(string q)
         {
-            await Task.Yield();
-
             var m = new AboutModel();
             q = q.Replace("<", "").Replace(">", "").Trim();
 
@@ -42,55 +40,19 @@ namespace FTServer.Controllers
             {
                 isdelete = false;
             }
-            else if (q.StartsWith("delete")
-              && (q.Contains("http://") || q.Contains("https://")))
-            {
-                q = q.substring(6).trim();
-                isdelete = true;
-            }
+
             if (!isdelete.HasValue)
             {
-                try
-                {
-                    IndexPage.addSearchTerm(q);
-                }
-                catch
-                {
-
-                }
+                IndexPage.addSearchTerm(q);
             }
             else if (isdelete.Value)
             {
-                lock (typeof(App))
-                {
-                    IndexPage.removePage(q);
-                }
-                q = "deleted";
             }
             else
             {
-
-                String[] fresult = new String[] { "background running" };
                 String furl = Html.getUrl(q);
-
-                Thread t = new Thread(() =>
-                {
-                    lock (typeof(App))
-                    {
-                        Log("For:" + furl);
-                        String rurl = IndexPage.addPage(furl, true);
-                        IndexPage.backgroundLog(furl, rurl);
-
-                        //IndexPage.addPageCustomText(furl, ttitle, tmsg);
-
-                        fresult[0] = rurl;
-                    }
-                });
-                IndexPage.waitingTasks = t;
-                t.Start();
-                t.Join(3000);
-
-                q = fresult[0];
+                IndexPage.runBGTask(furl);
+                q = "Background Index Running, See Console Output";
             }
 
             m.Result = new ResultPartialModel
