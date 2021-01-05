@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using AngleSharp;
 using AngleSharp.Dom;
-using iBoxDB.LocalServer;
+using IBoxDB.LocalServer;
 using System.Threading.Tasks;
 
 //the db classes

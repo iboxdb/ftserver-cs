@@ -1,8 +1,8 @@
 
 using System;
 using System.Threading;
-using iBoxDB.LocalServer;
-using iBoxDB.LocalServer.IO;
+using IBoxDB.LocalServer;
+using IBoxDB.LocalServer.IO;
 
 using static FTServer.App;
 
@@ -70,11 +70,11 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                //Recommend setup 4G-8G Cache
+
                 CacheLength = MB(1024);
 
-                FileIncSize = (int)MB(4);
-                SwapFileBuffer = (int)MB(4);
+                FileIncSize = (int)MB(16);
+                SwapFileBuffer = (int)MB(16);
 
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(this);
@@ -98,55 +98,19 @@ namespace FTServer
             }
 
         }
-        private class IndexStream : IBStream
+        private class IndexStream : IBStreamWrapper
         {
-            private IBStream s;
 
-            public IndexStream(IBStream iBStream)
+            public IndexStream(IBStream iBStream) : base(iBStream)
             {
-                this.s = iBStream;
+
             }
-            public void BeginWrite(long appID, int maxLen)
+            public override void BeginWrite(long appID, int maxLen)
             {
                 DelayService.delay();
-                s.BeginWrite(appID, maxLen);
+                base.BeginWrite(appID, maxLen);
             }
 
-            public void Write(long position, byte[] buffer, int offset, int count)
-            {
-                s.Write(position, buffer, offset, count);
-            }
-
-            public int Read(long position, byte[] buffer, int offset, int count)
-            {
-                return s.Read(position, buffer, offset, count);
-            }
-
-            public long Length => s.Length;
-
-            public void Dispose()
-            {
-                if (s != null)
-                {
-                    s.Dispose();
-                    s = null;
-                }
-            }
-
-            public void EndWrite()
-            {
-                s.EndWrite();
-            }
-
-            public void Flush()
-            {
-                s.Flush();
-            }
-
-            public void SetLength(long value)
-            {
-                s.SetLength(value);
-            }
         }
     }
 }

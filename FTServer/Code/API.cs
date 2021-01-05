@@ -10,7 +10,7 @@ using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 
-using iBoxDB.LocalServer;
+using IBoxDB.LocalServer;
 using static FTServer.App;
 using System.Runtime.CompilerServices;
 
@@ -203,7 +203,7 @@ namespace FTServer
         private static bool isshutdown = false;
         private static Thread backgroundTasks = new Func<Thread>(() =>
         {
-            int SLEEP_TIME = 2000;
+            int SLEEP_TIME = 0;//2000;
             var bt = new Thread(() =>
             {
                 while (!isshutdown)
@@ -221,7 +221,9 @@ namespace FTServer
                         }
                     }
                     if (!isshutdown)
+                    {
                         Thread.Sleep(SLEEP_TIME);
+                    }
                 }
             });
             bt.Priority = ThreadPriority.Lowest;
@@ -244,6 +246,9 @@ namespace FTServer
     }
     public class IndexAPI
     {
+        //set true, more memory, Writer faster.
+        public static bool EnableHuggers = false;
+
         public readonly static Engine engine = new Engine();
         public static Engine ENGINE => engine;
 
@@ -489,13 +494,13 @@ namespace FTServer
 
             foreach (PageText pt in ptlist)
             {
-                addPageTextIndex(pt);
+                addPageTextIndex(pt, ptlist.Count);
             }
 
             return true;
         }
 
-        public static void addPageTextIndex(PageText pt)
+        public static void addPageTextIndex(PageText pt, int huggers = 0)
         {
             using (IBox box = App.Auto.Cube())
             {
@@ -505,7 +510,7 @@ namespace FTServer
                 }
                 box["PageText"].Insert(pt);
                 ENGINE.indexText(box, pt.id, pt.indexedText(), false, DelayService.delay);
-                box.Commit();
+                box.Commit(EnableHuggers ? huggers : 0);
             }
         }
 
@@ -526,7 +531,7 @@ namespace FTServer
                 {
                     ENGINE.indexText(box, pt.id, pt.indexedText(), true);
                     box["PageText", pt.id].Delete();
-                    box.Commit();
+                    box.Commit(EnableHuggers ? ptlist.Count : 0);
                 }
             }
 

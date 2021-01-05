@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 
-using iBoxDB.LocalServer;
+using IBoxDB.LocalServer;
 using static FTServer.App;
 
 namespace FTServer
