@@ -10,3 +10,6 @@ bin/*
 */Data/*
 */data/*
 FTServer/Code/ExampleCode.txt
+*.box
+*.box.swp
+DATA_FTS_CS_140/*

@@ -137,13 +137,13 @@ namespace FTServer
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void runBGTask(String url, String customTitle = null, String customContent = null)
         {
-            backgroundThreadStack.Push(() =>
+            backgroundThreadStack.addFirst(() =>
              {
                  lock (typeof(App))
                  {
                      var bc = Console.BackgroundColor;
                      Console.BackgroundColor = ConsoleColor.DarkRed;
-                     Log("(KeyPage) For:" + url + " ," + backgroundThreadStack.Count);
+                     Log("(KeyPage) For:" + url + " ," + backgroundThreadStack.size());
                      Console.BackgroundColor = bc;
                      String r = addPage(url, true);
                      //addPageCustomText(url, customTitle, customContent);
@@ -162,16 +162,16 @@ namespace FTServer
             bool atNight = true;
             int max_background = atNight ? 1000 : 1;
 
-            if (backgroundThreadStack.Count < max_background)
+            if (backgroundThreadStack.size() < max_background)
             {
                 foreach (String vurl in subUrls)
                 {
                     var url = vurl;
-                    backgroundThreadStack.Push(() =>
+                    backgroundThreadStack.addLast(() =>
                     {
                         lock (typeof(App))
                         {
-                            Log("For:" + url + " ," + backgroundThreadStack.Count);
+                            Log("For:" + url + " ," + backgroundThreadStack.size());
                             String r = addPage(url, false);
                             backgroundLog(url, r);
                         }
@@ -199,7 +199,7 @@ namespace FTServer
         }
 
 
-        private static ConcurrentStack<ThreadStart> backgroundThreadStack = new ConcurrentStack<ThreadStart>();
+        private static ConcurrentLinkedDeque<ThreadStart> backgroundThreadStack = new ConcurrentLinkedDeque<ThreadStart>();
         private static bool isshutdown = false;
         private static Thread backgroundTasks = new Func<Thread>(() =>
         {
@@ -208,8 +208,8 @@ namespace FTServer
             {
                 while (!isshutdown)
                 {
-                    ThreadStart act;
-                    if (backgroundThreadStack.TryPop(out act))
+                    ThreadStart act = backgroundThreadStack.pollFirst();
+                    if (act != null)
                     {
                         try
                         {
@@ -246,8 +246,8 @@ namespace FTServer
     }
     public class IndexAPI
     {
-        //set true, more memory, Writer faster.
-        public static bool EnableHuggers = false;
+        //set >0, more memory, Writer faster.
+        public static long HuggersMemory = 0;
 
         public readonly static Engine engine = new Engine();
         public static Engine ENGINE => engine;
@@ -492,15 +492,17 @@ namespace FTServer
 
             List<PageText> ptlist = Html.getDefaultTexts(page);
 
+            int count = 0;
             foreach (PageText pt in ptlist)
             {
-                addPageTextIndex(pt, ptlist.Count);
+                count++;
+                addPageTextIndex(pt, count == ptlist.Count ? 0 : HuggersMemory);
             }
 
             return true;
         }
 
-        public static void addPageTextIndex(PageText pt, int huggers = 0)
+        public static void addPageTextIndex(PageText pt, long huggers = 0)
         {
             using (IBox box = App.Auto.Cube())
             {
@@ -510,7 +512,8 @@ namespace FTServer
                 }
                 box["PageText"].Insert(pt);
                 ENGINE.indexText(box, pt.id, pt.indexedText(), false, DelayService.delay);
-                box.Commit(EnableHuggers ? huggers : 0);
+                CommitResult cr = box.Commit(huggers);
+                Log("MEM:  " + cr.GetMemoryLength(box).ToString("#,#"));
             }
         }
 
@@ -525,13 +528,15 @@ namespace FTServer
 
             List<PageText> ptlist = App.Auto.Select<PageText>("from PageText where textOrder==?", page.textOrder);
 
+            int count = 0;
             foreach (PageText pt in ptlist)
             {
+                count++;
                 using (IBox box = App.Auto.Cube())
                 {
                     ENGINE.indexText(box, pt.id, pt.indexedText(), true);
                     box["PageText", pt.id].Delete();
-                    box.Commit(EnableHuggers ? ptlist.Count : 0);
+                    box.Commit(count == ptlist.Count ? 0 : HuggersMemory);
                 }
             }
 

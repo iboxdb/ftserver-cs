@@ -5,16 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup> 
-  <!--
-       <PackageReference Include="iBoxDB" Version="2.33.0"/>
-  -->   
+  
+       <PackageReference Include="iBoxDB" Version="3.0"/>
+     
         <PackageReference Include="AngleSharp" Version="0.14"/>
- 
- 
- 
- 
-    <Reference Include="/mnt/hgfs/Share/Fixed/iBoxDB.NET2.dll">
-    </Reference> 
+  
   </ItemGroup>
 
 </Project>

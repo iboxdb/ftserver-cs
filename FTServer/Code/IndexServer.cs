@@ -70,13 +70,16 @@ namespace FTServer
         {
             public IndexConfig()
             {
-
-                CacheLength = MB(1024);
+                // 8G System Memory
+                long SysMem = MB(1024 * 8);
+                CacheLength = SysMem / 4;
+                IndexAPI.HuggersMemory = SysMem / 16;
 
                 FileIncSize = (int)MB(16);
                 SwapFileBuffer = (int)MB(16);
 
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
+                Log("Huggers Cache = " + (IndexAPI.HuggersMemory / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 
 

@@ -16,20 +16,7 @@ using static FTServer.App;
 
 namespace FTServer
 {
-    /*
-    Turn off virtual memory for 8G+ RAM Machine
-    use DatabaseConfig.CacheLength and PageText.max_text_length to Control Memory
 
-    Linux:
-     # free -h
-     # sudo swapoff -a
-
-    Windows:
-    System Properties(Win+Pause) - Advanced system settings - Advanced
-    - Performance Settings - Advanced - Virtual Memory Change -
-    uncheck Automatically manage paging file - select No paging file - 
-    click Set - OK restart
-    */
     public class Program
     {
 
@@ -42,10 +29,10 @@ namespace FTServer
             var task = Task.Run<IndexServer>(() =>
             {
                 #region Path 
-                String dir = "ftsdata130c";
-                String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
+                String dir = "DATA_FTS_CS_140";
+                //String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dir);
+                String path = Path.Combine("../", dir);
                 Directory.CreateDirectory(path);
-
                 Log("DBPath=" + path);
                 DB.Root(path);
 
