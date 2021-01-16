@@ -536,7 +536,8 @@ namespace FTServer
                 {
                     ENGINE.indexText(box, pt.id, pt.indexedText(), true);
                     box["PageText", pt.id].Delete();
-                    box.Commit(count == ptlist.Count ? 0 : HuggersMemory);
+                    CommitResult cr = box.Commit(count == ptlist.Count ? 0 : HuggersMemory);
+                    Log("MEM:  " + cr.GetMemoryLength(box).ToString("#,#"));
                 }
             }
 
