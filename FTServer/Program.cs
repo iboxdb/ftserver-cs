@@ -29,9 +29,9 @@ namespace FTServer
             var task = Task.Run<IndexServer>(() =>
             {
                 #region Path 
-                String dir = "DATA_FTS_CS_140";
-                //String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dir);
-                String path = Path.Combine("../", dir);
+                String dir = "DATA_FTS_CS_150";
+                String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dir);
+                //String path = Path.Combine("../", dir);
                 Directory.CreateDirectory(path);
                 Log("DBPath=" + path);
                 DB.Root(path);
