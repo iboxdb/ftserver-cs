@@ -1,5 +1,7 @@
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using IBoxDB.LocalServer;
 using IBoxDB.LocalServer.IO;
@@ -33,20 +35,47 @@ namespace FTServer
         }
     }
 
+    public class ReadonlyIndexServer : LocalDatabaseServer
+    {
+        protected override DatabaseConfig BuildDatabaseConfig(long address)
+        {
+            return new ReadonlyConfig(address);
+        }
+        private class ReadonlyConfig : ReadonlyStreamConfig
+        {
+            private long address;
+            public ReadonlyConfig(long address) : base(GetStreamsImpl(address))
+            {
+                this.address = address;
+            }
+
+            private static Stream[] GetStreamsImpl(long address)
+            {
+                string pa = BoxFileStreamConfig.RootPath + ReadonlyStreamConfig.GetNameByAddrDefault(address);
+                return new Stream[] { new FileStream(pa, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                 new FileStream(pa, FileMode.Open, FileAccess.Read, FileShare.ReadWrite) };
+            }
+
+        }
+
+    }
     public class IndexServer : LocalDatabaseServer
     {
+        public static long SwitchToReadonlyIndexLength = 1024L * 1024L * 500L;
+        public static long ItemDB = 2L;
 
+        public static long IndexDBStart = 10L;
         public IndexServer()
         {
         }
 
         protected override DatabaseConfig BuildDatabaseConfig(long address)
         {
-            if (address == 1)
+            if (address >= IndexDBStart)
             {
                 return new IndexConfig();
             }
-            if (address == 2)
+            if (address == ItemDB)
             {
                 return new ItemConfig();
             }
@@ -59,7 +88,8 @@ namespace FTServer
             {
                 CacheLength = MB(64);
                 EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
-                EnsureTable<Page>("/PageBegin", "textOrder", "url(" + Page.MAX_URL_LENGTH + ")");
+                EnsureTable<Page>("Page", "textOrder");
+                EnsureIndex<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")", "textOrder");
             }
         }
 
@@ -82,12 +112,6 @@ namespace FTServer
                 Log("Huggers Cache = " + (IndexAPI.HuggersMemory / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 
-
-                EnsureTable<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")");
-                EnsureIndex<Page>("Page", true, "textOrder");
-
-                EnsureTable<PageText>("PageText", "id");
-                EnsureIndex<PageText>("PageText", false, "textOrder");
             }
 
             public override IBStream CreateStream(string path, StreamAccess access)
@@ -112,6 +136,34 @@ namespace FTServer
             {
                 DelayService.delay();
                 base.BeginWrite(appID, maxLen);
+            }
+
+            long length = 0;
+            public override void SetLength(long value)
+            {
+                base.SetLength(value);
+                length = value;
+            }
+
+            public override void Flush()
+            {
+                base.Flush();
+                if (length > IndexServer.SwitchToReadonlyIndexLength)
+                {
+
+                    var newIndices = new List<AutoBox>(App.Indices);
+                    newIndices.Remove(App.Index);
+
+                    long addr = App.Index.GetDatabase().LocalAddress;
+                    newIndices.Add(new ReadonlyIndexServer().GetInstance(addr).Get());
+                    addr++;
+                    newIndices.Add(new IndexServer().GetInstance(addr).Get());
+
+                    App.Indices = newIndices;
+                    App.Index = newIndices[newIndices.Count - 1];
+
+                    System.GC.Collect();
+                }
             }
 
         }

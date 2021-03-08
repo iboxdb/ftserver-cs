@@ -22,12 +22,7 @@
             bool isdesc = p.priority >= PageText.descriptionPriority;
             String content = isdesc ? p.text
                     : IndexPage.getDesc(p.text, p.keyWord, 80);
-            if (content.Length < 100) {
-                Page fpage = IndexPage.getPage(p.url);
-                if ( fpage != null){
-                  content += " " + fpage.getRandomContent(100);
-                }
-            }
+            
             String[] keywords = p.keywords.Split(" ");
 
 

@@ -23,14 +23,15 @@ namespace FTServer
     public class PageText
     {
 
-        public static readonly int max_text_length = 1100;
-
         public static readonly long userPriority = 12;
 
         public static readonly long descriptionKeyPriority = 11;
 
         //this is the center of Priorities, under is Body.Text, upper is user's input
         public static readonly long descriptionPriority = 10;
+
+        public static readonly long contextPriority = 9;
+
 
         private static readonly int priorityOffset = 50;
 
@@ -41,12 +42,16 @@ namespace FTServer
             pt.textOrder = id - (pt.priority << priorityOffset);
             return pt;
         }
+        public static long toId(long textOrder, long priority)
+        {
+            return textOrder | (priority << priorityOffset);
+        }
 
         public long id
         {
             get
             {
-                return textOrder | (priority << priorityOffset);
+                return toId(textOrder, priority);
             }
             set
             {
@@ -111,7 +116,10 @@ namespace FTServer
         public String keywords;
         public String description;
 
-        public bool showInResults = true;
+        public string userDescription;
+
+        public bool show = true;
+
     }
     public partial class Page
     {

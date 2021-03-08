@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 
 using IBoxDB.LocalServer;
 using static FTServer.App;
+using System.Collections.Concurrent;
 
 namespace FTServer
 {
@@ -26,11 +27,11 @@ namespace FTServer
             {
                 return true;
             };
-            var task = Task.Run<IndexServer>(() =>
+            var task = Task.Run<IDisposable>(() =>
             {
                 #region Path 
                 String dir = "DATA_FTS_CS_150";
-                String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dir);
+                String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
                 //String path = Path.Combine("../", dir);
                 Directory.CreateDirectory(path);
                 Log("DBPath=" + path);
@@ -38,18 +39,37 @@ namespace FTServer
 
                 #endregion
 
-                var db = new IndexServer();
-                App.Auto = db.GetInstance(1).Get();
-                App.Item = db.GetInstance(2).Get();
-                return db;
+                App.Item = new IndexServer().GetInstance(IndexServer.ItemDB).Get();
+
+                long start = IndexServer.IndexDBStart;
+                foreach (var f in Directory.GetFiles(path))
+                {
+                    var fn = Path.GetFileNameWithoutExtension(f).Replace("db", "");
+                    long.TryParse(fn, out long r);
+                    if (r > start) { start = r; }
+                }
+
+                App.Indices = new List<AutoBox>();
+                for (long l = IndexServer.IndexDBStart; l < start; l++)
+                {
+                    App.Indices.Add(new ReadonlyIndexServer().GetInstance(l).Get());
+                }
+                App.Indices.Add(new IndexServer().GetInstance(start).Get());
+
+                App.Index = App.Indices[App.Indices.Count - 1];
+
+                return null;
             });
 
             var host = CreateHostBuilder(args).Build();
 
-            using (task.GetAwaiter().GetResult())
+            task.GetAwaiter().GetResult();
+            host.Run();
+            IndexPage.Shutdown();
+            App.Item.GetDatabase().Dispose();
+            foreach (var d in App.Indices)
             {
-                host.Run();
-                IndexPage.Shutdown();
+                d.GetDatabase().Dispose();
             }
             Log("DB Closed");
         }
@@ -74,18 +94,17 @@ namespace FTServer
         //for Application
         public static AutoBox Item;
 
-        //for PageIndex
-        public static AutoBox Auto;
-        public static IBox Cube()
-        {
-            return Auto.Cube();
-        }
+        //for New Index
+        public static AutoBox Index;
+
+        //for Readonly PageIndex
+        public static List<AutoBox> Indices;
+
         public static void Log(String msg)
         {
             Console.WriteLine(msg);
         }
     }
-
 
 
 }
