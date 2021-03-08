@@ -19,104 +19,226 @@ namespace FTServer
 
     public class IndexAPI
     {
-        //set >0, more memory, Writer faster.
-        public static long HuggersMemory = 0;
-
         public readonly static Engine engine = new Engine();
         public static Engine ENGINE => engine;
 
-
-        public static long[] Search(List<PageText> outputPages,
-                String name, long[] startId, long pageCount)
+        internal class StartIdParam
         {
-            name = name.Trim();
-            if (name.Length > 100) { return new long[] { -1 }; }
-            //And
-            if (startId[0] > 0)
+            //andBox,orBox, ids...
+            public long[] startId;
+            public StartIdParam(long id) : this(new long[] { id })
             {
-                startId[0] = Search(outputPages, name, startId[0], pageCount);
-                if (outputPages.Count >= pageCount && startId[0] > 0)
-                {
-                    return startId;
-                }
             }
-
-            //Or
-            String orName = new String(ENGINE.sUtil.clear(name));
-            orName = orName.Replace("\"", " ").Trim();
-
-            ArrayList<StringBuilder> ors = new ArrayList<StringBuilder>();
-            ors.add(new StringBuilder());
-            for (int i = 0; i < orName.length(); i++)
+            public StartIdParam(long[] id)
             {
-                char c = orName[i];
-                StringBuilder last = ors.get(ors.size() - 1);
-
-                if (c == ' ')
+                if (id.Length == 1)
                 {
-                    if (last.Length > 0)
-                    {
-                        ors.add(new StringBuilder());
-                    }
-                }
-                else if (last.Length == 0)
-                {
-                    last.Append(c);
-                }
-                else if (!ENGINE.sUtil.isWord(c))
-                {
-                    if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
-                    {
-                        last.Append(c);
-                        ors.add(new StringBuilder());
-                    }
-                    else
-                    {
-                        last = new StringBuilder();
-                        last.Append(c);
-                        ors.add(last);
-                    }
+                    startId = new long[] { App.Indices.Count - 1, App.Indices.Count - 1, id[0] };
                 }
                 else
                 {
-                    if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
+                    startId = id;
+                }
+            }
+            public bool isAnd()
+            {
+                if (startId[0] >= 0)
+                {
+                    if (startId[2] >= 0) { return true; }
+                    startId[0]--;
+                    startId[2] = long.MaxValue;
+                    return isAnd();
+                }
+                return false;
+            }
+
+            internal virtual ArrayList<StringBuilder> ToOrCondition(String name)
+            {
+                String orName = new String(ENGINE.sUtil.clear(name));
+                orName = orName.Replace("\"", " ").Trim();
+
+                ArrayList<StringBuilder> ors = new ArrayList<StringBuilder>();
+                ors.add(new StringBuilder());
+                for (int i = 0; i < orName.length(); i++)
+                {
+                    char c = orName[i];
+                    StringBuilder last = ors.get(ors.size() - 1);
+
+                    if (c == ' ')
                     {
-                        last = new StringBuilder();
+                        if (last.Length > 0)
+                        {
+                            ors.add(new StringBuilder());
+                        }
+                    }
+                    else if (last.Length == 0)
+                    {
                         last.Append(c);
-                        ors.add(last);
+                    }
+                    else if (!ENGINE.sUtil.isWord(c))
+                    {
+                        if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
+                        {
+                            last.Append(c);
+                            ors.add(new StringBuilder());
+                        }
+                        else
+                        {
+                            last = new StringBuilder();
+                            last.Append(c);
+                            ors.add(last);
+                        }
                     }
                     else
                     {
-                        last.Append(c);
+                        if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
+                        {
+                            last = new StringBuilder();
+                            last.Append(c);
+                            ors.add(last);
+                        }
+                        else
+                        {
+                            last.Append(c);
+                        }
                     }
                 }
+
+                ors.add(0, null); //and box
+                ors.add(1, null); //or box
+                ors.add(2, null); //and startId
+                //OR
+                ors.add(3, new StringBuilder(name));
+
+                if (startId.Length < ors.size())
+                {
+                    startId = new long[ors.size()];
+                    startId[0] = -1;
+                    startId[1] = startId[1];//or box
+                    startId[2] = -1;
+                    for (int i = 3; i < startId.Length; i++)
+                    {
+                        startId[i] = long.MaxValue;
+                    }
+                }
+
+                if (ors.Count > 16 || stringEqual(ors[3].ToString(), ors[4].ToString()))
+                {
+                    for (int i = 0; i < startId.Length; i++)
+                    {
+                        startId[i] = -1;
+                    }
+                }
+
+                return ors;
             }
 
-            ors.add(0, null);
-            ors.add(1, new StringBuilder(name));
-
-
-            if (startId.Length < ors.size())
+            public bool isOr()
             {
-                startId = new long[ors.size()];
-                startId[0] = -1;
-                for (int i = 1; i < startId.Length; i++)
+                if (startId[1] >= 0)
                 {
-                    startId[i] = long.MaxValue;
+                    for (int i = 3; i < startId.Length; i++)
+                    {
+                        if (startId[i] >= 0) { return true; }
+                    }
+                    startId[1]--;
+                    for (int i = 3; i < startId.Length; i++)
+                    {
+                        startId[i] = long.MaxValue;
+                    }
+                    return isOr();
+                }
+                return false;
+            }
+        }
+
+        public static long[] Search(List<PageText> outputPages,
+                String name, long[] t_startId, long pageCount)
+        {
+            name = name.Trim();
+            if (name.Length > 100) { return new long[] { -1 }; }
+
+            StartIdParam startId = new StartIdParam(t_startId);
+            //And
+            while (startId.isAnd())
+            {
+                AutoBox auto = App.Indices[(int)startId.startId[0]];
+                startId.startId[2] = SearchAnd(auto, outputPages, name, startId.startId[2], pageCount);
+                if (outputPages.Count >= pageCount)
+                {
+                    return startId.startId;
                 }
             }
 
-            if (ors.Count > 16 || stringEqual(ors[1].ToString(), ors[2].ToString()))
+            //OR            
+            ArrayList<StringBuilder> ors = startId.ToOrCondition(name);
+            while (startId.isOr())
             {
-                for (int i = 1; i < startId.Length; i++)
+                AutoBox auto = App.Indices[(int)startId.startId[1]];
+                SearchOr(auto, outputPages, ors, startId.startId, pageCount);
+                if (outputPages.Count >= pageCount)
                 {
-                    startId[i] = -1;
+                    break;
                 }
-                return startId;
             }
+            return startId.startId;
+        }
 
 
-            using (IBox box = App.Cube())
+        private static int maxPos(long[] ids)
+        {
+            int pos = 0;
+            for (int i = 0; i < ids.Length; i++)
+            {
+                if (ids[i] > ids[pos])
+                {
+                    pos = i;
+                }
+            }
+            return pos;
+        }
+
+        private static bool stringEqual(String a, String b)
+        {
+            if (a.Equals(b)) { return true; }
+            if (a.Equals("\"" + b + "\"")) { return true; }
+            if (b.Equals("\"" + a + "\"")) { return true; }
+            return false;
+        }
+        private static long SearchAnd(AutoBox auto, List<PageText> pages,
+                String name, long startId, long pageCount)
+        {
+            name = name.Trim();
+            using (var box = auto.Cube())
+            {
+                foreach (KeyWord kw in engine.searchDistinct(box, name, startId, pageCount))
+                {
+                    pageCount--;
+                    startId = kw.I - 1;
+
+                    long id = kw.I;
+                    PageText pt = PageText.fromId(id);
+                    Page p = getPage(pt.textOrder);
+                    if (!p.show) { continue; }
+                    pt = Html.getDefaultText(p, id);
+
+                    if (pt.text.Length < 100)
+                    {
+                        pt.text += " " + p.getRandomContent(100);
+                    }
+
+                    pt.keyWord = kw;
+                    pages.Add(pt);
+                }
+
+                return pageCount == 0 ? startId : -1;
+            }
+        }
+        private static void SearchOr(AutoBox auto, List<PageText> outputPages,
+                       ArrayList<StringBuilder> ors, long[] startId, long pageCount)
+        {
+
+            using (IBox box = auto.Cube())
             {
 
                 IEnumerator<KeyWord>[] iters = new IEnumerator<KeyWord>[ors.size()];
@@ -166,15 +288,20 @@ namespace FTServer
 
                     mPos = maxPos(startId);
 
-                    if (mPos > 1)
+                    if (mPos > 3)
                     {
                         KeyWord kw = kws[mPos];
 
                         long id = kw.I;
-                        var p = box["PageText", id].Select<PageText>();
-                        p.keyWord = kw;
-                        p.isAndSearch = false;
-                        outputPages.Add(p);
+
+                        PageText pt = PageText.fromId(id);
+                        Page p = getPage(pt.textOrder);
+                        if (!p.show) { continue; }
+                        pt = Html.getDefaultText(p, id);
+
+                        pt.keyWord = kw;
+                        pt.isAndSearch = false;
+                        outputPages.Add(pt);
                     }
 
                     long maxId = startId[mPos];
@@ -189,56 +316,7 @@ namespace FTServer
                 }
 
             }
-            return startId;
-        }
 
-
-        private static int maxPos(long[] ids)
-        {
-            int pos = 0;
-            for (int i = 0; i < ids.Length; i++)
-            {
-                if (ids[i] > ids[pos])
-                {
-                    pos = i;
-                }
-            }
-            return pos;
-        }
-
-        private static bool stringEqual(String a, String b)
-        {
-            if (a.Equals(b)) { return true; }
-            if (a.Equals("\"" + b + "\"")) { return true; }
-            if (b.Equals("\"" + a + "\"")) { return true; }
-            return false;
-        }
-        public static long Search(IBox box, List<PageText> pages,
-                String name, long startId, long pageCount)
-        {
-            name = name.Trim();
-
-            foreach (KeyWord kw in engine.searchDistinct(box, name, startId, pageCount))
-            {
-                pageCount--;
-                startId = kw.I - 1;
-
-                long id = kw.I;
-                PageText pt = PageText.fromId(id);
-                Page p = getPage(pt.textOrder);
-                if (!p.show) { continue; }
-                pt = Html.getDefaultText(p, id);
-
-                if (pt.text.Length < 100)
-                {
-                    pt.text += " " + p.getRandomContent(100);
-                }
-
-                pt.keyWord = kw;
-                pages.Add(pt);
-            }
-
-            return pageCount == 0 ? startId : -1;
         }
 
         public static Page getPage(long textOrder)
@@ -256,7 +334,7 @@ namespace FTServer
 
         public static bool addPageIndex(Page page)
         {
-
+            long HuggersMemory = int.MaxValue / 2;
             List<PageText> ptlist = Html.getDefaultTexts(page);
 
             int count = 0;

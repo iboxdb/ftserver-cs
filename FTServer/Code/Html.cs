@@ -117,7 +117,7 @@ namespace FTServer
                     var links = doc.QuerySelectorAll<IHtmlAnchorElement>("a[href]");
                     foreach (var link in links)
                     {
-                        if (link.Host.Equals(host))
+                        //if (link.Host.Equals(host))
                         {
                             String ss = link.Href;
                             if (ss != null && ss.length() > 8)

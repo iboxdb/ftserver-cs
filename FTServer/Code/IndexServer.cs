@@ -47,6 +47,7 @@ namespace FTServer
             public ReadonlyConfig(long address) : base(GetStreamsImpl(address))
             {
                 this.address = address;
+                this.CacheLength = MB(64);
             }
 
             private static Stream[] GetStreamsImpl(long address)
@@ -86,7 +87,7 @@ namespace FTServer
         {
             public ItemConfig()
             {
-                CacheLength = MB(64);
+                CacheLength = MB(256);
                 EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
                 EnsureTable<Page>("Page", "textOrder");
                 EnsureIndex<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")", "textOrder");
@@ -100,16 +101,8 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                // 8G System Memory
-                long SysMem = MB(1024 * 8);
-                CacheLength = SysMem / 4;
-                IndexAPI.HuggersMemory = SysMem / 16;
-
-                FileIncSize = (int)MB(16);
-                SwapFileBuffer = (int)MB(16);
-
+                CacheLength = MB(1024);
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
-                Log("Huggers Cache = " + (IndexAPI.HuggersMemory / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 
             }
@@ -160,6 +153,8 @@ namespace FTServer
                     newIndices.Add(new IndexServer().GetInstance(addr).Get());
 
                     App.Indices = newIndices;
+                    //TODO Reset newIndices cache, newer index , bigger cache
+
                     App.Index = newIndices[newIndices.Count - 1];
 
                     System.GC.Collect();
