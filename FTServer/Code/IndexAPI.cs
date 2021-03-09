@@ -220,10 +220,9 @@ namespace FTServer
                 for (int i = 0; i < ors.size(); i++)
                 {
                     StringBuilder sbkw = ors.get(i);
-                    if (startId[i] <= 0 || sbkw == null || sbkw.Length < 2)
+                    if (sbkw == null || sbkw.Length < 2)
                     {
                         iters[i] = null;
-                        startId[i] = -1;
                         continue;
                     }
                     //never set Long.MAX 
@@ -231,13 +230,14 @@ namespace FTServer
                     iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], subCount).GetEnumerator();
                 }
 
+                int orStartPos = 3;
                 KeyWord[] kws = new KeyWord[iters.Length];
 
                 int mPos = maxPos(startId);
-                while (mPos > 0)
+                while (mPos >= orStartPos)
                 {
 
-                    for (int i = 0; i < iters.Length; i++)
+                    for (int i = orStartPos; i < iters.Length; i++)
                     {
                         if (kws[i] == null)
                         {
@@ -262,7 +262,7 @@ namespace FTServer
 
                     mPos = maxPos(startId);
 
-                    if (mPos > 3)
+                    if (mPos > orStartPos)
                     {
                         KeyWord kw = kws[mPos];
 
@@ -280,7 +280,7 @@ namespace FTServer
                     }
 
                     long maxId = startId[mPos];
-                    for (int i = 0; i < startId.Length; i++)
+                    for (int i = orStartPos; i < startId.Length; i++)
                     {
                         if (startId[i] == maxId)
                         {
@@ -296,15 +296,15 @@ namespace FTServer
 
         private static int maxPos(long[] ids)
         {
-            int pos = 0;
-            for (int i = 0; i < ids.Length; i++)
+            int orStartPos = 3 - 1;
+            for (int i = orStartPos; i < ids.Length; i++)
             {
-                if (ids[i] > ids[pos])
+                if (ids[i] > ids[orStartPos])
                 {
-                    pos = i;
+                    orStartPos = i;
                 }
             }
-            return pos;
+            return orStartPos;
         }
 
         private static bool stringEqual(String a, String b)
