@@ -41,15 +41,7 @@ namespace FTServer.Models
 
         public bool IsEnd()
         {
-            long[] ids = StartId;
-            foreach (long l in ids)
-            {
-                if (l > 0)
-                {
-                    return false;
-                }
-            }
-            return true;
+            return StartId[0] == -1 && StartId[1] == -1;
         }
 
 

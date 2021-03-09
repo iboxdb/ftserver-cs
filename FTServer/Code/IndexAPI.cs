@@ -22,7 +22,7 @@ namespace FTServer
         public readonly static Engine engine = new Engine();
         public static Engine ENGINE => engine;
 
-        internal class StartIdParam
+        private class StartIdParam
         {
             //andBox,orBox, ids...
             public long[] startId;
@@ -33,7 +33,7 @@ namespace FTServer
             {
                 if (id.Length == 1)
                 {
-                    startId = new long[] { App.Indices.Count - 1, App.Indices.Count - 1, id[0] };
+                    startId = new long[] { App.Indices.Count - 1, -1, id[0] };
                 }
                 else
                 {
@@ -110,11 +110,11 @@ namespace FTServer
                 //OR
                 ors.add(3, new StringBuilder(name));
 
-                if (startId.Length < ors.size())
+                if (startId.Length != ors.size())
                 {
                     startId = new long[ors.size()];
                     startId[0] = -1;
-                    startId[1] = startId[1];//or box
+                    startId[1] = App.Indices.Count - 1;//or box
                     startId[2] = -1;
                     for (int i = 3; i < startId.Length; i++)
                     {
@@ -184,27 +184,6 @@ namespace FTServer
             return startId.startId;
         }
 
-
-        private static int maxPos(long[] ids)
-        {
-            int pos = 0;
-            for (int i = 0; i < ids.Length; i++)
-            {
-                if (ids[i] > ids[pos])
-                {
-                    pos = i;
-                }
-            }
-            return pos;
-        }
-
-        private static bool stringEqual(String a, String b)
-        {
-            if (a.Equals(b)) { return true; }
-            if (a.Equals("\"" + b + "\"")) { return true; }
-            if (b.Equals("\"" + a + "\"")) { return true; }
-            return false;
-        }
         private static long SearchAnd(AutoBox auto, List<PageText> pages,
                 String name, long startId, long pageCount)
         {
@@ -221,13 +200,8 @@ namespace FTServer
                     Page p = getPage(pt.textOrder);
                     if (!p.show) { continue; }
                     pt = Html.getDefaultText(p, id);
-
-                    if (pt.text.Length < 100)
-                    {
-                        pt.text += " " + p.getRandomContent(100);
-                    }
-
                     pt.keyWord = kw;
+                    pt.page = p;
                     pages.Add(pt);
                 }
 
@@ -300,6 +274,7 @@ namespace FTServer
                         pt = Html.getDefaultText(p, id);
 
                         pt.keyWord = kw;
+                        pt.page = p;
                         pt.isAndSearch = false;
                         outputPages.Add(pt);
                     }
@@ -319,21 +294,47 @@ namespace FTServer
 
         }
 
+        private static int maxPos(long[] ids)
+        {
+            int pos = 0;
+            for (int i = 0; i < ids.Length; i++)
+            {
+                if (ids[i] > ids[pos])
+                {
+                    pos = i;
+                }
+            }
+            return pos;
+        }
+
+        private static bool stringEqual(String a, String b)
+        {
+            if (a.Equals(b)) { return true; }
+            if (a.Equals("\"" + b + "\"")) { return true; }
+            if (b.Equals("\"" + a + "\"")) { return true; }
+            return false;
+        }
         public static Page getPage(long textOrder)
         {
             return App.Item.Get<Page>("Page", textOrder);
         }
 
-        public static bool addPage(Page page)
+        public static long addPage(Page page)
         {
             page.createTime = DateTime.Now;
             page.textOrder = App.Item.NewId();
-            return App.Item.Insert("Page", page);
+            if (App.Item.Insert("Page", page))
+            {
+                return page.textOrder;
+            }
+            return -1;
         }
 
 
-        public static bool addPageIndex(Page page)
+        public static bool addPageIndex(long textOrder)
         {
+            Page page = getPage(textOrder);
+            if (page == null) { return false; }
             long HuggersMemory = int.MaxValue / 2;
             List<PageText> ptlist = Html.getDefaultTexts(page);
 
@@ -347,15 +348,10 @@ namespace FTServer
             return true;
         }
 
-        public static void addPageTextIndex(PageText pt, long huggers = 0)
+        private static void addPageTextIndex(PageText pt, long huggers = 0)
         {
             using (IBox box = App.Index.Cube())
             {
-                if (box["PageText", pt.id].Select<Object>() != null)
-                {
-                    return;
-                }
-                box["PageText"].Insert(pt);
                 ENGINE.indexText(box, pt.id, pt.indexedText(), false, DelayService.delay);
                 CommitResult cr = box.Commit(huggers);
                 Log("MEM:  " + cr.GetMemoryLength(box).ToString("#,#"));
@@ -368,7 +364,7 @@ namespace FTServer
             {
                 List<Page> page = new List<Page>();
 
-                foreach (var p in box.Select<Page>("from Page where url== limit 1,10", url))
+                foreach (var p in box.Select<Page>("from Page where url==? limit 1,10", url))
                 {
                     if (!p.show) { break; }
                     page.Add(p);

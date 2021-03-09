@@ -101,7 +101,7 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                CacheLength = MB(1024);
+                CacheLength = MB(512);
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 
@@ -153,7 +153,6 @@ namespace FTServer
                     newIndices.Add(new IndexServer().GetInstance(addr).Get());
 
                     App.Indices = newIndices;
-                    //TODO Reset newIndices cache, newer index , bigger cache
 
                     App.Index = newIndices[newIndices.Count - 1];
 

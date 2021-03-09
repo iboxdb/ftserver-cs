@@ -5,77 +5,92 @@
 }
 
 @{
-    //Model.pageCount = 2;
-    Model.Init();
+  Model.pageCount = 2;
+  Model.Init();
 }
-  
+
 <div id='@Html.Raw( "ldiv" + @Model.IdToString() )'>
- @{ 
-     var pages = Model.pages;
-     var isFirstLoad = Model.isFirstLoad;
-     var pageCount = Model.pageCount;
+  @{
+    var pages = Model.pages;
+    var isFirstLoad = Model.isFirstLoad;
+    var pageCount = Model.pageCount;
 
-     foreach (var p in pages) {
-        if (p.priority == 0) {
-          continue;
-        }
-            bool isdesc = p.priority >= PageText.descriptionPriority;
-            String content = isdesc ? p.text
-                    : IndexPage.getDesc(p.text, p.keyWord, 80);
-            
-            String[] keywords = p.keywords.Split(" ");
-
-
-<h3><div class="spartcss"><a class="stext" target="_blank"   href="@p.url" >@p.title</a></div></h3> 
-<span class="stext"> @content </span>
-
-  var css = isdesc ? "gt" : "gtt";
-
- <div class="@css">
-    @if(p.isAndSearch) { 
-    } else {
-      <text>*</text>
-    }
-    @p.url  
-    @p.createTime
-    <br>
-    @foreach (var tkw in keywords)
+    foreach (var p in pages)
     {
-      var kw = tkw.Trim();
-      if ( kw ==null || kw.Length < 1){ continue;} 
-      <a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(kw))"  class="@css kw"> &nbsp;  @kw  &nbsp; </a> 
-      <text>  &nbsp; </text>  
+      if (p.priority == 0)
+      {
+        continue;
+      }
+      bool isdesc = p.priority >= PageText.descriptionPriority;
+      String content = isdesc ? p.text
+        : IndexPage.getDesc(p.text, p.keyWord, 80);
+
+      if (content.Length < 200 && p.page != null)
+      {
+        content += " " + p.page.getRandomContent(200);
+      }
+      String[] keywords = p.keywords.Split(" ");
+
+
+      <h3>
+        <div class="spartcss"><a class="stext" target="_blank" href="@p.url">@p.title</a></div>
+      </h3>
+      <span class="stext"> @content </span>
+      var css = isdesc ? "gt" : "gtt";
+
+      <div class="@css">
+        @if (p.isAndSearch)
+        {
+        }
+        else
+        {
+          <text>*</text>
+        }
+        @p.url
+        @p.createTime
+        <br>
+        @foreach (var tkw in keywords)
+        {
+          var kw = tkw.Trim();
+          if (kw == null || kw.Length < 1) { continue; }
+          <a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(kw))" class="@css kw"> &nbsp; @kw &nbsp; </a>
+          <text> &nbsp; </text>
+        }
+      </div>
     }
+  }
 </div>
-                
- }
-}
+
+<div class="ui teal message" id='@Html.Raw("s" + @Model.IdToString())'>
+  @{
+    String tcontent = (DateTime.Now - Model.begin).TotalSeconds + "s, "
+      + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
+
+    @: @Model.Query, TIME: @tcontent,
+    <a href="#btnsearch"><b>
+        @if (!@Model.IsEnd())
+        {
+          @:"CONTINUING"
+
+        }
+        else
+        {
+          @:"END"
+
+        }
+      </b></a>
+  }
 </div>
-                
- <div class="ui teal message" id='@Html.Raw("s" + @Model.IdToString())'>
-    @{
-       String tcontent = (DateTime.Now - Model.begin).TotalSeconds + "s, "
-                            + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
-    
-    @: @Model.Query,  TIME: @tcontent,
-      <a href="#btnsearch" ><b>
-        @if (!@Model.IsEnd()){
-             @:"CONTINUING" 
-        }else{
-             @:"END"
-        }      
-      </b></a> 
-    }       
-</div>            
 
 <script>
-    setTimeout(function () {
-        highlight( '@Html.Raw( "ldiv" + @Model.IdToString() )' ); 
-     @if (!@Model.IsEnd()) {
-        //startId is a big number, in javascript, have to write big number as a 'String'
-        @: onscroll_loaddiv('@Html.Raw( "s" + @Model.IdToString() )', '@Model.IdToString()');
-     }
+  setTimeout(function () {
+    highlight('@Html.Raw( "ldiv" + @Model.IdToString() )');
+    @if (!@Model.IsEnd())
+  {
+    //startId is a big number, in javascript, have to write big number as a 'String'
+        @:onscroll_loaddiv('@Html.Raw( "s" + @Model.IdToString() )', '@Model.IdToString()');
+
+  }
     }, 100);
-     extitle = "@Html.Raw(@Model.ToKeyWordString())";
-</script>      
-      
+  extitle = "@Html.Raw(@Model.ToKeyWordString())";
+</script>

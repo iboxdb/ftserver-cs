@@ -58,7 +58,7 @@ namespace FTServer
 
                 App.Index = App.Indices[App.Indices.Count - 1];
 
-                return null;
+                return Task.FromResult<IDisposable>(null);
             });
 
             var host = CreateHostBuilder(args).Build();

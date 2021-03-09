@@ -1,14 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
 using System.Linq;
-using System.Text;
 using System.Threading;
-
-using AngleSharp;
-using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
 
 using IBoxDB.LocalServer;
 using static FTServer.App;
@@ -28,7 +21,13 @@ namespace FTServer
                 pst.time = DateTime.Now;
                 pst.keywords = keywords;
                 pst.uid = Guid.NewGuid();
-                App.Item.Insert("/PageSearchTerm", pst);
+
+                long huggersMem = 1024L * 1024L * 2;
+                using (var box = App.Item.Cube())
+                {
+                    box["/PageSearchTerm"].Insert(pst);
+                    box.Commit(huggersMem);
+                }
             }
         }
 
@@ -54,7 +53,6 @@ namespace FTServer
                     '\u2E80', '\u9fa5', 2).ToList();
             }
         }
-
 
 
         public static String addPage(String url, string userDescription, bool isKeyPage)
@@ -83,11 +81,11 @@ namespace FTServer
             {
 
                 p.isKeyPage = isKeyPage;
-                IndexAPI.addPage(p);
-                IndexAPI.addPageIndex(p);
-                IndexAPI.DisableOldPage(url);
-
-                long textOrder = App.Item.NewId(0, 0);
+                long textOrder = IndexAPI.addPage(p);
+                if (IndexAPI.addPageIndex(textOrder))
+                {
+                    IndexAPI.DisableOldPage(url);
+                }
                 DateTime indexend = DateTime.Now;
                 Log("TIME IO:" + (ioend - begin).TotalSeconds
                     + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " ");
@@ -108,15 +106,12 @@ namespace FTServer
         {
             backgroundThreadStack.addFirst(() =>
              {
-                 lock (typeof(App))
-                 {
-                     var bc = Console.BackgroundColor;
-                     Console.BackgroundColor = ConsoleColor.DarkRed;
-                     Log("(KeyPage) For:" + url + " ," + backgroundThreadStack.size());
-                     Console.BackgroundColor = bc;
-                     String r = addPage(url, customContent, true);
-                     backgroundLog(url, r);
-                 }
+                 var bc = Console.BackgroundColor;
+                 Console.BackgroundColor = ConsoleColor.DarkRed;
+                 Log("(KeyPage) For:" + url + " ," + backgroundThreadStack.size());
+                 Console.BackgroundColor = bc;
+                 String r = addPage(url, customContent, true);
+                 backgroundLog(url, r);
              });
         }
 
@@ -137,12 +132,9 @@ namespace FTServer
                     var url = vurl;
                     backgroundThreadStack.addLast(() =>
                     {
-                        lock (typeof(App))
-                        {
-                            Log("For:" + url + " ," + backgroundThreadStack.size());
-                            String r = addPage(url, null, false);
-                            backgroundLog(url, r);
-                        }
+                        Log("For:" + url + " ," + backgroundThreadStack.size());
+                        String r = addPage(url, null, false);
+                        backgroundLog(url, r);
                     });
                 }
             }

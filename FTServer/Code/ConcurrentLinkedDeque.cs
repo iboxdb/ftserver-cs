@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace FTServer
 {
-    public class ConcurrentLinkedDeque<T>
+    public class ConcurrentLinkedDeque<T> where T : class
     {
 
         LinkedList<T> list = new LinkedList<T>();

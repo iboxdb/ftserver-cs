@@ -40,6 +40,11 @@ namespace FTServer
             PageText pt = new PageText();
             pt.priority = id >> priorityOffset;
             pt.textOrder = id - (pt.priority << priorityOffset);
+
+            pt.text = String.Empty;
+            pt.keywords = String.Empty;
+            pt.url = String.Empty;
+            pt.title = String.Empty;
             return pt;
         }
         public static long toId(long textOrder, long priority)
@@ -95,6 +100,11 @@ namespace FTServer
 
         [NotColumn]
         public KeyWord keyWord;
+
+
+        [NotColumn]
+        public Page page;
+
     }
 
     public partial class Page
