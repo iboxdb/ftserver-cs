@@ -55,7 +55,7 @@ namespace FTServer
                     App.Indices.Add(new ReadonlyIndexServer().GetInstance(l).Get());
                 }
                 App.Indices.Add(new IndexServer().GetInstance(start).Get());
-
+                Log("Current Index DB (" + start + ")");
                 App.Index = App.Indices[App.Indices.Count - 1];
 
                 return Task.FromResult<IDisposable>(null);

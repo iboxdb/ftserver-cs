@@ -101,7 +101,7 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                CacheLength = MB(512);
+                CacheLength = MB(1024);
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 
@@ -150,6 +150,7 @@ namespace FTServer
                     long addr = App.Index.GetDatabase().LocalAddress;
                     newIndices.Add(new ReadonlyIndexServer().GetInstance(addr).Get());
                     addr++;
+                    Log("\r\nSwitch To DB (" + addr + ")");
                     newIndices.Add(new IndexServer().GetInstance(addr).Get());
 
                     App.Indices = newIndices;
