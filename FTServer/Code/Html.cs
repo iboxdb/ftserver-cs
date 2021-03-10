@@ -103,13 +103,25 @@ namespace FTServer
 
                 Page page = new Page();
                 page.url = url;
-                page.text = replace(doc.Body.TextContent);
-                if (page.text.length() < 10)
+                String text = replace(doc.Body.TextContent);
+                if (text.length() < 10)
                 {
                     //some website can't get html
                     Log("No HTML " + url);
                     return null;
                 }
+                if (text.length() > 100_000)
+                {
+                    Log("BIG HTML " + url);
+                    return null;
+                }
+                if (text.length() > 50_000)
+                {
+                    Log("[BigURL] " + url);
+                }
+                page.text = text;
+
+
 
                 if (subUrls != null)
                 {
@@ -169,9 +181,9 @@ namespace FTServer
                 }
 
                 description = getMetaContentByName(doc, "description");
-                if (description.length() > 400)
+                if (description.length() > 500)
                 {
-                    description = description.substring(0, 400);
+                    description = description.substring(0, 500);
                 }
 
                 page.title = title;

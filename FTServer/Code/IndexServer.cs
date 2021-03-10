@@ -153,10 +153,14 @@ namespace FTServer
                     Log("\r\nSwitch To DB (" + addr + ")");
                     newIndices.Add(new IndexServer().GetInstance(addr).Get());
 
+                    for (int i = 0; i < newIndices.Count - 10; i++)
+                    {
+                        addr = newIndices[i].GetDatabase().LocalAddress;
+                        newIndices[i] = new ReadonlyIndexServer().GetInstance(addr).Get();
+                    }
+
                     App.Indices = newIndices;
-
                     App.Index = newIndices[newIndices.Count - 1];
-
                     System.GC.Collect();
                 }
             }

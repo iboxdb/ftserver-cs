@@ -87,7 +87,7 @@ namespace FTServer
                 return text + " " + title;
             }
 
-            if (priority == (descriptionPriority - 1))
+            if (priority == contextPriority)
             {
                 return text + " " + url;
             }

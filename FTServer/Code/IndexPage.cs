@@ -87,9 +87,10 @@ namespace FTServer
                 {
                     IndexAPI.DisableOldPage(url);
                 }
+                long dbaddr = App.Indices.Count + IndexServer.IndexDBStart - 1;
                 DateTime indexend = DateTime.Now;
                 Log("TIME IO:" + (ioend - begin).TotalSeconds
-                    + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " ");
+                    + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " (" + dbaddr + ") ");
 
                 subUrls.remove(url);
                 subUrls.remove(url + "/");

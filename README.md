@@ -64,29 +64,6 @@ and set the default nextpage_startId=Long.MaxValue,
 in javascript the big number have to write as String ("'" + nextpage_startId + "'")
 
 
-#### The Page-Text and the Text-Index -Process flow
-
-When Insert
-
-1.insert page --> 2.insert index
-````cs
-IndexAPI.addPage(p);
-IndexAPI.addPageIndex(url);
-````
-
-
-When Delete
-
-1.delete index --> 2.delete page
-````cs
-IndexAPI.removePage(url);
-````
-
-
-#### Add Custom information to Page
-```cs
-IndexPage.addPageCustomText(furl, ttitle, tmsg);
-```
 
 #### Private Server
 Open 
@@ -104,44 +81,26 @@ return page;
 ```
 
 
-#### Memory
-````cs
-//Bigger, faster, more memories.
-//Smaller, less memory.
-int PageText.max_text_length ;
-````
+#### Maximum Opened Files
 
-#### How to set big cache
-```cs
-DatabaseConfig dbcfg = db.GetConfig(); 
-dbcfg.CacheLength = dbcfg.MB(2048);
-//Or
-dbcfg.CacheLength = 2048L * 1024L * 1024L;
-
-//Wrong, overflow
-//dbcfg.CacheLength = 2048 * 1024 * 1024;
-```
-
-#### Turn off SWAP
-
-```
+```sh
+[user@localhost ~]$ cat /proc/sys/fs/file-max
+803882
 [user@localhost ~]$ ulimit -a | grep files
 open files                      (-n) 500000
+[user@localhost ~]$  ulimit -Hn
+500000
+[user@localhost ~]$ ulimit -Sn
+500000
+[user@localhost ~]$ 
 
 
-Turn off virtual memory for 8G+ RAM Machine
-use DatabaseConfig.CacheLength and PageText.max_text_length to Control Memory
+$ vi /etc/security/limits.conf
+*         hard    nofile      500000
+*         soft    nofile      500000
+root      hard    nofile      500000
+root      soft    nofile      500000
 
-Linux:
- # free -h
- # sudo swapoff -a
- # free -h 
-
-Windows:
-System Properties(Win+Pause) - Advanced system settings - Advanced
-- Performance Settings - Advanced - Virtual Memory Change -
-uncheck Automatically manage paging file - select No paging file - 
-click Set - OK restart
 ```
 
 
