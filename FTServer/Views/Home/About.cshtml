@@ -40,10 +40,12 @@
 @section Scripts{
             <script>
                 var extitle = "";
+                //it's a simple highlight method, can find some better JS to replace it.
             function highlight(loadedDivId) {
-
+                //KeyWords,
                 var txt = document.title.substr(0, document.title.indexOf(','));
                 txt +=  (" " + extitle);
+                //Text
                 var div = document.getElementById(loadedDivId);
                 var ts = div.getElementsByClassName("stext");
 
