@@ -105,6 +105,8 @@ namespace FTServer
         [NotColumn]
         public Page page;
 
+        [NotColumn]
+        public long dbOrder = -1;
     }
 
     public partial class Page

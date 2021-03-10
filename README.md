@@ -125,6 +125,10 @@ dbcfg.CacheLength = 2048L * 1024L * 1024L;
 #### Turn off SWAP
 
 ```
+[user@localhost ~]$ ulimit -a | grep files
+open files                      (-n) 500000
+
+
 Turn off virtual memory for 8G+ RAM Machine
 use DatabaseConfig.CacheLength and PageText.max_text_length to Control Memory
 

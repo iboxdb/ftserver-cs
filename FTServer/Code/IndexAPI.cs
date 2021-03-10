@@ -107,7 +107,7 @@ namespace FTServer
                 ors.add(0, null); //and box
                 ors.add(1, null); //or box
                 ors.add(2, null); //and startId
-                //OR
+                //full search
                 ors.add(3, new StringBuilder(name));
 
                 if (startId.Length != ors.size())
@@ -163,7 +163,14 @@ namespace FTServer
             while (startId.isAnd())
             {
                 AutoBox auto = App.Indices[(int)startId.startId[0]];
-                startId.startId[2] = SearchAnd(auto, outputPages, name, startId.startId[2], pageCount);
+                startId.startId[2] = SearchAnd(auto, outputPages, name, startId.startId[2], pageCount - outputPages.Count);
+                foreach (var pt in outputPages)
+                {
+                    if (pt.dbOrder < 0)
+                    {
+                        pt.dbOrder = startId.startId[0];
+                    }
+                }
                 if (outputPages.Count >= pageCount)
                 {
                     return startId.startId;
@@ -176,6 +183,13 @@ namespace FTServer
             {
                 AutoBox auto = App.Indices[(int)startId.startId[1]];
                 SearchOr(auto, outputPages, ors, startId.startId, pageCount);
+                foreach (var pt in outputPages)
+                {
+                    if (pt.dbOrder < 0)
+                    {
+                        pt.dbOrder = startId.startId[1];
+                    }
+                }
                 if (outputPages.Count >= pageCount)
                 {
                     break;
@@ -188,6 +202,7 @@ namespace FTServer
                 String name, long startId, long pageCount)
         {
             name = name.Trim();
+
             using (var box = auto.Cube())
             {
                 foreach (KeyWord kw in engine.searchDistinct(box, name, startId, pageCount))
@@ -198,11 +213,14 @@ namespace FTServer
                     long id = kw.I;
                     PageText pt = PageText.fromId(id);
                     Page p = getPage(pt.textOrder);
-                    if (!p.show) { continue; }
-                    pt = Html.getDefaultText(p, id);
-                    pt.keyWord = kw;
-                    pt.page = p;
-                    pages.Add(pt);
+                    if (p.show)
+                    {
+                        pt = Html.getDefaultText(p, id);
+                        pt.keyWord = kw;
+                        pt.page = p;
+                        pt.isAndSearch = true;
+                        pages.Add(pt);
+                    }
                 }
 
                 return pageCount == 0 ? startId : -1;
@@ -270,13 +288,14 @@ namespace FTServer
 
                         PageText pt = PageText.fromId(id);
                         Page p = getPage(pt.textOrder);
-                        if (!p.show) { continue; }
-                        pt = Html.getDefaultText(p, id);
-
-                        pt.keyWord = kw;
-                        pt.page = p;
-                        pt.isAndSearch = false;
-                        outputPages.Add(pt);
+                        if (p.show)
+                        {
+                            pt = Html.getDefaultText(p, id);
+                            pt.keyWord = kw;
+                            pt.page = p;
+                            pt.isAndSearch = false;
+                            outputPages.Add(pt);
+                        }
                     }
 
                     long maxId = startId[mPos];
@@ -296,7 +315,8 @@ namespace FTServer
 
         private static int maxPos(long[] ids)
         {
-            int orStartPos = 3 - 1;
+            int orStartPos = 3;
+            orStartPos--;
             for (int i = orStartPos; i < ids.Length; i++)
             {
                 if (ids[i] > ids[orStartPos])

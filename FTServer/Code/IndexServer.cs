@@ -47,7 +47,7 @@ namespace FTServer
             public ReadonlyConfig(long address) : base(GetStreamsImpl(address))
             {
                 this.address = address;
-                this.CacheLength = MB(64);
+                this.CacheLength = MB(32);
             }
 
             private static Stream[] GetStreamsImpl(long address)
@@ -101,7 +101,7 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                CacheLength = MB(1024);
+                CacheLength = MB(512);
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 
