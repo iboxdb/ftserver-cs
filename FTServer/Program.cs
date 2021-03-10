@@ -32,7 +32,10 @@ namespace FTServer
                 #region Path 
                 String dir = "DATA_FTS_CS_150";
                 String path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), dir);
-                //String path = Path.Combine("../", dir);
+
+                //path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dir);
+                //path = Path.Combine("/mnt/hgfs/DB", dir);
+                //path = Path.Combine("../", dir);
                 Directory.CreateDirectory(path);
                 Log("DBPath=" + path);
                 DB.Root(path);

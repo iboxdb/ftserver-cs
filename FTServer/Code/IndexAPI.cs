@@ -16,9 +16,7 @@ namespace FTServer
         {
             //andBox,orBox, ids...
             public long[] startId;
-            public StartIdParam(long id) : this(new long[] { id })
-            {
-            }
+
             public StartIdParam(long[] id)
             {
                 if (id.Length == 1)
