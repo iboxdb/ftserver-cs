@@ -1,18 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
-using System.Linq;
-using System.Text;
-using System.Threading;
 
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 
-using IBoxDB.LocalServer;
 using static FTServer.App;
-using System.Runtime.CompilerServices;
 
 namespace FTServer
 {
@@ -264,7 +258,7 @@ namespace FTServer
         {
             foreach (var s in new string[] { "script", "style", "textarea", "noscript" })
             {
-                foreach (var c in doc.GetElementsByTagName(s).ToArray())
+                foreach (var c in new List<IElement>(doc.GetElementsByTagName(s)))
                 {
                     c.Parent.RemoveElement(c);
                 }

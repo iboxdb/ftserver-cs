@@ -1,12 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
-using System.Linq;
-using AngleSharp;
-using AngleSharp.Dom;
 using IBoxDB.LocalServer;
-using System.Threading.Tasks;
 
 //the db classes
 namespace FTServer

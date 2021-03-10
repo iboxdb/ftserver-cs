@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-
-using IBoxDB.LocalServer;
 using static FTServer.App;
 using System.Runtime.CompilerServices;
 
@@ -70,8 +68,6 @@ namespace FTServer
 
             DateTime begin = DateTime.Now;
             Page p = Html.Get(url, subUrls);
-            p.userDescription = userDescription;
-            p.show = true;
             DateTime ioend = DateTime.Now;
 
             if (p == null)
@@ -80,7 +76,8 @@ namespace FTServer
             }
             else
             {
-
+                p.userDescription = userDescription;
+                p.show = true;
                 p.isKeyPage = isKeyPage;
                 long textOrder = IndexAPI.addPage(p);
                 if (IndexAPI.addPageIndex(textOrder))

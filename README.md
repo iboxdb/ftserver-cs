@@ -22,7 +22,7 @@ dotnet run -c Release
 ### The Results Order
 The results order based on the **id()** number in **class PageText**,  descending order.
 
-Page has many PageTexts.
+A Page has many PageTexts. if don't need multiple Texts, modify **Html.getDefaultTexts(Page)**, only results one PageText.
 
 
 

@@ -58,7 +58,19 @@ namespace FTServer
             }
 
         }
-
+        public static void DeleteOldSwap(long address)
+        {
+            string pa = BoxFileStreamConfig.RootPath + ReadonlyStreamConfig.GetNameByAddrDefault(address);
+            pa += ".swp";
+            try
+            {
+                File.Delete(pa);
+            }
+            catch
+            {
+                Log("Can't Delete " + pa);
+            }
+        }
     }
     public class IndexServer : LocalDatabaseServer
     {
@@ -157,6 +169,7 @@ namespace FTServer
                     {
                         addr = newIndices[i].GetDatabase().LocalAddress;
                         newIndices[i] = new ReadonlyIndexServer().GetInstance(addr).Get();
+                        ReadonlyIndexServer.DeleteOldSwap(addr);
                     }
 
                     App.Indices = newIndices;
