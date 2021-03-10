@@ -168,7 +168,7 @@ namespace FTServer
                 {
                     if (pt.dbOrder < 0)
                     {
-                        pt.dbOrder = startId.startId[0];
+                        pt.dbOrder = startId.startId[0] + IndexServer.IndexDBStart;
                     }
                 }
                 if (outputPages.Count >= pageCount)
@@ -187,7 +187,7 @@ namespace FTServer
                 {
                     if (pt.dbOrder < 0)
                     {
-                        pt.dbOrder = startId.startId[1];
+                        pt.dbOrder = startId.startId[1] + IndexServer.IndexDBStart;
                     }
                 }
                 if (outputPages.Count >= pageCount)

@@ -66,6 +66,7 @@ namespace FTServer
             task.GetAwaiter().GetResult();
             host.Run();
             IndexPage.Shutdown();
+            IndexPage.addSearchTerm("SystemShutdown", true);
             App.Item.GetDatabase().Dispose();
             foreach (var d in App.Indices)
             {

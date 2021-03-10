@@ -13,7 +13,7 @@ namespace FTServer
     public class IndexPage
     {
 
-        public static void addSearchTerm(String keywords)
+        public static void addSearchTerm(String keywords, bool isShutdown = false)
         {
             if (keywords.length() < PageSearchTerm.MAX_TERM_LENGTH)
             {
@@ -22,7 +22,8 @@ namespace FTServer
                 pst.keywords = keywords;
                 pst.uid = Guid.NewGuid();
 
-                long huggersMem = 1024L * 1024L * 2;
+                long huggersMem = 1024L * 1024L * 10L;
+                if (isShutdown) { huggersMem = 0; }
                 using (var box = App.Item.Cube())
                 {
                     box["/PageSearchTerm"].Insert(pst);

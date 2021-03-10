@@ -145,7 +145,7 @@ namespace FTServer
                 {
 
                     var newIndices = new List<AutoBox>(App.Indices);
-                    newIndices.Remove(App.Index);
+                    newIndices.RemoveAt(newIndices.Count - 1);
 
                     long addr = App.Index.GetDatabase().LocalAddress;
                     newIndices.Add(new ReadonlyIndexServer().GetInstance(addr).Get());
