@@ -9,8 +9,7 @@ namespace FTServer
 
     public class IndexAPI
     {
-        public readonly static Engine engine = new Engine();
-        public static Engine ENGINE => engine;
+        public readonly static Engine ENGINE = new Engine();
 
         private class StartIdParam
         {
@@ -193,7 +192,7 @@ namespace FTServer
 
             using (var box = auto.Cube())
             {
-                foreach (KeyWord kw in engine.searchDistinct(box, name, startId, pageCount))
+                foreach (KeyWord kw in ENGINE.searchDistinct(box, name, startId, pageCount))
                 {
                     pageCount--;
                     startId = kw.I - 1;
@@ -255,7 +254,6 @@ namespace FTServer
                             else
                             {
                                 iters[i] = null;
-                                kws[i] = null;
                                 startId[i] = -1;
                             }
                         }
@@ -335,7 +333,7 @@ namespace FTServer
             {
                 return page.textOrder;
             }
-            return -1;
+            return -1L;
         }
 
 

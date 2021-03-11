@@ -48,7 +48,7 @@ namespace FTServer
         {
             using (var box = App.Index.Cube())
             {
-                return IndexAPI.engine.discover(box, 'a', 'z', 2,
+                return IndexAPI.ENGINE.discover(box, 'a', 'z', 2,
                     '\u2E80', '\u9fa5', 2).ToList();
             }
         }
