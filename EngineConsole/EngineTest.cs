@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-using iBoxDB.LocalServer;
+using IBoxDB.LocalServer;
 
 namespace FTServer
 {

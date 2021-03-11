@@ -22,14 +22,12 @@ dotnet run -c Release
 ### The Results Order
 The results order based on the **id()** number in **class PageText**,  descending order.
 
-A Page has many PageTexts. if don't need multiple Texts, modify **Html.getDefaultTexts(Page)**, only results one PageText.
-
-
+A Page has many PageTexts. if don't need multiple Texts, modify **Html.getDefaultTexts(Page)**, only returns one PageText.
 
 the Page.GetRandomContent() method is used to keep the Search-Page-Content always changing, doesn't affect the real PageText order.
 
-if you have many pages(>100,000),  use the ID number to control the order instead of loading all pages to memory. 
-Or you can load top 100-1000 pages to memory then re-order it by favor. 
+Use the ID number to control the order instead of loading all pages to memory. 
+Or load top 100 pages to memory then re-order it by favor. 
 
 
 #### Search Format

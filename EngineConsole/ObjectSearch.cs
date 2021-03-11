@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using iBoxDB.LocalServer;
+using IBoxDB.LocalServer;
 
 namespace FTServer
 {
