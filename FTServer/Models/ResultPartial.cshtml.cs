@@ -41,7 +41,7 @@ namespace FTServer.Models
 
         public bool IsEnd()
         {
-            return StartId[0] == -1 && StartId[1] == -1;
+            return StartId[0] < 0 && StartId[1] < 0;
         }
 
 
