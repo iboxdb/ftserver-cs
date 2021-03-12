@@ -165,9 +165,9 @@ namespace FTServer
                 }
             }
             long _endId = startId.startId[0];
-            if ((_beginId - _endId) > 10)
+            if ((_beginId - _endId) > 20)
             {
-                Log("Hard to Find ALL: " + name);
+                Log("Long Search: " + name);
             }
 
             //OR            
