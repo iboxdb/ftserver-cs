@@ -327,13 +327,17 @@ namespace FTServer
 
         public static long addPage(Page page)
         {
-            page.createTime = DateTime.Now;
-            page.textOrder = App.Item.NewId();
-            if (App.Item.Insert("Page", page))
+            using (var box = App.Item.Cube())
             {
-                return page.textOrder;
+                page.createTime = DateTime.Now;
+                page.textOrder = box.NewId();
+                box["Page"].Insert(page, 1);
+                if (box.Commit() == CommitResult.OK)
+                {
+                    return page.textOrder;
+                }
+                return -1L;
             }
-            return -1L;
         }
 
 

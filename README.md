@@ -22,7 +22,7 @@ dotnet run -c Release
 ### The Results Order
 The results order based on the **id()** number in **class PageText**,  descending order.
 
-A Page has many PageTexts. if don't need multiple Texts, modify **Html.getDefaultTexts(Page)**, only returns one PageText.
+A Page has many PageTexts. if don't need multiple Texts, modify **Html.getDefaultTexts(Page)**, returns only one PageText.
 
 the Page.GetRandomContent() method is used to keep the Search-Page-Content always changing, doesn't affect the real PageText order.
 

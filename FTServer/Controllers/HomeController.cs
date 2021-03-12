@@ -48,10 +48,8 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = null
             };
-            if (!ishttp)
-            {
-                DelayService.delayIndex();
-            }
+
+            DelayService.delayIndex();
             return View(m);
         }
 
