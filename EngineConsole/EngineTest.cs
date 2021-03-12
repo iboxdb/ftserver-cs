@@ -178,7 +178,6 @@ namespace FTServer
             }
         }
 
-        //150 seconds test
         public static void test_big_n()
         {
             String book = "/hero.txt";
@@ -189,23 +188,22 @@ namespace FTServer
             bool rebuild = true;
             int notranCount = -1;//10;
             String strkw = "黄蓉 郭靖 洪七公";
-            //strkw = "洪七公 黄蓉 郭靖";
-            //strkw = "黄蓉 郭靖 公";
-            //strkw = "郭靖 黄蓉";
-            //strkw = "黄蓉";
-            //strkw = "时察";
-            //strkw = "的";
-            //strkw = "七十二路";
-            //strkw = "十八掌";
-            //strkw = "日日夜夜无穷无尽的";
-            //strkw = "牛家村边绕 日日夜夜无穷无尽的";
-            //strkw = "这几天";
-            //strkw = "有 这几天";
-            //strkw = "这几天 有";
+            strkw = "洪七公 黄蓉 郭靖";
+            strkw = "黄蓉 郭靖 公";
+            strkw = "郭靖 黄蓉";
+            strkw = "黄蓉";
+            strkw = "时察";
+            strkw = "的";
+            strkw = "七十二路";
+            strkw = "十八掌";
+            strkw = "日日夜夜无穷无尽的";
+            strkw = "牛家村边绕 日日夜夜无穷无尽的";
+            strkw = "这几天";
+            strkw = "有 这几天";
+            strkw = "这几天 有";
             test_big(book, dbid, rebuild, split, strkw, notranCount);
         }
 
-        //30 seconds test
         public static void test_big_e()
         {
             String book = "/phoenix.txt";
@@ -218,18 +216,18 @@ namespace FTServer
 
             String strkw = "Harry";
             strkw = "Harry Philosopher";
-            //strkw = "Philosopher";
-            //strkw = "\"Harry Philosopher\"";
-            //strkw = "\"He looks\"";
-            //strkw = "He looks";
-            //strkw = "\"he drove toward town he thought\"";
-            //strkw = "\"he drove toward\"";
-            //strkw = "\"he thought\"";
-            //strkw = "\"he thought\" toward";
-            //strkw = "toward \"he thought\"";
-            //strkw = "he thought";
-            //strkw = "he thought toward";
-            //strkw = "He";
+            strkw = "Philosopher";
+            strkw = "\"Harry Philosopher\"";
+            strkw = "\"He looks\"";
+            strkw = "He looks";
+            strkw = "\"he drove toward town he thought\"";
+            strkw = "\"he drove toward\"";
+            strkw = "\"he thought\"";
+            strkw = "\"he thought\" toward";
+            strkw = "toward \"he thought\"";
+            strkw = "he thought";
+            strkw = "he thought toward";
+            strkw = "He";
             test_big(book, dbid, rebuild, split, strkw, notranCount);
         }
 
@@ -245,7 +243,7 @@ namespace FTServer
             DB db = new DB(dbid);
 
             String[] tstmp = File.OpenText(System.Environment.GetFolderPath(Environment.SpecialFolder.Personal) +
-                book).ReadToEnd().Split(split);
+              "/github" + book).ReadToEnd().Split(split);
 
             //three times data
             List<String> list = new List<String>();
