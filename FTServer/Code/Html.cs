@@ -174,6 +174,11 @@ namespace FTServer
                 }
 
                 description = getMetaContentByName(doc, "description");
+                if (description.length() == 0)
+                {
+                    Log("Can't find description " + url);
+                    description = text.substring(0, 200);
+                }
                 if (description.length() > 500)
                 {
                     description = description.substring(0, 500);
