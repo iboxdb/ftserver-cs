@@ -146,6 +146,7 @@ namespace FTServer
             if (name.Length > 100) { return new long[] { -1 }; }
 
             StartIdParam startId = new StartIdParam(t_startId);
+            long _beginId = startId.startId[0];
             //And
             while (startId.isAnd())
             {
@@ -162,6 +163,11 @@ namespace FTServer
                 {
                     return startId.startId;
                 }
+            }
+            long _endId = startId.startId[0];
+            if ((_beginId - _endId) > 10)
+            {
+                Log("Hard to Find ALL: " + name);
             }
 
             //OR            
