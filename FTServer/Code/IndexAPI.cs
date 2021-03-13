@@ -336,10 +336,17 @@ namespace FTServer
         public static long addPage(Page page)
         {
             Page oldPage = GetOldPage(page.url);
-            if (oldPage != null && oldPage.show && oldPage.text.equals(page.text))
+            if (oldPage != null && oldPage.show)
             {
-                Log("Page is not changed. " + page.url);
-                return -1L;
+                if (oldPage.text.equals(page.text))
+                {
+                    Log("Page is not changed. " + page.url);
+                    return -1L;
+                }
+                else
+                {
+                    Log("Page is changed. " + page.url);
+                }
             }
 
             using (var box = App.Item.Cube())

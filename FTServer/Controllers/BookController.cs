@@ -57,6 +57,10 @@ namespace FTServer.Controllers
             m.Title = title;
             m.Description = description;
             m.Keywords = keywords;
+            if (book == 0)
+            {
+                text += "  " + DateTime.Now;
+            }
             m.Text = text;
 
             return View(m);
