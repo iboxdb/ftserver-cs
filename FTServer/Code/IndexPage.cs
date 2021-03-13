@@ -72,7 +72,7 @@ namespace FTServer
 
             if (p == null)
             {
-                return "temporarily unreachable";
+                return "Temporarily Unreachable";
             }
             else
             {
@@ -80,7 +80,7 @@ namespace FTServer
                 p.show = true;
                 p.isKeyPage = isKeyPage;
                 long textOrder = IndexAPI.addPage(p);
-                if (IndexAPI.addPageIndex(textOrder))
+                if (textOrder >= 0 && IndexAPI.addPageIndex(textOrder))
                 {
                     IndexAPI.DisableOldPage(url);
                 }

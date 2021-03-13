@@ -335,6 +335,13 @@ namespace FTServer
 
         public static long addPage(Page page)
         {
+            Page oldPage = GetOldPage(page.url);
+            if (oldPage != null && oldPage.show && oldPage.text.equals(page.text))
+            {
+                Log("Page is not changed. " + page.url);
+                return -1L;
+            }
+
             using (var box = App.Item.Cube())
             {
                 page.createTime = DateTime.Now;
@@ -394,6 +401,12 @@ namespace FTServer
                 }
                 box.Commit().Assert();
             }
+        }
+        public static Page GetOldPage(String url)
+        {
+            List<Page> pages = App.Item.Select<Page>("from Page where url==? limit 0,1", url);
+            if (pages.Count > 0) { return pages[0]; }
+            return null;
         }
     }
 
