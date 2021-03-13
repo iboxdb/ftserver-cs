@@ -102,7 +102,9 @@ namespace FTServer
                 CacheLength = MB(256);
                 SwapFileBuffer = (int)MB(20);
                 EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
+
                 EnsureTable<Page>("Page", "textOrder");
+                //the 'textOrder' is used to control url's order
                 EnsureIndex<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")", "textOrder");
             }
         }
