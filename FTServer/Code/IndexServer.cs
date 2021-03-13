@@ -100,6 +100,7 @@ namespace FTServer
             public ItemConfig()
             {
                 CacheLength = MB(256);
+                SwapFileBuffer = (int)MB(20);
                 EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
                 EnsureTable<Page>("Page", "textOrder");
                 EnsureIndex<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")", "textOrder");
@@ -114,6 +115,7 @@ namespace FTServer
             public IndexConfig()
             {
                 CacheLength = MB(512);
+                SwapFileBuffer = (int)MB(20);
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 

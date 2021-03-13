@@ -70,7 +70,7 @@ namespace FTServer
         //keywords
         public String keywords;
 
-        public DateTime createTime = DateTime.Now;
+        public DateTime createTime;
 
         [NotColumn]
         public String indexedText()

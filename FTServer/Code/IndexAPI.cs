@@ -165,9 +165,9 @@ namespace FTServer
                 }
             }
             long _endId = startId.startId[0];
-            if ((_beginId - _endId) > 20)
+            if ((_beginId - _endId) > 50)
             {
-                Log("Long Search: " + name);
+                //Log("Long Search: " + name);
             }
 
             //OR            
@@ -211,6 +211,7 @@ namespace FTServer
                         pt = Html.getDefaultText(p, id);
                         pt.keyWord = kw;
                         pt.page = p;
+                        pt.createTime = p.createTime;
                         pt.isAndSearch = true;
                         pages.Add(pt);
                     }
@@ -285,6 +286,7 @@ namespace FTServer
                             pt = Html.getDefaultText(p, id);
                             pt.keyWord = kw;
                             pt.page = p;
+                            pt.createTime = p.createTime;
                             pt.isAndSearch = false;
                             outputPages.Add(pt);
                         }

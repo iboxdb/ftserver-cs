@@ -91,6 +91,11 @@ namespace FTServer
                 {
                     return null;
                 }
+                if (doc.ContentType != null && doc.ContentType.toLowerCase().equals("text/xml"))
+                {
+                    Log("XML " + url);
+                    return null;
+                }
                 //Log(doc.ToHtml());
                 fixSpan(doc);
 
@@ -177,7 +182,9 @@ namespace FTServer
                 if (description.length() == 0)
                 {
                     Log("Can't find description " + url);
-                    description = text.substring(0, 200);
+                    int desLen = 200;
+                    if (desLen > text.length()) { desLen = text.length(); }
+                    description = text.substring(0, desLen);
                 }
                 if (description.length() > 500)
                 {
