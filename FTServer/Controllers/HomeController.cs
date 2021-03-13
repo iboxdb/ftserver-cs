@@ -40,7 +40,7 @@ namespace FTServer.Controllers
             {
                 String furl = Html.getUrl(q);
                 IndexPage.runBGTask(furl);
-                q = "Background Index Running, See Console Output";
+                q = "BackgroundIndexRunning-SeeConsoleOutput";
             }
 
             m.Result = new ResultPartialModel
