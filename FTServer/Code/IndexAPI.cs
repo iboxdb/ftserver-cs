@@ -211,7 +211,6 @@ namespace FTServer
                         pt = Html.getDefaultText(p, id);
                         pt.keyWord = kw;
                         pt.page = p;
-                        pt.createTime = p.createTime;
                         pt.isAndSearch = true;
                         pages.Add(pt);
                     }
@@ -286,7 +285,6 @@ namespace FTServer
                             pt = Html.getDefaultText(p, id);
                             pt.keyWord = kw;
                             pt.page = p;
-                            pt.createTime = p.createTime;
                             pt.isAndSearch = false;
                             outputPages.Add(pt);
                         }

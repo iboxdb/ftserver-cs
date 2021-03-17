@@ -157,7 +157,7 @@ namespace FTServer
                 }
                 if (title.length() < 1)
                 {
-                    title = url;
+                    //title = url;
                     //ignore no title
                     Log("No Title " + url);
                     return null;
@@ -209,6 +209,7 @@ namespace FTServer
             PageText pt = PageText.fromId(id);
             pt.url = page.url;
             pt.title = page.title;
+            pt.createTime = page.createTime;
             if (pt.priority >= PageText.descriptionPriority)
             {
                 pt.keywords = page.keywords;
