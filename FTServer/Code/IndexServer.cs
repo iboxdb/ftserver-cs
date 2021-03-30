@@ -74,7 +74,7 @@ namespace FTServer
     }
     public class IndexServer : LocalDatabaseServer
     {
-        public static long SwitchToReadonlyIndexLength = 1024L * 1024L * 500L;
+        public static long SwitchToReadonlyIndexLength = 1024L * 1024L * 500L * 1L;
         public static long ItemDB = 2L;
 
         public static long IndexDBStart = 10L;
@@ -116,7 +116,8 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                CacheLength = MB(512);
+                int lenMB = (int)(SwitchToReadonlyIndexLength / 1024L / 1024L);
+                CacheLength = MB(lenMB);
                 SwapFileBuffer = (int)MB(20);
                 Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(this);

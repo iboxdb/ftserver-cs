@@ -20,7 +20,7 @@ namespace FTServer
                 pst.keywords = keywords;
                 pst.uid = Guid.NewGuid();
 
-                long huggersMem = 1024L * 1024L * 10L;
+                long huggersMem = 1024L * 1024L * 3L;
                 if (isShutdown) { huggersMem = 0; }
                 using (var box = App.Item.Cube())
                 {
