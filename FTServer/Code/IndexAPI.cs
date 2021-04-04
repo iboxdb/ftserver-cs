@@ -143,7 +143,7 @@ namespace FTServer
                 String name, long[] t_startId, long pageCount)
         {
             name = name.Trim();
-            if (name.Length > 100) { return new long[] { -1 }; }
+            if (name.Length > 100) { return new long[] { -1, -1, -1 }; }
 
             StartIdParam startId = new StartIdParam(t_startId);
             long _beginId = startId.startId[0];

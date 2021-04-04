@@ -452,6 +452,11 @@ namespace FTServer
             }
             set.add((char)0);
             set.add((char)8203);
+            // http://www.unicode-symbol.com/block/Punctuation.html
+            for (int i = 0x2000; i <= 0x206F; i++)
+            {
+                set.add((char)i);
+            }
             set.add((char)0x0E00);//Thai
 
         }
@@ -486,10 +491,71 @@ namespace FTServer
             {
                 return true;
             }
+            if (isWordRight2Left(c))
+            {
+                return true;
+            }
             //special
             return c == '-' || c == '#';
         }
 
+
+        private bool isWordRight2Left(char c)
+        {
+            // https://unicode-table.com/en/blocks/hebrew/
+            // https://www.compart.com/en/unicode/block/U+0590
+            if (c >= 0x05D0 && c <= 0x05EE)
+            {
+                //not implemented yet            
+                //return true;
+            }
+            // https://unicode-table.com/en/blocks/arabic/
+            // https://www.compart.com/en/unicode/bidiclass/AL
+
+            if (c >= 0x0617 && c <= 0x061A)
+            {
+                return true;
+            }
+
+            if (c >= 0x0620 && c <= 0x065F)
+            {
+                return true;
+            }
+            if (c >= 0x0660 && c <= 0x0669)
+            {
+                return true;
+            }
+
+            if (c >= 0x066E && c <= 0x06D3)
+            {
+                return true;
+            }
+            if (c >= 0x06D5 && c <= 0x06D5)
+            {
+                return true;
+            }
+            if (c >= 0x06EE && c <= 0x06FC)
+            {
+                return true;
+            }
+            if (c >= 0x06FF && c <= 0x06FF)
+            {
+                return true;
+            }
+
+            // https://unicode-table.com/en/blocks/arabic-supplement/
+            if (c >= 0x0750 && c <= 0x077F)
+            {
+                return true;
+            }
+            // https://unicode-table.com/en/blocks/arabic-extended-a/
+            if (c >= 0x08A0 && c <= 0x08FF)
+            {
+                return true;
+            }
+
+            return false;
+        }
         public char[] clear(String str)
         {
             char[] cs = (str + "   ").toLowerCase().toCharArray();
