@@ -505,41 +505,13 @@ namespace FTServer
         {
             // https://unicode-table.com/en/blocks/hebrew/
             // https://www.compart.com/en/unicode/block/U+0590
-            if (c >= 0x05D0 && c <= 0x05EE)
+            if (c >= 0x0590 && c <= 0x05FF)
             {
-                //not implemented yet            
-                //return true;
+                return true;
             }
             // https://unicode-table.com/en/blocks/arabic/
             // https://www.compart.com/en/unicode/bidiclass/AL
-
-            if (c >= 0x0617 && c <= 0x061A)
-            {
-                return true;
-            }
-
-            if (c >= 0x0620 && c <= 0x065F)
-            {
-                return true;
-            }
-            if (c >= 0x0660 && c <= 0x0669)
-            {
-                return true;
-            }
-
-            if (c >= 0x066E && c <= 0x06D3)
-            {
-                return true;
-            }
-            if (c >= 0x06D5 && c <= 0x06D5)
-            {
-                return true;
-            }
-            if (c >= 0x06EE && c <= 0x06FC)
-            {
-                return true;
-            }
-            if (c >= 0x06FF && c <= 0x06FF)
+            if (c >= 0x0600 && c <= 0x06FF)
             {
                 return true;
             }
