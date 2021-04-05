@@ -48,8 +48,16 @@ namespace FTServer
         {
             using (var box = App.Index.Cube())
             {
-                return IndexAPI.ENGINE.discover(box, (char)0x0001, (char)0x2000, 2,
-                    (char)0x2001, (char)0xEEEE, 2).ToList();
+                List<String> result = new List<string>();
+                result.AddRange(IndexAPI.ENGINE.discover(box, (char)0x0061, (char)0x007A, 2,
+                    (char)0x4E00, (char)0x9FFF, 2));
+
+                result.AddRange(IndexAPI.ENGINE.discover(box, (char)0x0621, (char)0x064A, 2,
+                    (char)0x3040, (char)0x312F, 2));
+
+                result.AddRange(IndexAPI.ENGINE.discover(box, (char)0x0410, (char)0x044F, 2,
+                    (char)0xAC00, (char)0xD7AF, 2));
+                return result;
             }
         }
 

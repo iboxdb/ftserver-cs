@@ -82,6 +82,7 @@ namespace FTServer
             {
                 if (url == null || url.Length > Page.MAX_URL_LENGTH || url.Length < 8)
                 {
+                    Log("URL Length: " + url + " :" + (url != null ? url.length() : ""));
                     return null;
                 }
 

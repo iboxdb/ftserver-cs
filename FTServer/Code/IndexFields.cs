@@ -104,7 +104,7 @@ namespace FTServer
 
     public partial class Page
     {
-        public const int MAX_URL_LENGTH = 200;
+        public const int MAX_URL_LENGTH = 400;
 
         public String url;
 

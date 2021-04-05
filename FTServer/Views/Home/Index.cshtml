@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "iBoxDB";
+
+    DateTime begin = DateTime.Now; 
 }
 
 @section Styles{
@@ -62,6 +64,6 @@
  
                     
                 </div>
-
+Load Time:  @((DateTime.Now - begin).TotalSeconds)  s
             </div>
         </div>

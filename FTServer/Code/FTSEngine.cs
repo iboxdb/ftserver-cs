@@ -123,9 +123,9 @@ namespace FTServer
                 foreach (KeyWord tkw in lessMatch(box, kw))
                 {
                     String str = tkw.getKeyWord().ToString();
-                    if (str.Length < 3)
+                    if (str[0] < efrom)
                     {
-                        continue;
+                        break;
                     }
                     int c = list.Count;
                     list.Add(str);
@@ -150,8 +150,13 @@ namespace FTServer
                 kw.longKeyWord(cs[0], cs[1], (char)0);
                 foreach (KeyWord tkw in lessMatch(box, kw))
                 {
+                    String str = ((KeyWordN)tkw).toKString();
+                    if (str[0] < nfrom)
+                    {
+                        break;
+                    }
                     int c = list.Count;
-                    list.Add(((KeyWordN)tkw).toKString());
+                    list.Add(str);
                     if (list.Count > c)
                     {
                         nlength--;
@@ -533,6 +538,23 @@ namespace FTServer
             {
                 return true;
             }
+            // https://unicode-table.com/en/blocks/hangul-jamo/
+            if (c >= 0x1100 && c <= 0x11FF)
+            {
+                return true;
+            }
+            //https://unicode-table.com/en/blocks/hangul-jamo-extended-b/
+            if (c >= 0xD7B0 && c <= 0xD7FF)
+            {
+                return true;
+            }
+            //Japanese
+            /*
+            if (c >= 0x3040 && c <= 0x312F)
+            {
+                return true;
+            }
+            */
 
             // https://unicode-table.com/en/blocks/latin-extended-additional/
             if (c >= 0x1E00 && c <= 0x1EFF)
