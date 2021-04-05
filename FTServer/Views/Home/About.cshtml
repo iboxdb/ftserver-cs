@@ -33,6 +33,9 @@
             .kw{
                 background-color: #eee;
             }
+            .rtl{
+                text-align: initial !important;
+            }
         </style>
 }
 
@@ -126,7 +129,7 @@
 
                         <div class="ui action input">
                             <a href="./"><i class="teal disk outline icon" style="font-size:42px"></i> </a>
-                            <input name="q"  value="@Model.Result.Query" required onfocus="formfocus()" />
+                            <input name="q"  value="@Model.Result.Query" required onfocus="formfocus()"  dir="auto" />
                             <input id="btnsearch" type="submit"  class="ui teal right button" value="Search" /> 
                         </div>
                     </div>
@@ -142,7 +145,7 @@
             </div>
         </div>
 
-        <div class="ui grid">
+        <div class="rtl ui grid">
             <div class="ten wide column" style="max-width: 600px;" id="maindiv">
                @{
                    //Html.RenderPartial( "ResultPartial",  @Model.Result );

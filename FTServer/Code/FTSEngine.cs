@@ -451,6 +451,7 @@ namespace FTServer
                 set.add(c);
             }
             set.add((char)0);
+            set.add((char)0x09);
             set.add((char)8203);
             // http://www.unicode-symbol.com/block/Punctuation.html
             for (int i = 0x2000; i <= 0x206F; i++)
