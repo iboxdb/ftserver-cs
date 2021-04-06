@@ -2,6 +2,12 @@
 
 @{
   Layout = "";
+
+  Random ran = BookModel.ran;
+  bool nodesc = ran.Next(5) == 0;
+    if (nodesc) {
+        Model.Description = "";
+    } 
 }
 
 <!DOCTYPE html>
@@ -18,7 +24,7 @@
         <p>@Model.Text</p>
 <br>
 @{
-    Random ran = new Random();
+    
     String[] books = BookController.Books;
     int bbase = BookController.Base;
         for (int i = 0; i < 2000; i++) {

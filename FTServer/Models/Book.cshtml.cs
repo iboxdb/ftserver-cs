@@ -1,10 +1,13 @@
 
 
 
+using System;
+
 namespace FTServer.Models
 {
     public class BookModel
     {
+        public static readonly Random ran = new Random();
         public string Title { get; set; }
         public string Description { get; set; }
 

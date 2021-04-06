@@ -183,9 +183,7 @@ namespace FTServer
                 if (description.length() == 0)
                 {
                     Log("Can't find description " + url);
-                    int desLen = 200;
-                    if (desLen > text.length()) { desLen = text.length(); }
-                    description = text.substring(0, desLen);
+                    page.text += " " + title;
                 }
                 if (description.length() > 500)
                 {
