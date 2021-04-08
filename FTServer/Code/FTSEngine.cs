@@ -465,12 +465,16 @@ namespace FTServer
             }
             set.add((char)0x0E00);//Thai
 
+            //https://unicode-table.com/en/blocks/arabic/
+            //Punctuation Arabic
+            set.add((char)0x060C);
+            set.add((char)0x060D);
+            set.add((char)0x061B);
+            set.add((char)0x061E);
+            set.add((char)0x061F);
+            set.add((char)0x06D4);
         }
 
-        //https://unicode-table.com/
-        //Chinese  [\u2E80-\u9fa5]
-        //Japanese [\u0800-\u4e00]|
-        //Korean   [\uAC00-\uD7A3] [\u3130-\u318F] 
         public bool isWord(char c)
         {
             // https://unicode-table.com/en/blocks/basic-latin/
@@ -523,7 +527,7 @@ namespace FTServer
             //Russian
             // https://unicode-table.com/en/blocks/cyrillic/
             // https://unicode-table.com/en/blocks/cyrillic-supplement/
-            if (c >= 0x0400 && c <= 0x052f)
+            if (c >= 0x0400 && c <= 0x052F)
             {
                 return true;
             }
