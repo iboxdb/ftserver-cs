@@ -45,7 +45,7 @@ namespace FTServer.Controllers
             String content = Books[book].Substring(startIndex, endIndex - startIndex);
 
             String title = content.Length > 200 ? content.Substring(0, 200) : content;
-            String description = content.Length > 300 ? content.Substring(100, 300) : content;
+            String description = content.Length > 400 ? content.Substring(100, 300) : content;
             String text = content.Length > 500 ? content.Substring(300) : content;
             String keywords = "keyword1 keywords2,keyword3 hello";
 
