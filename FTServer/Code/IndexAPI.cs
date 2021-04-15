@@ -150,6 +150,7 @@ namespace FTServer
             //And
             while (startId.isAnd())
             {
+                DelayService.delayIndex();
                 AutoBox auto = App.Indices[(int)startId.startId[0]];
                 startId.startId[2] = SearchAnd(auto, outputPages, name, startId.startId[2], pageCount - outputPages.Count);
                 foreach (var pt in outputPages)
@@ -174,6 +175,7 @@ namespace FTServer
             ArrayList<StringBuilder> ors = startId.ToOrCondition(name);
             while (startId.isOr())
             {
+                DelayService.delayIndex();
                 AutoBox auto = App.Indices[(int)startId.startId[1]];
                 SearchOr(auto, outputPages, ors, startId.startId, pageCount);
                 foreach (var pt in outputPages)

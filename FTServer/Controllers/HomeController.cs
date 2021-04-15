@@ -49,7 +49,7 @@ namespace FTServer.Controllers
                 StartId = null
             };
 
-            DelayService.delayIndex();
+
             return View(m);
         }
 
@@ -74,7 +74,6 @@ namespace FTServer.Controllers
                 Query = q,
                 StartId = ids
             };
-            DelayService.delayIndex();
             return View("ResultPartial", Result);
         }
 
