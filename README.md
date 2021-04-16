@@ -8,6 +8,7 @@ cd FTServer
 dotnet run -c Release
 ```
 
+![](/iboxdb/ftserver/raw/master/FTServer/src/main/webapp/css/fts.png)
 
 
 ### Dependencies

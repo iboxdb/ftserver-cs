@@ -143,10 +143,11 @@ namespace FTServer
                 String name, long[] t_startId, long pageCount)
         {
             name = name.Trim();
-            if (name.Length > 100) { return new long[] { -1, -1, -1 }; }
+            if (name.Length > 150) { return new long[] { -1, -1, -1 }; }
 
             StartIdParam startId = new StartIdParam(t_startId);
-            long _beginId = startId.startId[0];
+            long beginTime = Environment.TickCount64;
+            long maxTime = 1000 * 3;
             //And
             while (startId.isAnd())
             {
@@ -164,12 +165,12 @@ namespace FTServer
                 {
                     return startId.startId;
                 }
+                if ((Environment.TickCount64 - beginTime) > maxTime)
+                {
+                    return startId.startId;
+                }
             }
-            long _endId = startId.startId[0];
-            if ((_beginId - _endId) > 50)
-            {
-                //Log("Long Search: " + name);
-            }
+
 
             //OR            
             ArrayList<StringBuilder> ors = startId.ToOrCondition(name);
@@ -186,6 +187,10 @@ namespace FTServer
                     }
                 }
                 if (outputPages.Count >= pageCount)
+                {
+                    break;
+                }
+                if ((Environment.TickCount64 - beginTime) > maxTime)
                 {
                     break;
                 }
