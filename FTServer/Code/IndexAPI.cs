@@ -147,7 +147,7 @@ namespace FTServer
 
             StartIdParam startId = new StartIdParam(t_startId);
             long beginTime = Environment.TickCount64;
-            long maxTime = 1000 * 3;
+            long maxTime = 1000 * 2;
             //And
             while (startId.isAnd())
             {
