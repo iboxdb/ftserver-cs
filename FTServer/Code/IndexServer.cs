@@ -174,7 +174,7 @@ namespace FTServer
                     {
                         addr = newIndices[i].GetDatabase().LocalAddress;
                         newIndices[i] = new ReadonlyIndexServer().GetInstance(addr).Get();
-                        ReadonlyIndexServer.DeleteOldSwap(addr);
+                        //ReadonlyIndexServer.DeleteOldSwap(addr);
                     }
 
                     App.Indices = newIndices;
