@@ -282,7 +282,7 @@ namespace FTServer
                     {
                         try
                         {
-                            c.TextContent += " " + c.TextContent + " ";
+                            c.TextContent = " " + c.TextContent + " ";
                         }
                         catch (Exception e)
                         {
