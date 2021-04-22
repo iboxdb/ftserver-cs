@@ -120,7 +120,7 @@ namespace FTServer
 
                 Page page = new Page();
                 page.url = url;
-                String text = replace(doc.Body.TextContent);
+                String text = replace(doc.Body.Text());
                 if (text.length() < 10)
                 {
                     //some website can't get html
@@ -278,7 +278,7 @@ namespace FTServer
             {
                 foreach (var c in doc.GetElementsByTagName(s))
                 {
-                    if (c.ChildNodes.Length == 1)
+                    if (c.ChildNodes.Length == 1 && c.ChildNodes[0].NodeType == NodeType.Text)
                     {
                         try
                         {
