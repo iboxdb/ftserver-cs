@@ -97,6 +97,24 @@ namespace FTServer
                     Log("XML " + url);
                     return null;
                 }
+
+                if (subUrls != null)
+                {
+                    var host = doc.BaseUrl.Host;
+                    var links = doc.QuerySelectorAll<IHtmlAnchorElement>("a[href]");
+                    foreach (var link in links)
+                    {
+                        //if (link.Host.Equals(host))
+                        {
+                            String ss = link.Href;
+                            if (ss != null && ss.length() > 8)
+                            {
+                                ss = getUrl(ss);
+                                subUrls.add(ss);
+                            }
+                        }
+                    }
+                }
                 //Log(doc.ToHtml());
                 fixSpan(doc);
 
@@ -121,24 +139,6 @@ namespace FTServer
                 page.text = text;
 
 
-
-                if (subUrls != null)
-                {
-                    var host = doc.BaseUrl.Host;
-                    var links = doc.QuerySelectorAll<IHtmlAnchorElement>("a[href]");
-                    foreach (var link in links)
-                    {
-                        //if (link.Host.Equals(host))
-                        {
-                            String ss = link.Href;
-                            if (ss != null && ss.length() > 8)
-                            {
-                                ss = getUrl(ss);
-                                subUrls.add(ss);
-                            }
-                        }
-                    }
-                }
 
                 String title = null;
                 String keywords = null;
@@ -274,11 +274,21 @@ namespace FTServer
                     c.Parent.RemoveElement(c);
                 }
             }
-            foreach (var c in doc.GetElementsByTagName("span"))
+            foreach (var s in new string[] { "span", "td", "th", "li", "a" })
             {
-                if (c.ChildNodes.Length == 1)
+                foreach (var c in doc.GetElementsByTagName(s))
                 {
-                    c.TextContent += " " + c.TextContent + " ";
+                    if (c.ChildNodes.Length == 1)
+                    {
+                        try
+                        {
+                            c.TextContent += " " + c.TextContent + " ";
+                        }
+                        catch (Exception e)
+                        {
+                            Log(e.ToString());
+                        }
+                    }
                 }
             }
         }
