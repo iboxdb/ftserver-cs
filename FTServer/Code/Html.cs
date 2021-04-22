@@ -274,7 +274,9 @@ namespace FTServer
                     c.Parent.RemoveElement(c);
                 }
             }
-            foreach (var s in new string[] { "span", "td", "th", "li", "a", "option", "p" })
+            foreach (var s in new string[] {
+                 "span", "td", "th", "li", "a", "option", "p", 
+                 "div", "h1","h2","h3","h4","h5", "pre" } )
             {
                 foreach (var c in doc.GetElementsByTagName(s))
                 {
