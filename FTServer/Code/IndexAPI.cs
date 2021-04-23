@@ -340,6 +340,7 @@ namespace FTServer
 
         public static long addPage(Page page)
         {
+            /*
             Page oldPage = GetOldPage(page.url);
             if (oldPage != null && oldPage.show)
             {
@@ -353,7 +354,7 @@ namespace FTServer
                     Log("Page is changed. " + page.url);
                 }
             }
-
+            */
             using (var box = App.Item.Cube())
             {
                 page.createTime = DateTime.Now;
