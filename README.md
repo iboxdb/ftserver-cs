@@ -19,6 +19,16 @@ dotnet run -c Release
 [Semantic-UI](http://semantic-ui.com/)
 
 
+#### Search Format
+
+[Word1 Word2 Word3] => text has **Word1** and **Word2** and **Word3**
+
+["Word1 Word2 Word3"] => text has **"Word1 Word2 Word3"** as a whole
+
+Search [https http] => get almost all pages
+
+
+
 ### The Results Order
 The results order based on the **id()** number in **class PageText**,  descending order.
 
@@ -30,13 +40,6 @@ Use the ID number to control the order instead of loading all pages to memory.
 Or load top 100 pages to memory then re-order it by favor. 
 
 
-#### Search Format
-
-[Word1 Word2 Word3] => text has **Word1** and **Word2** and **Word3**
-
-["Word1 Word2 Word3"] => text has **"Word1 Word2 Word3"** as a whole
-
-Search [https http] => get almost all pages
 
 #### Search Method
 search (... String keywords, long **startId**, long **count**)
@@ -45,6 +48,7 @@ search (... String keywords, long **startId**, long **count**)
 use (startId=Long.MaxValue) to read from the top, descending order
 
 **count** => records to read,  **important parameter**, the search speed depends on this parameter, not how big the data is.
+
 
 ##### Next Page
 set the startId as the last id from the results of search minus one
