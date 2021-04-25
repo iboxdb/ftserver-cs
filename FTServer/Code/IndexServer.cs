@@ -101,6 +101,7 @@ namespace FTServer
             {
                 CacheLength = MB(256);
                 SwapFileBuffer = (int)MB(20);
+                FileIncSize = (int)MB(20);
                 EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
 
                 EnsureTable<Page>("Page", "textOrder");
