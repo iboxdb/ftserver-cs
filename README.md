@@ -32,8 +32,9 @@ Search [https http] => get almost all pages
 
 
 
-### Develop Guide
+### Developer Guide
 
+[Download Visual Studio Code](https://code.visualstudio.com/)
 
 #### Dependencies
 
