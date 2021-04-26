@@ -1,9 +1,17 @@
-## Lightweight Full Text Search Server for CSharp
+## Full Text Search Lightweight Server for CSharp
 
-### Setup
 
-```s
-Download Project
+### User Guide
+
+#### Setup
+
+1. [Install NET5.0](https://dotnet.microsoft.com/download)
+
+2. Download this Project.
+
+3. Run
+
+```sh
 cd FTServer
 dotnet run -c Release
 ```
@@ -11,12 +19,7 @@ dotnet run -c Release
 ![](../../../../iboxdb/ftserver/raw/master/FTServer/src/main/webapp/css/fts.png)
 
 
-### Dependencies
-[iBoxDB](http://www.iboxdb.com/)
-
-[AngleSharp](https://github.com/AngleSharp/AngleSharp)
-
-[Semantic-UI](http://semantic-ui.com/)
+Input a Full URL to index the Page, then search.
 
 
 #### Search Format
@@ -29,7 +32,20 @@ Search [https http] => get almost all pages
 
 
 
-### The Results Order
+### Develop Guide
+
+
+#### Dependencies
+
+[iBoxDB](http://www.iboxdb.com/)
+
+[AngleSharp](https://github.com/AngleSharp/AngleSharp)
+
+[Semantic-UI](http://semantic-ui.com/)
+
+
+
+#### The Results Order
 The results order based on the **id()** number in **class PageText**,  descending order.
 
 A Page has many PageTexts. if don't need multiple Texts, modify **Html.getDefaultTexts(Page)**, returns only one PageText.
@@ -53,7 +69,7 @@ use (startId=Long.MaxValue) to read from the top, descending order
 ##### Next Page
 set the startId as the last id from the results of search minus one
 
-```java
+```cs
 startId = search( "keywords", startId, count);
 nextpage_startId = startId - 1 // this 'minus one' has done inside search()
 ...
@@ -83,7 +99,8 @@ return page;
 ```
 
 
-#### Maximum Opened Files
+#### Set Maximum Opened Files
+
 
 ```sh
 [user@localhost ~]$ cat /proc/sys/fs/file-max
@@ -106,8 +123,6 @@ root      soft    nofile      500000
 ```
 
 
-#### Tools
-Linux + ASP.NET Core
 
 #### More
 [Transplant from Full Text Search Java JSP Version](https://github.com/iboxdb/ftserver)
