@@ -89,7 +89,8 @@ namespace FTServer
                        return false;
                    });
                });
-                   webBuilder.UseStartup<Startup>();
+                   webBuilder.UseStartup<Startup>()
+                   .UseUrls("http://*:5000");
                });
     }
 

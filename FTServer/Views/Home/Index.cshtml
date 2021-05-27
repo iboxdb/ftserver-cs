@@ -1,69 +1,63 @@
 ﻿@{
     ViewData["Title"] = "iBoxDB";
 
-    DateTime begin = DateTime.Now; 
+    DateTime begin = DateTime.Now;
 }
 
 @section Styles{
-            <style>
-            td{ 
-                white-space:nowrap; 
-                overflow: hidden
-            }
+<style>
+    body {
+        margin-top: 10px;
+        max-width: 95%;
+    }
 
-            body {
-                margin-top: 10px;
-                overflow:hidden;
-            }
-     
-            .column {
-                max-width: 60%;
-            }
-
-        </style> 
+    .column {
+        max-width: 95%;
+    }
+</style>
 }
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
 
- <div class="ui middle aligned center aligned grid">
-            <div class="column" >
-
-                <h2 class="ui teal header" > 
-                    <i class="disk outline icon" style="font-size:82px"></i> Full Text Search Server
-                </h2>
-                <form class="ui large form"  action="About"  onsubmit="formsubmit()"  >
-                    <div class="ui label input">
-                        <div class="ui action input">
-                            <input name="q"  value=""  onfocus="formfocus()" required  dir="auto" />
-                            <input id="btnsearch" type="submit"  class="ui teal right button big" 
-                                   value="Search"    /> 
-                        </div> 
-                    </div>
-                </form>
-                <script>
-                    function formsubmit() {
-                       document.getElementById('btnsearch').disabled = "disabled";
-                    }
-                    function formfocus() {
-                        document.getElementById('btnsearch').disabled = undefined;
-                    }
-                </script>
-
-                <div class="ui message" style="text-align: left">
-                    Input [KeyWord] to search,  input [URL http or https] to index <br /> 
-                    <br />Recent Searches:<br />
-                    @foreach (var t in IndexPage.getSearchTerm(10)) {
-                        var str = t.keywords;
-                    @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp; 
-                    }
-                    
-               
-                    
-                    <br /><br /><a  href="./">Refresh Discoveries</a>:&nbsp; 
-   					@foreach (String str in IndexPage.discover()) {
-                    @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp; 
-                    }
- 
-                    
+        <h2 class="ui teal header">
+            <i class="disk outline icon" style="font-size:82px"></i> Full Text Search Server
+        </h2>
+        <form class="ui large form" action="About" onsubmit="formsubmit()">
+            <div class="ui label input">
+                <div class="ui action input">
+                    <input name="q" value="" onfocus="formfocus()" required dir="auto" />
+                    <input id="btnsearch" type="submit" class="ui teal right button big" value="Search" />
                 </div>
-Load Time:  @((DateTime.Now - begin).TotalSeconds)  s
             </div>
+        </form>
+        <script>
+            function formsubmit() {
+                document.getElementById('btnsearch').disabled = "disabled";
+            }
+            function formfocus() {
+                document.getElementById('btnsearch').disabled = undefined;
+            }
+        </script>
+
+        <div class="ui message" style="text-align: left">
+            Input [KeyWord] to search, input [URL http or https] to index <br />
+            <br /> <br />
+            @foreach (var t in IndexPage.getSearchTerm(10))
+            {
+                var str = t.keywords;
+                @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp;
+            }
+
+
+
+            <br /><br /><a href="./">Refresh Discoveries</a>:&nbsp; <br />
+            @foreach (String str in IndexPage.discover())
+            {
+                @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp;
+            }
+
+
         </div>
+        Load Time: @((DateTime.Now - begin).TotalSeconds) s
+    </div>
+</div>

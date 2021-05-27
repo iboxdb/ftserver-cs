@@ -1,162 +1,164 @@
 ﻿@model AboutModel
- 
+
 @{
     ViewData["Title"] = Model.Result.Query.Replace("\"", "") + ",";
 }
 
 @section Styles{
-            <style>
-            body {
-                margin-top: 10px;
-                margin-left: 10px;
-                font-weight:lighter;
-                overflow-x: hidden;
-            }
-            .stext{
+<style>
+    body {
+        margin-top: 10px;
+        max-width: 95%;
+    }
 
-            }
-            .rt{
-                color: red;
-            }
-            .gt{
-                color: green;
-            }
-            .gtt{
-                 color: #4092cc;
-            }
-            .spartcss{
-                max-width: 600px;
-                white-space: normal;
-                overflow: visible;
-                text-overflow:ellipsis;
-            }
-            .kw{
-                background-color: #eee;
-            }
-            .rtl{
-                text-align: initial !important;
-            }
-        </style>
+    .column {
+        max-width: 95%;
+    }
+
+    .stext {}
+
+    .rt {
+        color: red;
+    }
+
+    .gt {
+        color: green;
+    }
+
+    .gtt {
+        color: #4092cc;
+    }
+
+    .spartcss {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: ellipsis;
+    }
+
+    .kw {
+        background-color: #eee;
+    }
+
+    .rtl {
+        text-align: initial !important;
+    }
+</style>
 }
 
 
 @section Scripts{
-            <script>
-                var extitle = "";
-                //it's a simple highlight method, can find some better JS to replace it.
-            function highlight(loadedDivId) {
-                //KeyWords,
-                var txt = document.title.substr(0, document.title.indexOf(','));
-                txt +=  (" " + extitle);
-                //Text
-                var div = document.getElementById(loadedDivId);
-                var ts = div.getElementsByClassName("stext");
+<script>
+    var extitle = "";
+    //it's a simple highlight method, can find some better JS to replace it.
+    function highlight(loadedDivId) {
+        //KeyWords,
+        var txt = document.title.substr(0, document.title.indexOf(','));
+        txt += (" " + extitle);
+        //Text
+        var div = document.getElementById(loadedDivId);
+        var ts = div.getElementsByClassName("stext");
 
-                var kws = txt.split(/[ 　]/);
-                for (var i = 0; i < kws.length; i++) {
-                    var kw = String(kws[i]).trim();
-                    if (kw.length < 1) {
-                        continue;
-                    }
-                    var fontText = "<font class='rt'>";
-                    if (fontText.indexOf(kw.toLowerCase()) > -1) {
-                        continue;
-                    }
-                    if ("</font>".indexOf(kw.toLowerCase()) > -1) {
-                        continue;
-                    }
-                    for (var j = 0; j < ts.length; j++) {
-                        var html = ts[j].innerHTML;
-                        ts[j].innerHTML =
-                                html.replace(new RegExp(kw, 'gi'),
-                                        fontText + kw + "</font>");
-                    }
-                }
+        var kws = txt.split(/[ 　]/);
+        for (var i = 0; i < kws.length; i++) {
+            var kw = String(kws[i]).trim();
+            if (kw.length < 1) {
+                continue;
             }
-        </script>
-        <script>
-            var div_load = null;
-            document.addEventListener("scroll", function () {
-                scroll_event();
-            });
-            function onscroll_loaddiv(divid, startId) {
-                div_load = document.getElementById(divid);
-                div_load.startId = startId;
-                scroll_event();
+            var fontText = "<font class='rt'>";
+            if (fontText.indexOf(kw.toLowerCase()) > -1) {
+                continue;
             }
-            function scroll_event() {
-                if (div_load !== null) {
-                    var top = div_load.getBoundingClientRect().top;
-                    var se = document.documentElement.clientHeight;
+            if ("</font>".indexOf(kw.toLowerCase()) > -1) {
+                continue;
+            }
+            for (var j = 0; j < ts.length; j++) {
+                var html = ts[j].innerHTML;
+                ts[j].innerHTML =
+                    html.replace(new RegExp(kw, 'gi'),
+                        fontText + kw + "</font>");
+            }
+        }
+    }
+</script>
+<script>
+    var div_load = null;
+    document.addEventListener("scroll", function () {
+        scroll_event();
+    });
+    function onscroll_loaddiv(divid, startId) {
+        div_load = document.getElementById(divid);
+        div_load.startId = startId;
+        scroll_event();
+    }
+    function scroll_event() {
+        if (div_load !== null) {
+            var top = div_load.getBoundingClientRect().top;
+            var se = document.documentElement.clientHeight;
 
-                    top = top - 1000;
-                    if (top <= se) {
-                        var startId = div_load.startId;
-                        div_load = null;
-                        var xhr = new XMLHttpRequest();
-                        xhr.onreadystatechange = function () {
-                            if (xhr.readyState == XMLHttpRequest.DONE) {
-                                var html = xhr.responseText;
+            top = top - 1000;
+            if (top <= se) {
+                var startId = div_load.startId;
+                div_load = null;
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        var html = xhr.responseText;
 
-                                var frag = document.createElement("div");
-                                frag.innerHTML = html;
-                                var maindiv = document.getElementById('maindiv');
-                                maindiv.appendChild(frag);
+                        var frag = document.createElement("div");
+                        frag.innerHTML = html;
+                        var maindiv = document.getElementById('maindiv');
+                        maindiv.appendChild(frag);
 
-                                var ss = frag.getElementsByTagName("script");
-                                for (var i = 0; i < ss.length; i++) {
-                                    eval(ss[i].innerHTML);
-                                }
-                            }
+                        var ss = frag.getElementsByTagName("script");
+                        for (var i = 0; i < ss.length; i++) {
+                            eval(ss[i].innerHTML);
                         }
-                        var url = "Result?q=@Html.Raw(UrlEncoder.Default.Encode(Model.Result.Query))" + "&s=" + startId;
-                        xhr.open('GET', url, true);
-                        xhr.send(null);
                     }
                 }
+                var url = "Result?q=@Html.Raw(UrlEncoder.Default.Encode(Model.Result.Query))" + "&s=" + startId;
+                xhr.open('GET', url, true);
+                xhr.send(null);
             }
-            function onload_event(){
-               onscroll_loaddiv('maindiv',  '@long.MaxValue' );
-            }
-        </script>
+        }
+    }
+    function onload_event() {
+        onscroll_loaddiv('maindiv', '@long.MaxValue');
+    }
+</script>
 }
 
 
-   <div class="ui left aligned grid">
-            <div class="column"  style="max-width: 600px;"> 
-                <form class="ui large form"  action="About" onsubmit="formsubmit()">
-                    <div class="ui label input">
+<div class="ui center aligned grid">
+    <div class="column">
+        <form class="ui large form" action="About" onsubmit="formsubmit()">
+            <div class="ui label input">
 
-                        <div class="ui action input">
-                            <a href="./"><i class="teal disk outline icon" style="font-size:42px"></i> </a>
-                            <input name="q"  value="@Model.Result.Query" required onfocus="formfocus()"  dir="auto" />
-                            <input id="btnsearch" type="submit"  class="ui teal right button" value="Search" /> 
-                        </div>
-                    </div>
-                </form> 
-                <script>
-                    function formsubmit() {
-                        document.getElementById('btnsearch').disabled = "disabled";
-                    }
-                    function formfocus() {
-                        document.getElementById('btnsearch').disabled = undefined;
-                    }
-                </script>
+                <div class="ui action input">
+                    <input name="q" value="@Model.Result.Query" required onfocus="formfocus()" dir="auto" />
+                    <input id="btnsearch" type="submit" class="ui teal right button" value="Search" />
+                </div>
             </div>
-        </div>
+        </form>
+        <script>
+            function formsubmit() {
+                document.getElementById('btnsearch').disabled = "disabled";
+            }
+            function formfocus() {
+                document.getElementById('btnsearch').disabled = undefined;
+            }
+        </script>
+    </div>
+</div>
 
-        <div class="rtl ui grid">
-            <div class="ten wide column" style="max-width: 600px;" id="maindiv">
-               @{
-                   //Html.RenderPartial( "ResultPartial",  @Model.Result );
-                }
-                <partial name="ResultPartial" for="Result"></partial>
-            </div>
-            <div class="six wide column" style="max-width: 200px;">
-                <div class="ui segment">
-                    <h4>Full Text Search</h4> 
-                </div> 
- 
+<div class="ui center aligned grid">
+    <div class="rtl column" id="maindiv">
+        @{
+            //Html.RenderPartial( "ResultPartial", @Model.Result );
+        }
+        <partial name="ResultPartial" for="Result"></partial>
+    </div>
+</div>
 
-            </div>
-        </div>
+<div class="ui center aligned grid">
+    <a href="./"><i class="teal disk outline icon" style="font-size:70px"></i></a>
+</div>

@@ -23,7 +23,7 @@
       }
       bool isdesc = p.priority >= PageText.descriptionPriority;
       String content = isdesc ? p.text
-        : IndexPage.getDesc(p.text, p.keyWord, 150);
+      : IndexPage.getDesc(p.text, p.keyWord, 150);
 
       if (content.Length < 200 && p.page != null)
       {
@@ -62,7 +62,7 @@
   }
 </div>
 
-<div class="ui teal message" id='@Html.Raw("s" + @Model.IdToString())'>
+<div class="ui teal message" id='@Html.Raw("s" + @Model.IdToString())' dir="auto">
   @{
     String tcontent = (DateTime.Now - Model.begin).TotalSeconds + "s, "
       + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
@@ -86,10 +86,10 @@
 <script>
   setTimeout(function () {
     highlight('@Html.Raw( "ldiv" + @Model.IdToString() )');
-    @if (!@Model.IsEnd())
+  @if (!@Model.IsEnd())
   {
     //startId is a big number, in javascript, have to write big number as a 'String'
-        @:onscroll_loaddiv('@Html.Raw( "s" + @Model.IdToString() )', '@Model.IdToString()');
+    @:onscroll_loaddiv('@Html.Raw( "s" + @Model.IdToString() )', '@Model.IdToString()');
 
   }
     }, 100);
