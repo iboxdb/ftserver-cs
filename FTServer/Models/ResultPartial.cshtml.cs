@@ -78,9 +78,13 @@ namespace FTServer.Models
 
         public void Init()
         {
-            if (StartId == null) { StartId = new long[] { long.MaxValue }; }
+            if (StartId == null)
+            {
+                StartId = new long[] { long.MaxValue };
+            }
 
             isFirstLoad = StartId[0] == long.MaxValue;
+            if (isFirstLoad) { pageCount = 1; }
 
             pages = new List<PageText>();
 
@@ -88,10 +92,6 @@ namespace FTServer.Models
 
             StartId = IndexAPI.Search(pages, Query, StartId, pageCount);
 
-            if (isFirstLoad && pages.Count == 0)
-            {
-
-            }
         }
     }
 }
