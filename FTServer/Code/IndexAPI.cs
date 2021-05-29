@@ -145,9 +145,14 @@ namespace FTServer
             name = name.Trim();
             if (name.Length > 150) { return new long[] { -1, -1, -1 }; }
 
+            long maxTime = 1000 * 2;
+            if (pageCount == 1)
+            {
+                maxTime = 500;
+            }
             StartIdParam startId = new StartIdParam(t_startId);
             long beginTime = Environment.TickCount64;
-            long maxTime = 1000 * 2;
+
             //And
             while (startId.isAnd())
             {
