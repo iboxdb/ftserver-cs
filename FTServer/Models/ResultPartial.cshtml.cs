@@ -20,7 +20,7 @@ namespace FTServer.Models
         public bool isFirstLoad;
 
         // reset in ResultPartial.cshtml
-        public long pageCount = 4;
+        public long pageCount = 8;
 
 
         public String IdToString()

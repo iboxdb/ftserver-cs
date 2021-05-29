@@ -10,18 +10,21 @@
         margin-top: 10px;
         padding: 20px;
     }
-    .grid{
+
+    .grid {
         max-width: 100%;
-        width:100%;
+        width: 100%;
         text-align: center;
     }
 
-    .stext{
-        font-size: 22px; 
+    .stext {
+        font-size: 22px;
     }
-    .stext_s{
-        font-size: 18px; 
+
+    .stext_s {
+        font-size: 18px;
     }
+
     .rt {
         color: red;
     }
@@ -46,6 +49,10 @@
 
     .rtl {
         text-align: initial !important;
+    }
+
+    #maindiv {
+        overflow-x: hidden;
     }
 </style>
 }
@@ -100,7 +107,7 @@
             var top = div_load.getBoundingClientRect().top;
             var se = document.documentElement.clientHeight;
 
-            top = top - 1000;
+            top = top - 500;
             if (top <= se) {
                 var startId = div_load.startId;
                 div_load = null;
@@ -157,7 +164,7 @@
 
 <div class="grid">
     <div class="rtl column" id="maindiv">
-    <br>
+        <br>
         @{
             //Html.RenderPartial( "ResultPartial", @Model.Result );
         }
