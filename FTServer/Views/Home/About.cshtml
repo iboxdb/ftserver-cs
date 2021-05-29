@@ -8,15 +8,20 @@
 <style>
     body {
         margin-top: 10px;
-        max-width: 95%;
+        padding: 20px;
+    }
+    .grid{
+        max-width: 100%;
+        width:100%;
+        text-align: center;
     }
 
-    .column {
-        max-width: 95%;
+    .stext{
+        font-size: 22px; 
     }
-
-    .stext {}
-
+    .stext_s{
+        font-size: 18px; 
+    }
     .rt {
         color: red;
     }
@@ -128,7 +133,7 @@
 }
 
 
-<div class="ui center aligned grid">
+<div class="grid">
     <div class="column">
         <form class="ui large form" action="About" onsubmit="formsubmit()">
             <div class="ui label input">
@@ -150,8 +155,9 @@
     </div>
 </div>
 
-<div class="ui center aligned grid">
+<div class="grid">
     <div class="rtl column" id="maindiv">
+    <br>
         @{
             //Html.RenderPartial( "ResultPartial", @Model.Result );
         }
@@ -159,6 +165,6 @@
     </div>
 </div>
 
-<div class="ui center aligned grid">
+<div class="grid">
     <a href="./"><i class="teal disk outline icon" style="font-size:70px"></i></a>
 </div>

@@ -8,15 +8,17 @@
 <style>
     body {
         margin-top: 10px;
-        max-width: 95%;
+        padding: 10px;
     }
 
-    .column {
-        max-width: 95%;
+    .grid{
+        max-width: 100%;
+        width:100%;
+        text-align: center;
     }
 </style>
 }
-<div class="ui middle aligned center aligned grid">
+<div class="grid">
     <div class="column">
 
         <h2 class="ui teal header">
@@ -39,7 +41,7 @@
             }
         </script>
 
-        <div class="ui message" style="text-align: left">
+        <div class="ui message" style="text-align: left; font-size: 20px">
             Input [KeyWord] to search, input [URL http or https] to index <br />
             <br /> <br />
             @foreach (var t in IndexPage.getSearchTerm(10))
