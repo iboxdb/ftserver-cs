@@ -1,4 +1,5 @@
-﻿using System;
+﻿/* iBoxDB FTServer Bruce Yang CL */
+using System;
 using System.Collections.Generic;
 using System.Text;
 using IBoxDB.LocalServer;

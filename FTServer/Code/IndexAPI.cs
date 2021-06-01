@@ -1,3 +1,4 @@
+/* iBoxDB FTServer Bruce Yang CL */
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -243,7 +244,7 @@ namespace FTServer
                 for (int i = 0; i < ors.size(); i++)
                 {
                     StringBuilder sbkw = ors.get(i);
-                    if (sbkw == null || sbkw.Length < 2)
+                    if (sbkw == null || sbkw.Length < 1)
                     {
                         iters[i] = null;
                         continue;
