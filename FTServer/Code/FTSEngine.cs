@@ -930,6 +930,21 @@ namespace FTServer
         {
             return o.Equals(o2);
         }
+
+        public static int length(this StringBuilder self)
+        {
+            return self.Length;
+        }
+
+        public static char charAt(this StringBuilder self, int pos)
+        {
+            return self[pos];
+        }
+
+        public static void insert(this StringBuilder self, int pos, char c)
+        {
+            self.Insert(pos, c);
+        }
         public static bool isEmpty(this String self)
         {
             return self.Length == 0;
