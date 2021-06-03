@@ -142,7 +142,7 @@
                         }
                     }
                 }
-                var url = "Result?q=@Html.Raw(UrlEncoder.Default.Encode(Model.Result.Query))" + "&s=" + startId;
+                var url = "Result?q=@Html.Raw(System.Net.WebUtility.UrlEncode(Model.Result.Query))" + "&s=" + startId;
                 xhr.open('GET', url, true);
                 xhr.send(null);
             }
