@@ -16,7 +16,7 @@ namespace FTServer.Controllers
         private static String book2_path = "/home/user/github/phoenix.txt";
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Index(int book = 0, float start = 0, int length = 2000)
+        public IActionResult Index(int book = 0, float start = 0, int length = 2000, string ex = "")
         {
             if (Books == null)
             {
@@ -62,7 +62,7 @@ namespace FTServer.Controllers
                 text += "  " + DateTime.Now;
             }
             m.Text = text;
-
+            m.Ex = ex;
             return View(m);
         }
     }

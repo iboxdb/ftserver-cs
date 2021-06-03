@@ -12,14 +12,7 @@
 @functions {
   String decodeTry(String str)
   {
-    try
-    {
-      return System.Net.WebUtility.UrlDecode(str);
-    }
-    catch
-    {
-      return str;
-    }
+    return PageText.decodeTry(str);
   }
 }
 

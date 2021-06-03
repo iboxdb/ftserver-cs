@@ -82,10 +82,21 @@ namespace FTServer
 
             if (priority == contextPriority)
             {
-                return text + " " + url;
+                return text + " " + decodeTry(url);
             }
 
             return text;
+        }
+        public static String decodeTry(String str)
+        {
+            try
+            {
+                return System.Net.WebUtility.UrlDecode(str);
+            }
+            catch
+            {
+                return str;
+            }
         }
 
         [NotColumn]
