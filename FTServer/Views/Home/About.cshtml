@@ -1,7 +1,7 @@
 ﻿@model AboutModel
 
 @{
-    ViewData["Title"] = Model.Result.Query.Replace("\"", "") + ",";
+    ViewData["Title"] = Model.Result.Query.Replace("\"", " ") + ",";
 }
 
 @section Styles{
@@ -43,11 +43,7 @@
         color: #4092cc;
     }
 
-    .spartcss {
-        white-space: normal;
-        overflow: visible;
-        text-overflow: ellipsis;
-    }
+    .spartcss {}
 
     .kw {
         background-color: #eee;
@@ -58,7 +54,7 @@
     }
 
     #maindiv {
-        overflow-x: hidden;
+        overflow-x: hidden !important;
     }
 </style>
 }
