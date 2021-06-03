@@ -9,6 +9,20 @@
   Model.Init();
 }
 
+@functions {
+  String decodeTry(String str)
+  {
+    try
+    {
+      return System.Net.WebUtility.UrlDecode(str);
+    }
+    catch
+    {
+      return str;
+    }
+  }
+}
+
 <div id='@Html.Raw( "ldiv" + @Model.IdToString() )'>
   @{
     var pages = Model.pages;
@@ -32,9 +46,9 @@
       String[] keywords = p.keywords.Split(" ");
 
 
-      <h3>
-        <div class="spartcss" dir="auto"><a class="stext" target="_blank" href="@p.url">@p.title</a></div>
-      </h3>
+
+      <div class="spartcss" dir="auto"><a class="stext" target="_blank" href="@p.url">@p.title</a></div>
+
       <div class="stext" dir="auto"> @content </div>
       var css = isdesc ? "gt" : "gtt";
 
@@ -47,17 +61,24 @@
         {
           <text>*</text>
         }
-        @p.url
+
+        @decodeTry(p.url)
+
         @p.createTime
-        <br>
+
+        @if (keywords.Length > 0)
+        {
+          @: <br>
+        }
         @foreach (var tkw in keywords)
         {
           var kw = tkw.Trim();
           if (kw == null || kw.Length < 1) { continue; }
-          <a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(kw))" class="@css kw stext_s"> &nbsp; @kw &nbsp; </a>
+          <a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(kw))" class="@css kw stext_s"> &nbsp; @kw &nbsp; </a>
           <text> &nbsp; </text>
         }
       </div>
+      <br>
     }
   }
 </div>
@@ -82,7 +103,7 @@
       </b></a>
   }
 </div>
-
+<br>
 <script>
   setTimeout(function () {
     highlight('@Html.Raw( "ldiv" + @Model.IdToString() )');

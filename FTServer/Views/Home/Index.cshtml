@@ -11,9 +11,9 @@
         padding: 10px;
     }
 
-    .grid{
+    .grid {
         max-width: 100%;
-        width:100%;
+        width: 100%;
         text-align: center;
     }
 </style>
@@ -47,7 +47,7 @@
             @foreach (var t in IndexPage.getSearchTerm(10))
             {
                 var str = t.keywords;
-                @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp;
+                @:<a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(str))">[@str]</a> &nbsp;
             }
 
 
@@ -55,7 +55,7 @@
             <br /><br /><a href="./">Refresh Discoveries</a>:&nbsp; <br />
             @foreach (String str in IndexPage.discover())
             {
-                @:<a href="About?q=@Html.Raw(UrlEncoder.Default.Encode(str))">@str</a>. &nbsp;
+                @:<a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(str))">[@str]</a> &nbsp;
             }
 
 
