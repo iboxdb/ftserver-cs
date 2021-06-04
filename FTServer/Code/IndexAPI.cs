@@ -159,11 +159,13 @@ namespace FTServer
             }
         }
 
+        public static readonly string IndexingMessage = "BackgroundIndexRunning-SeeConsoleOutput";
         public static long[] Search(List<PageText> outputPages,
                 String name, long[] t_startId, long pageCount)
         {
             name = name.Trim();
-            if (name.length() == 0 || name.Length > 150) { return new long[] { -1, -1, -1 }; }
+            if (name.length() == 0 || name.Length > 150 || name == IndexingMessage) { return new long[] { -1, -1, -1 }; }
+
 
             long maxTime = 1000 * 2;
             if (pageCount == 1)
