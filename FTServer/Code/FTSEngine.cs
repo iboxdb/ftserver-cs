@@ -767,7 +767,7 @@ namespace FTServer
                     end = str.length();
                 }
                 sb.append(str.substring(start, end))
-                    .append("...");
+                    .append("... ");
             }
             return sb.ToString();
 
