@@ -129,7 +129,7 @@ namespace FTServer
                     }
                 }
 
-                if (ors.Count > 16 || stringEqual(ors[3].ToString(), ors[4].ToString()))
+                if (ors.Count > 16 || ors.size() < 5 || stringEqual(ors[3].ToString(), ors[4].ToString()))
                 {
                     for (int i = 0; i < startId.Length; i++)
                     {
