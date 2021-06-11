@@ -756,7 +756,7 @@ namespace FTServer
                 {
                     continue;
                 }
-                if ((start + len) >= str.length())
+                if (start >= str.length())
                 {
                     continue;
                 }
