@@ -75,7 +75,6 @@ namespace FTServer
             {
                 try
                 {
-
                     foreach (var nw in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
                     {
                         if (nw.AddressFamily == AddressFamily.InterNetwork)
@@ -83,6 +82,13 @@ namespace FTServer
                             Console.WriteLine("http://" + nw.ToString() + ":" + App.HttpPort);
                         }
                     }
+                }
+                catch
+                {
+
+                }
+                try
+                {
 
                     var resultsPath = "http://127.0.0.1:" + App.HttpPort;
                     Console.WriteLine("use Browser to Open " + resultsPath);
