@@ -16,6 +16,14 @@
         width: 100%;
         text-align: center;
     }
+
+    .message {
+        overflow-x: hidden;
+    }
+
+    .abw {
+        word-wrap: break-word;
+    }
 </style>
 }
 <div class="grid">
@@ -42,11 +50,15 @@
         </script>
 
         <div class="ui message" style="text-align: left; font-size: 20px">
-            Input [KeyWord] to search, input [URL http or https] to index <br />
-            <br /> <br />
+            <a href="Admin" target="ADMIN_FTSERVER">Add Page Index</a> <br>
+            <br />
             @foreach (var t in IndexPage.getSearchTerm(10))
             {
                 var str = t.keywords;
+                if (str.Equals(IndexPage.SystemShutdown))
+                {
+                    continue;
+                }
                 @:<a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(str))">[@str]</a> &nbsp;
             }
 
@@ -57,8 +69,8 @@
             {
                 @:<a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(str))">[@str]</a> &nbsp;
             }
-
-
+            <br>
+            <br>
         </div>
         Load Time: @((DateTime.Now - begin).TotalSeconds) s
     </div>

@@ -28,15 +28,21 @@
       {
         continue;
       }
+      int minSize = 200;
+      if (p.keyWord is KeyWordE)
+      {
+        minSize = 300;
+      }
       bool isdesc = p.priority >= PageText.descriptionPriority;
       String content = isdesc ? p.text
-      : IndexPage.getDesc(p.text, p.keyWord, 150);
+      : IndexPage.getDesc(p.text, p.keyWord, minSize - 20);
 
-      if (content.Length < 200 && p.page != null)
+      if (content.Length < minSize && p.page != null)
       {
-        content += "... " + p.page.getRandomContent(200);
+        content += "... " + p.page.getRandomContent(minSize);
       }
-      String[] keywords = p.keywords.Split(" ");
+      String sp = p.keywords.IndexOf(',') > 0 ? "," : " ";
+      String[] keywords = p.keywords.Split(sp);
 
 
 
@@ -67,6 +73,10 @@
         {
           var kw = tkw.Trim();
           if (kw == null || kw.Length < 1) { continue; }
+          if (kw.IndexOf(" ") > 0)
+          {
+            kw = "\"" + kw + "\"";
+          }
           <a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(kw))" class="@css kw stext_s"> &nbsp; @kw &nbsp; </a>
           <text> &nbsp; </text>
         }

@@ -21,15 +21,21 @@ namespace FTServer.Controllers
             if (Books == null)
             {
                 String[] tmp = new String[2];
+                if (System.IO.File.Exists(book1_path) && System.IO.File.Exists(book2_path))
+                {
+                    StreamReader sr = new StreamReader(book1_path);
+                    tmp[0] = sr.ReadToEnd();
+                    sr.Close();
 
-                StreamReader sr = new StreamReader(book1_path);
-                tmp[0] = sr.ReadToEnd();
-                sr.Close();
-
-                sr = new StreamReader(book2_path);
-                tmp[1] = sr.ReadToEnd();
-                sr.Close();
-
+                    sr = new StreamReader(book2_path);
+                    tmp[1] = sr.ReadToEnd();
+                    sr.Close();
+                }
+                else
+                {
+                    tmp[0] = RamdomBook(0x4E00, 0x9FFF, (int)'　', 150, 600000);
+                    tmp[1] = RamdomBook(0x0061, 0x007A, (int)' ', 16, 1000000);
+                }
                 Books = tmp;
             }
 
@@ -64,6 +70,25 @@ namespace FTServer.Controllers
             m.Text = text;
             m.Ex = ex;
             return View(m);
+        }
+
+        private static String RamdomBook(int startChar, int endChar, int emptyChar, int emptylen, int maxlen)
+        {
+            Random ran = new Random();
+            char[] cs = new char[maxlen];
+            for (int i = 0; i < cs.Length; i++)
+            {
+                if (ran.nextInt(emptylen) == 0)
+                {
+                    cs[i] = (char)emptyChar;
+                }
+                else
+                {
+                    char c = (char)(ran.nextInt(endChar - startChar) + startChar);
+                    cs[i] = c;
+                }
+            }
+            return new String(cs);
         }
     }
 

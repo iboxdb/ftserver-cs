@@ -37,44 +37,42 @@ namespace FTServer
 
     public class ReadonlyIndexServer : LocalDatabaseServer
     {
+
+        public bool OutOfCache = false;
         protected override DatabaseConfig BuildDatabaseConfig(long address)
         {
-            return new ReadonlyConfig(address);
+            return new ReadonlyConfig(address, OutOfCache);
         }
-        private class ReadonlyConfig : ReadonlyStreamConfig
+        public class ReadonlyConfig : ReadonlyStreamConfig
         {
             private long address;
-            public ReadonlyConfig(long address) : base(GetStreamsImpl(address))
+            public bool OutOfCache;
+            public ReadonlyConfig(long address, bool outOfCache) : base(GetStreamsImpl(address, outOfCache))
             {
                 this.address = address;
-                this.CacheLength = MB(32);
+                this.OutOfCache = outOfCache;
+                this.CacheLength = Config.Readonly_CacheLength;
+                if (this.CacheLength < Config.lowReadonlyCache)
+                {
+                    this.CacheLength = Config.SwitchToReadonlyIndexLength / 5 + 1;
+                }
             }
 
-            private static Stream[] GetStreamsImpl(long address)
+            private static Stream[] GetStreamsImpl(long address, bool outOfCache)
             {
                 string pa = BoxFileStreamConfig.RootPath + ReadonlyStreamConfig.GetNameByAddrDefault(address);
-                return new Stream[] { new FileStream(pa, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
-                 new FileStream(pa, FileMode.Open, FileAccess.Read, FileShare.ReadWrite) };
+                Stream[] os = new Stream[outOfCache ? 1 : 2];
+                for (int i = 0; i < os.Length; i++)
+                {
+                    os[i] = new FileStream(pa, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                }
+                return os;
             }
 
-        }
-        public static void DeleteOldSwap(long address)
-        {
-            string pa = BoxFileStreamConfig.RootPath + ReadonlyStreamConfig.GetNameByAddrDefault(address);
-            pa += ".swp";
-            try
-            {
-                File.Delete(pa);
-            }
-            catch
-            {
-                Log("Can't Delete " + pa);
-            }
         }
     }
     public class IndexServer : LocalDatabaseServer
     {
-        public static long SwitchToReadonlyIndexLength = 1024L * 1024L * 500L * 1L;
         public static long ItemDB = 2L;
 
         public static long IndexDBStart = 10L;
@@ -99,9 +97,9 @@ namespace FTServer
         {
             public ItemConfig()
             {
-                CacheLength = MB(256);
-                SwapFileBuffer = (int)MB(20);
-                FileIncSize = (int)MB(20);
+                CacheLength = Config.ItemConfig_CacheLength;
+                SwapFileBuffer = Config.ItemConfig_SwapFileBuffer;
+                FileIncSize = Config.ItemConfig_SwapFileBuffer;
                 EnsureTable<PageSearchTerm>("/PageSearchTerm", "time", "keywords(" + PageSearchTerm.MAX_TERM_LENGTH + ")", "uid");
 
                 EnsureTable<Page>("Page", "textOrder");
@@ -117,10 +115,17 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                int lenMB = (int)(SwitchToReadonlyIndexLength / 1024L / 1024L);
-                CacheLength = MB(lenMB);
-                SwapFileBuffer = (int)MB(20);
-                Log("DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
+                CacheLength = Config.SwitchToReadonlyIndexLength;
+                SwapFileBuffer = Config.ItemConfig_SwapFileBuffer;
+                if (SwapFileBuffer < FileIncSize)
+                {
+                    FileIncSize = SwapFileBuffer;
+                }
+                if (CacheLength == Config.SwitchToReadonlyIndexLength)
+                {
+                    //ReadStreamCount = 1;
+                }
+                Log("Index DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 new Engine().Config(this);
 
             }
@@ -159,27 +164,17 @@ namespace FTServer
             public override void Flush()
             {
                 base.Flush();
-                if (length > IndexServer.SwitchToReadonlyIndexLength)
+                if (length > Config.SwitchToReadonlyIndexLength)
                 {
 
-                    var newIndices = new List<AutoBox>(App.Indices);
-                    newIndices.RemoveAt(newIndices.Count - 1);
-
+                    App.Indices.switchIndexToReadonly();
                     long addr = App.Index.GetDatabase().LocalAddress;
-                    newIndices.Add(new ReadonlyIndexServer().GetInstance(addr).Get());
                     addr++;
                     Log("\r\nSwitch To DB (" + addr + ")");
-                    newIndices.Add(new IndexServer().GetInstance(addr).Get());
+                    App.Indices.add(addr, false);
 
-                    for (int i = 0; i < newIndices.Count - 10; i++)
-                    {
-                        addr = newIndices[i].GetDatabase().LocalAddress;
-                        newIndices[i] = new ReadonlyIndexServer().GetInstance(addr).Get();
-                        //ReadonlyIndexServer.DeleteOldSwap(addr);
-                    }
+                    App.Index = App.Indices.get(App.Indices.length() - 1);
 
-                    App.Indices = newIndices;
-                    App.Index = newIndices[newIndices.Count - 1];
                     System.GC.Collect();
                 }
             }

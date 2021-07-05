@@ -22,26 +22,13 @@ namespace FTServer.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult About(string q)
         {
+            if (q == null) { return NotFound(); }
+
             var m = new AboutModel();
             q = q.Replace("<", "").Replace(">", "").Trim();
 
-            bool ishttp = false;
 
-            if (q.StartsWith("http://") || q.StartsWith("https://"))
-            {
-                ishttp = true;
-            }
-
-            if (!ishttp)
-            {
-                IndexPage.addSearchTerm(q);
-            }
-            else
-            {
-                String furl = Html.getUrl(q);
-                IndexPage.runBGTask(furl);
-                q = IndexAPI.IndexingMessage;
-            }
+            IndexPage.addSearchTerm(q);
 
             m.Result = new ResultPartialModel
             {
@@ -75,6 +62,33 @@ namespace FTServer.Controllers
                 StartId = ids
             };
             return View("ResultPartial", Result);
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Admin(String url = null, String msg = null)
+        {
+            if (url != null)
+            {
+                url = url.trim();
+                bool ishttp = false;
+
+                if (url.StartsWith("http://") || url.StartsWith("https://"))
+                {
+                    ishttp = true;
+                }
+
+                if (ishttp)
+                {
+                    String furl = Html.getUrl(url);
+                    IndexPage.runBGTask(furl, msg);
+                    url = IndexAPI.IndexingMessage;
+                }
+            }
+            var m = new AdminModel();
+            m.url = url;
+            m.msg = msg;
+
+            return View(m);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

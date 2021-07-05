@@ -75,7 +75,7 @@ namespace FTServer
 
             return replace(description);
         }
-        static String splitWords = " ,.　，。";
+        //static String splitWords = " ,.　，。";
         public static Page Get(String url, HashSet<String> subUrls)
         {
             try
@@ -97,7 +97,11 @@ namespace FTServer
                     Log("XML " + url);
                     return null;
                 }
-
+                if (doc.ContentType != null && (doc.ContentType.toLowerCase().IndexOf("text/html") < 0))
+                {
+                    Log("Not HTML " + doc.ContentType);
+                    return null;
+                }
                 if (subUrls != null)
                 {
                     var host = doc.BaseUrl.Host;
@@ -170,10 +174,8 @@ namespace FTServer
                 }
 
                 keywords = getMetaContentByName(doc, "keywords");
-                foreach (char c in splitWords)
-                {
-                    keywords = keywords.Replace(c, ' ');
-                }
+                keywords = keywords.Replace("，", ",");
+
                 if (keywords.length() > 200)
                 {
                     keywords = keywords.substring(0, 200);
@@ -256,10 +258,10 @@ namespace FTServer
         }
 
 
-        private static string replace(String content)
+        public static string replace(String content)
         {
-            content = content.Replace("　", " ").Replace(((char)8203).ToString(), "");
-            content = Regex.Replace(content, "\t|\r|\n|�|<|>", " ");
+            content = content.Replace("　", " ").Replace(((char)8203).ToString(), " ");
+            content = Regex.Replace(content, "\t|\r|\n|<|>", " ");
             content = Regex.Replace(content, "\\$", " ");
             content = Regex.Replace(content, "\\s+", " ");
             content = content.Trim();
@@ -267,7 +269,7 @@ namespace FTServer
         }
         private static void fixSpan(IDocument doc)
         {
-            foreach (var s in new string[] { "script", "style", "textarea", "noscript" })
+            foreach (var s in new string[] { "script", "style", "textarea", "noscript", "code" })
             {
                 foreach (var c in new List<IElement>(doc.GetElementsByTagName(s)))
                 {
@@ -275,8 +277,8 @@ namespace FTServer
                 }
             }
             foreach (var s in new string[] {
-                 "span", "td", "th", "li", "a", "option", "p", 
-                 "div", "h1","h2","h3","h4","h5", "pre" } )
+                 "span", "td", "th", "li", "a", "option", "p",
+                 "div", "h1","h2","h3","h4","h5", "pre" })
             {
                 foreach (var c in doc.GetElementsByTagName(s))
                 {

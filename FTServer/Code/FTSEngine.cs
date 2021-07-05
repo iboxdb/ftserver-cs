@@ -1,4 +1,4 @@
-﻿/* iBoxDB FTServer Bruce Yang CL */
+﻿/* iBoxDB FTServer Bruce Yang CL-N */
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -1125,8 +1125,9 @@ namespace FTServer
     {
         public static T[] copyOf<T>(T[] kws, int len)
         {
-            T[] condition = new T[kws.Length - 1];
-            Array.Copy(kws, 0, condition, 0, condition.Length);
+            //T[] condition = new T[kws.Length - 1];
+            T[] condition = new T[len];
+            Array.Copy(kws, 0, condition, 0, Math.Min(kws.Length, condition.Length));
             return condition;
         }
     }

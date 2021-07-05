@@ -14,6 +14,9 @@ using Microsoft.Extensions.Hosting;
 using IBoxDB.LocalServer;
 using static FTServer.App;
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace FTServer
 {
@@ -52,14 +55,14 @@ namespace FTServer
                     if (r > start) { start = r; }
                 }
 
-                App.Indices = new List<AutoBox>();
                 for (long l = IndexServer.IndexDBStart; l < start; l++)
                 {
-                    App.Indices.Add(new ReadonlyIndexServer().GetInstance(l).Get());
+                    App.Indices.add(l, true);
                 }
-                App.Indices.Add(new IndexServer().GetInstance(start).Get());
+                App.Indices.add(start, false);
                 Log("Current Index DB (" + start + ")");
-                App.Index = App.Indices[App.Indices.Count - 1];
+                Log("Max Readonly DB Count(" + Config.Readonly_MaxDBCount + ")");
+                App.Index = App.Indices.get(App.Indices.length() - 1);
 
                 return Task.FromResult<IDisposable>(null);
             });
@@ -67,14 +70,39 @@ namespace FTServer
             var host = CreateHostBuilder(args).Build();
 
             task.GetAwaiter().GetResult();
-            host.Run();
-            IndexPage.Shutdown();
-            IndexPage.addSearchTerm("SystemShutdown", true);
-            App.Item.GetDatabase().Dispose();
-            foreach (var d in App.Indices)
+
+            Task.Delay(2000).ContinueWith((t) =>
             {
-                d.GetDatabase().Dispose();
-            }
+                try
+                {
+
+                    foreach (var nw in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+                    {
+                        if (nw.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            Console.WriteLine("http://" + nw.ToString() + ":" + App.HttpPort);
+                        }
+                    }
+
+                    var resultsPath = "http://127.0.0.1:" + App.HttpPort;
+                    Console.WriteLine("use Browser to Open " + resultsPath);
+                    var psi = new ProcessStartInfo(resultsPath);
+                    psi.UseShellExecute = true;
+                    Process.Start(psi);
+                }
+                catch
+                {
+
+                }
+                return Task.FromResult<object>(null);
+            });
+
+            host.Run();
+
+            IndexPage.Shutdown();
+            IndexPage.addSearchTerm(IndexPage.SystemShutdown);
+            App.Item.GetDatabase().Dispose();
+            App.Indices.Dispose();
             Log("DB Closed");
         }
 
@@ -83,19 +111,36 @@ namespace FTServer
                .ConfigureWebHostDefaults(webBuilder =>
                {
                    webBuilder.ConfigureLogging(logging =>
-               {
-                   logging.AddFilter((name, lev) =>
-                   {
-                       return false;
-                   });
-               });
+                        {
+                            logging.AddFilter((name, lev) =>
+                            {
+                                if (lev == LogLevel.Information)
+                                {
+                                    switch (name)
+                                    {
+                                        case "Microsoft.AspNetCore.Routing.EndpointMiddleware":
+                                        case "Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor":
+                                        case "Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker":
+                                        case "Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware":
+                                        case "Microsoft.AspNetCore.Hosting.Diagnostics":
+                                            return false;
+                                        default:
+                                            return true;
+                                    }
+                                }
+                                return false;
+                            });
+                        });
                    webBuilder.UseStartup<Startup>()
-                   .UseUrls("http://*:5000");
+                     .UseUrls("http://*:" + App.HttpPort);
                });
     }
 
     public class App
     {
+        internal readonly static bool IsAndroid = false;
+        public static int HttpPort = 5066;
+
         //for Application
         public static AutoBox Item;
 
@@ -103,7 +148,7 @@ namespace FTServer
         public static AutoBox Index;
 
         //for Readonly PageIndex
-        public static List<AutoBox> Indices;
+        public static readonly ReadonlyList Indices = new ReadonlyList();
 
         public static void Log(String msg)
         {

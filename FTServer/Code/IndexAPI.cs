@@ -1,4 +1,4 @@
-/* iBoxDB FTServer Bruce Yang CL */
+/* iBoxDB FTServer Bruce Yang CL-N */
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,7 +21,7 @@ namespace FTServer
             {
                 if (id.Length == 1)
                 {
-                    startId = new long[] { App.Indices.Count - 1, -1, id[0] };
+                    startId = new long[] { App.Indices.length() - 1, -1, id[0] };
                 }
                 else
                 {
@@ -121,7 +121,7 @@ namespace FTServer
                 {
                     startId = new long[ors.size()];
                     startId[0] = -1;
-                    startId[1] = App.Indices.Count - 1;//or box
+                    startId[1] = App.Indices.length() - 1;//or box
                     startId[2] = -1;
                     for (int i = 3; i < startId.Length; i++)
                     {
@@ -164,7 +164,10 @@ namespace FTServer
                 String name, long[] t_startId, long pageCount)
         {
             name = name.Trim();
-            if (name.length() == 0 || name.Length > 150 || name == IndexingMessage) { return new long[] { -1, -1, -1 }; }
+            if (name.length() == 0 || name.Length > 150
+                || name == IndexingMessage
+                || name == IndexPage.SystemShutdown
+            ) { return new long[] { -1, -1, -1 }; }
 
 
             long maxTime = 1000 * 2;
@@ -179,8 +182,9 @@ namespace FTServer
             while (startId.isAnd())
             {
                 DelayService.delayIndex();
-                AutoBox auto = App.Indices[(int)startId.startId[0]];
+                AutoBox auto = App.Indices.get((int)startId.startId[0]);
                 startId.startId[2] = SearchAnd(auto, outputPages, name, startId.startId[2], pageCount - outputPages.Count);
+                App.Indices.tryCloseOutOfCache(auto);
                 foreach (var pt in outputPages)
                 {
                     if (pt.dbOrder < 0)
@@ -204,8 +208,9 @@ namespace FTServer
             while (startId.isOr())
             {
                 DelayService.delayIndex();
-                AutoBox auto = App.Indices[(int)startId.startId[1]];
+                AutoBox auto = App.Indices.get((int)startId.startId[1]);
                 SearchOr(auto, outputPages, ors, startId.startId, pageCount);
+                App.Indices.tryCloseOutOfCache(auto);
                 foreach (var pt in outputPages)
                 {
                     if (pt.dbOrder < 0)
@@ -448,6 +453,18 @@ namespace FTServer
             if (pages.Count > 0) { return pages[0]; }
             return null;
         }
+
+        public static String lastInputUrl()
+        {
+            List<Page> pages = App.Item.Select<Page>("from Page limit 0,2");
+            if (pages.Count < 2)
+            {
+                // App may exit without indexing the Page.
+                return "";
+            }
+            return pages[1].url;
+        }
+
     }
 
 }

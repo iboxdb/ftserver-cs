@@ -1,0 +1,81 @@
+@model AdminModel
+
+@{
+    ViewData["Title"] = "Add Page Index";
+    @if (Model.url == null)
+    {
+        Model.url = "https://www.iboxdb.com/";
+    }
+}
+
+@section Styles{
+<style>
+    body {
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .grid {
+        max-width: 100%;
+        width: 100%;
+        text-align: center;
+    }
+
+    .column {}
+</style>
+}
+
+
+@section Scripts{
+<script>
+
+</script>
+}
+
+
+<div class="grid">
+    <div class="column">
+        <form class="ui large form" action="Admin" onsubmit="formsubmit()" method="post">
+            <div class="ui label input">
+
+                <div class="ui action input">
+                    <input name="url" value="@Model.url" required onfocus="formfocus()" />
+                    <input id="btnsearch" type="submit" class="ui teal right button" value=" ADD " />
+                </div>
+
+                <div class="ui">Description:</div>
+                <div class="ui action input">
+
+                    <textarea name="msg" maxlength="800" height="200px"></textarea>
+                </div>
+
+            </div>
+        </form>
+
+        <h3>Input HTTP or HTTPS ://URL</h3>
+
+        The indexing process will continue until all be done, check the Log for details,
+        it needs bandwidth and time.
+        Close the App can stop it.
+        <br>
+        Some pages may not finish the Indexing process because the App has stopped, try re-add again.
+        <br>
+        Some pages were designed to not be indexed, it would never show up.
+        <br>
+        Search Format:<br>
+        [Word1 Word2 Word3] = text has <b>Word1</b> and <b>Word2</b> and <b>Word3</b><br>
+        ["Word1 Word2 Word3"] = text has <b>"Word1 Word2 Word3"</b> as a whole<br>
+        <br>
+        <a href="./"><i class="teal disk outline icon" style="font-size:70px"></i></a>
+        <script>
+            function formsubmit() {
+                document.getElementById('btnsearch').disabled = "disabled";
+                document.getElementById('btnsearch').value = "Loading";
+            }
+            function formfocus() {
+                document.getElementById('btnsearch').disabled = undefined;
+                document.getElementsByName('url')[0].value = "";
+            }
+        </script>
+    </div>
+</div>

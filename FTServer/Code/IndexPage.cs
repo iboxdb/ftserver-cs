@@ -10,8 +10,9 @@ namespace FTServer
 
     public class IndexPage
     {
+        public static readonly String SystemShutdown = "SystemShutdown";
 
-        public static void addSearchTerm(String keywords, bool isShutdown = false)
+        public static void addSearchTerm(String keywords)
         {
             if (keywords.length() < PageSearchTerm.MAX_TERM_LENGTH)
             {
@@ -21,6 +22,8 @@ namespace FTServer
                 pst.uid = Guid.NewGuid();
 
                 long huggersMem = 1024L * 1024L * 3L;
+
+                bool isShutdown = SystemShutdown.Equals(keywords);
                 if (isShutdown) { huggersMem = 0; }
                 using (var box = App.Item.Cube())
                 {
@@ -84,6 +87,10 @@ namespace FTServer
             }
             else
             {
+                if (userDescription != null)
+                {
+                    userDescription = Html.replace(userDescription);
+                }
                 p.userDescription = userDescription;
                 p.show = true;
                 p.isKeyPage = isKeyPage;
@@ -92,7 +99,7 @@ namespace FTServer
                 {
                     IndexAPI.DisableOldPage(url);
                 }
-                long dbaddr = App.Indices.Count + IndexServer.IndexDBStart - 1;
+                long dbaddr = App.Indices.length() + IndexServer.IndexDBStart - 1;
                 DateTime indexend = DateTime.Now;
                 Log("TIME IO:" + (ioend - begin).TotalSeconds
                     + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " (" + dbaddr + ") ");

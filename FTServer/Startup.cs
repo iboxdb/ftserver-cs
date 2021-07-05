@@ -39,6 +39,8 @@ namespace FTServer
                             await next();
                         });
             */
+            Console.WriteLine(env.ApplicationName);
+            Console.WriteLine(env.EnvironmentName);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
