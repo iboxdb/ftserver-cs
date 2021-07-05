@@ -16,7 +16,7 @@ cd FTServer
 dotnet run -c Release
 ```
 
-4. Open [http://localhost:5000/](http://localhost:5000/)
+4. Open [http://127.0.0.1:5066/](http://127.0.0.1:5066/)
 
 
 ![](../../../../iboxdb/ftserver/raw/master/FTServer/src/main/webapp/css/fts.png)
