@@ -108,7 +108,7 @@ namespace FTServer
                 subUrls.remove(url + "/");
                 subUrls.remove(url.substring(0, url.length() - 1));
 
-                runBGTask(subUrls);
+                runBGTask(subUrls, isKeyPage);
 
                 return url;
             }
@@ -118,11 +118,11 @@ namespace FTServer
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void runBGTask(String url, String customContent = null)
         {
-            backgroundThreadStack.addFirst(() =>
+            backgroundThreadQueue.addFirst(() =>
              {
                  var bc = Console.BackgroundColor;
                  Console.BackgroundColor = ConsoleColor.DarkRed;
-                 Log("(KeyPage) For:" + url + " ," + backgroundThreadStack.size());
+                 Log("(KeyPage) For:" + url + " ," + backgroundThreadQueue.size());
                  Console.BackgroundColor = bc;
                  String r = addPage(url, customContent, true);
                  backgroundLog(url, r);
@@ -130,27 +130,39 @@ namespace FTServer
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private static void runBGTask(HashSet<String> subUrls)
+        private static void runBGTask(HashSet<String> subUrls, bool isKeyPage)
         {
             if (subUrls == null || isshutdown)
             {
                 return;
             }
             bool atNight = true;
-            int max_background = atNight ? 1000 : 1;
 
-            if (backgroundThreadStack.size() < max_background)
+            int max_background = atNight ? 500 : 0;
+            if (App.IsAndroid && max_background > 50)
             {
-                foreach (String vurl in subUrls)
+                max_background = 50;
+            }
+
+            if (isKeyPage)
+            {
+                max_background *= 2;
+            }
+
+
+            foreach (String vurl in subUrls)
+            {
+                if (backgroundThreadQueue.size() > max_background)
                 {
-                    var url = vurl;
-                    backgroundThreadStack.addLast(() =>
-                    {
-                        Log("For:" + url + " ," + backgroundThreadStack.size());
-                        String r = addPage(url, null, false);
-                        backgroundLog(url, r);
-                    });
+                    break;
                 }
+                var url = Html.getUrl(vurl);
+                backgroundThreadQueue.addLast(() =>
+                {
+                    Log("For:" + url + " ," + backgroundThreadQueue.size());
+                    String r = addPage(url, null, false);
+                    backgroundLog(url, r);
+                });
             }
 
         }
@@ -173,7 +185,7 @@ namespace FTServer
         }
 
 
-        private static ConcurrentLinkedDeque<ThreadStart> backgroundThreadStack = new ConcurrentLinkedDeque<ThreadStart>();
+        private static ConcurrentLinkedDeque<ThreadStart> backgroundThreadQueue = new ConcurrentLinkedDeque<ThreadStart>();
         private static bool isshutdown = false;
         private static Thread backgroundTasks = new Func<Thread>(() =>
         {
@@ -182,7 +194,7 @@ namespace FTServer
             {
                 while (!isshutdown)
                 {
-                    ThreadStart act = backgroundThreadStack.pollFirst();
+                    ThreadStart act = backgroundThreadQueue.pollFirst();
                     if (act != null)
                     {
                         try
