@@ -61,7 +61,12 @@ namespace FTServer
                 }
                 App.Indices.add(start, false);
                 Log("Current Index DB (" + start + ")");
-                Log("Max Readonly DB Count(" + Config.Readonly_MaxDBCount + ")");
+
+                Log("ReadOnly CacheLength = " + (Config.Readonly_CacheLength / 1024L / 1024L) + " MB (" + Config.Readonly_CacheLength + ")");
+                Log("ReadOnly Max DB Count = " + Config.Readonly_MaxDBCount);
+
+                Log("MinCache = " + (Config.minCache() / 1024L / 1024L) + " MB");
+
                 App.Index = App.Indices.get(App.Indices.length() - 1);
 
                 return Task.FromResult<IDisposable>(null);

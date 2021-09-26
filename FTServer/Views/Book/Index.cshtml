@@ -38,7 +38,7 @@
                 int book = ran.Next(books.Length);
                 int start = ran.Next(bbase);
                 int length = ran.Next(600) * 100 + 100;
-                length = ran.Next(6000);
+                length = ran.Next(26000);
                 String url = "?book=" + book + "&start=" + start + "&length=" + length;
                 <a  href="@Html.Raw(@url)"> &nbsp; </a><br>
     
