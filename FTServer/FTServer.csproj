@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ApplicationIcon>fts.ico</ApplicationIcon>
     <Version>1.8</Version>
     <!--  
@@ -20,7 +20,7 @@ dotnet publish -r win-x64 -c Release - -no-self-contained -o /mnt/hgfs/Share/fts
   </PropertyGroup>
 
   <ItemGroup>  
-      <PackageReference Include="iBoxDB" Version="3.0.0"/>     
+      <PackageReference Include="iBoxDB" Version="3.1.0"/>     
       <PackageReference Include="AngleSharp" Version="0.16"/>  
   </ItemGroup>
 
