@@ -5,7 +5,7 @@
 
 #### Setup
 
-1. [Install NET5.0](https://dotnet.microsoft.com/download)
+1. [Install NET6.0](https://dotnet.microsoft.com/download)
 
 2. Download this Project.
 
@@ -17,6 +17,8 @@ dotnet run -c Release
 ```
 
 4. Open [http://127.0.0.1:5066/](http://127.0.0.1:5066/)
+
+5. Press [Ctrl+C] to shut down.
 
 
 ![](../../../../iboxdb/ftserver/raw/master/FTServer/src/main/webapp/css/fts.png)
@@ -125,6 +127,8 @@ root      hard    nofile      500000
 root      soft    nofile      500000
 
 ```
+
+
 
 
 
