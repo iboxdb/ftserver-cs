@@ -45,43 +45,45 @@
       String[] keywords = p.keywords.Split(sp);
 
 
+      <div hurl="@p.textOrder">
+        <div class="spartcss" dir="auto"><a class="stext" target="_blank" href="@p.url">@p.title</a></div>
 
-      <div class="spartcss" dir="auto"><a class="stext" target="_blank" href="@p.url">@p.title</a></div>
-
-      <div class="stext" dir="auto"> @content </div>
-      var css = isdesc ? "gt" : "gtt";
-
-      <div class="@css">
-        [ @p.dbOrder ]
-        @if (p.isAndSearch)
-        {
-        }
-        else
-        {
-          <text>*</text>
-        }
-
-        @decodeTry(p.url)
-
-        @p.createTime
-
-        @if (keywords.Length > 0)
-        {
-          @: <br>
-        }
-        @foreach (var tkw in keywords)
-        {
-          var kw = tkw.Trim();
-          if (kw == null || kw.Length < 1) { continue; }
-          if (kw.IndexOf(" ") > 0)
+        <div class="stext" dir="auto"> @content </div>
+@{
+        var css = isdesc ? "gt" : "gtt";
+}
+        <div class="@css">
+          [@p.dbOrder-@p.textOrder]
+          @if (p.isAndSearch)
           {
-            kw = "\"" + kw + "\"";
           }
-          <a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(kw))" class="@css kw stext_s"> &nbsp; @kw &nbsp; </a>
-          <text> &nbsp; </text>
-        }
+          else
+          {
+            <text>*</text>
+          }
+
+          @decodeTry(p.url)
+
+          @p.createTime
+
+          @if (keywords.Length > 0)
+          {
+            @: <br>
+          }
+          @foreach (var tkw in keywords)
+          {
+            var kw = tkw.Trim();
+            if (kw == null || kw.Length < 1) { continue; }
+            if (kw.IndexOf(" ") > 0)
+            {
+              kw = "\"" + kw + "\"";
+            }
+            <a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(kw))" class="@css kw stext_s"> &nbsp; @kw &nbsp; </a>
+            <text> &nbsp; </text>
+          }
+        </div>
+        <br>
       </div>
-      <br>
     }
   }
 </div>
@@ -110,6 +112,7 @@
 <script>
   setTimeout(function () {
     highlight('@Html.Raw( "ldiv" + @Model.IdToString() )');
+    hideMultiText('@Html.Raw( "ldiv" + @Model.IdToString() )');
   @if (!@Model.IsEnd())
   {
     //startId is a big number, in javascript, have to write big number as a 'String'
