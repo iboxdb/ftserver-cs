@@ -62,6 +62,27 @@
 
 @section Scripts{
 <script>
+    function splitHelper() {
+        try {
+            var splitWord = ["的"];
+            var sh = document.getElementById("searchHelp");
+            var q = document.getElementsByName("q")[0];
+            var value = new String(q.value);
+            for (var i = 0; i < splitWord.length; i++) {
+                value = value.replace(splitWord[i], " ");
+            }
+            value = value.trim();
+            if (value == String(q.value)) {
+                sh.innerHTML = "";
+            } else {
+                var url = "About?q=" + encodeURI(value);
+                sh.innerHTML = "<a href='" + url + "' >" + value + "</a>"
+            }
+        } catch (e) {
+        }
+    }
+</script>
+<script>
     var multiTexts = {};
     function hideMultiText(loadedDivId) {
         var div = document.getElementById(loadedDivId);
@@ -182,11 +203,13 @@
             <div class="ui label input">
 
                 <div class="ui action input">
-                    <input name="q" value="@Model.Result.Query" required onfocus="formfocus()" dir="auto" />
+                    <input name="q" value="@Model.Result.Query" required onfocus="formfocus()" dir="auto"
+                        onchange="splitHelper()" />
                     <input id="btnsearch" type="submit" class="ui teal right button" value="Search" />
                 </div>
             </div>
         </form>
+        <div style="text-align:left" id="searchHelp"></div>
         <script>
             function formsubmit() {
                 document.getElementById('btnsearch').disabled = "disabled";
@@ -194,6 +217,7 @@
             function formfocus() {
                 document.getElementById('btnsearch').disabled = undefined;
             }
+            splitHelper();
         </script>
     </div>
 </div>
