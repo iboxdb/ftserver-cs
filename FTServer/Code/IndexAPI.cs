@@ -434,7 +434,7 @@ namespace FTServer
             {
                 List<Page> page = new List<Page>();
 
-                foreach (var p in box.Select<Page>("from Page where url==? limit 1,10", url))
+                foreach (var p in box.Scaler<Page>("from Page where url==? limit 1,10", url))
                 {
                     if (!p.show) { break; }
                     page.Add(p);
