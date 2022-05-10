@@ -42,7 +42,7 @@ namespace FTServer
 
             internal virtual ArrayList<StringBuilder> ToOrCondition(String name)
             {
-                String orName = new String(ENGINE.sUtil.clear(name));
+                String orName = new String(StringUtil.Instance.clear(name));
                 orName = orName.Replace("\"", " ").Trim();
 
                 ArrayList<StringBuilder> ors = new ArrayList<StringBuilder>();
@@ -63,9 +63,9 @@ namespace FTServer
                     {
                         last.Append(c);
                     }
-                    else if (!ENGINE.sUtil.isWord(c))
+                    else if (!StringUtil.Instance.isWord(c))
                     {
-                        if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
+                        if (!StringUtil.Instance.isWord(last[last.Length - 1]))
                         {
                             last.Append(c);
                             ors.add(new StringBuilder());
@@ -79,7 +79,7 @@ namespace FTServer
                     }
                     else
                     {
-                        if (!ENGINE.sUtil.isWord(last[last.Length - 1]))
+                        if (!StringUtil.Instance.isWord(last[last.Length - 1]))
                         {
                             last = new StringBuilder();
                             last.Append(c);
@@ -104,7 +104,7 @@ namespace FTServer
                     {
                         char c = sbi.charAt(0);
                         char pc = sbp.charAt(sbp.length() - 1);
-                        if ((!ENGINE.sUtil.isWord(c)) && (!ENGINE.sUtil.isWord(pc)))
+                        if ((!StringUtil.Instance.isWord(c)) && (!StringUtil.Instance.isWord(pc)))
                         {
                             sbi.insert(0, pc);
                         }
