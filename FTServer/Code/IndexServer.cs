@@ -60,7 +60,7 @@ namespace FTServer
 
             private static Stream[] GetStreamsImpl(long address, bool outOfCache)
             {
-                string pa = BoxFileStreamConfig.RootPath + ReadonlyStreamConfig.GetNameByAddrDefault(address);
+                string pa = DatabaseConfig.GetFileName(address);
                 Stream[] os = new Stream[outOfCache ? 1 : 2];
                 for (int i = 0; i < os.Length; i++)
                 {
