@@ -5,11 +5,10 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
  <ItemGroup>
-    <PackageReference Include="iBoxDB" Version="3.1"/>
+    <PackageReference Include="iBoxDB" Version="3.2"/>    
+    <PackageReference Include="AngleSharp" Version="0.16"/>  
   </ItemGroup>
  <ItemGroup>
-    <Compile Include="..\FTServer\Code\FTSEngine.cs">
-      <Link>FTSEngine.cs</Link>
-    </Compile>
+    <Compile Include="..\FTServer\Code\*.cs" />
   </ItemGroup>
 </Project>

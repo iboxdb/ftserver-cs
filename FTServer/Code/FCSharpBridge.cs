@@ -7,10 +7,10 @@ using System.Threading;
 using IBoxDB.LocalServer;
 
 
-namespace FTServer{
+namespace FTServer
+{
 
-
-    #region Transplanting Bridge
+    //Ported from
     internal static class CSharpBridge
     {
         public static String toString<T>(this T o)
@@ -216,13 +216,10 @@ namespace FTServer{
     {
         public static T[] copyOf<T>(T[] kws, int len)
         {
-            //T[] condition = new T[kws.Length - 1];
             T[] condition = new T[len];
             Array.Copy(kws, 0, condition, 0, Math.Min(kws.Length, condition.Length));
             return condition;
         }
     }
-    #endregion
-
-
+  
 }

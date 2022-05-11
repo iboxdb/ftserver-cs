@@ -19,7 +19,7 @@ namespace FTServer
 
             BoxSystem.DBDebug.DeleteDBFiles(3);
             DB db = new DB(3);
-            Engine engine = new Engine();
+            Engine engine = Engine.Instance;
             engine.Config(db.GetConfig());
 
             AutoBox auto = db.Open();
@@ -167,7 +167,7 @@ prev | next
             {
                 BoxSystem.DBDebug.DeleteDBFiles(3);
                 DB db = new DB(3);
-                Engine engine = new Engine();
+                Engine engine = Engine.Instance;
                 engine.Config(db.GetConfig());
 
                 AutoBox auto = db.Open();
@@ -305,7 +305,7 @@ prev | next
             String[] ts = list.ToArray();
 
 
-            Engine engine = new Engine();
+            Engine engine = Engine.Instance;
             engine.Config(db.GetConfig());
             //engine.maxSearchTime = 1000;
 
@@ -352,7 +352,7 @@ prev | next
             }
 
 
-            StringUtil sutil = new StringUtil();
+            StringUtil sutil = StringUtil.Instance;
             for (int i = 0; i < ts.Length; i++)
             {
                 ts[i] = ts[i].ToLower() + " ";

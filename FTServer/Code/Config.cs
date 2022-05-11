@@ -15,11 +15,16 @@ namespace FTServer
             return 1024L * 1024L * len;
         }
 
+        // it should set bigger than 500MB
         public static long SwitchToReadonlyIndexLength = mb(500L * 1L) / DSize;
 
         public static long Readonly_CacheLength = mb(32);
+
+        //Set 1400 MB Readonly Index Cache
         public static long Readonly_MaxDBCount = mb(1400) / mb(32) / DSize;
 
+
+        //HTML Page Cache, this should set bigger, if have more memory. 
         public static long ItemConfig_CacheLength = mb(256);
         public static int ItemConfig_SwapFileBuffer = (int)mb(20);
 

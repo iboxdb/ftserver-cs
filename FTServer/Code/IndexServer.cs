@@ -117,16 +117,11 @@ namespace FTServer
             {
                 CacheLength = Config.SwitchToReadonlyIndexLength;
                 SwapFileBuffer = Config.ItemConfig_SwapFileBuffer;
-                if (SwapFileBuffer < FileIncSize)
-                {
-                    FileIncSize = SwapFileBuffer;
-                }
-                if (CacheLength == Config.SwitchToReadonlyIndexLength)
-                {
-                    //ReadStreamCount = 1;
-                }
+                //this size trigger "SWITCH" in Flush()
+                FileIncSize = Config.ItemConfig_SwapFileBuffer;
+
                 Log("Index DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
-                new Engine().Config(this);
+                Engine.Instance.Config(this);
 
             }
 

@@ -9,7 +9,12 @@ namespace FTServer
 {
     public class Engine
     {
+        public readonly static Engine Instance = new Engine();
 
+        private Engine()
+        {
+
+        }
         public void Config(DatabaseConfig config)
         {
             KeyWord.config(config);

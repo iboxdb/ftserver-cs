@@ -15,7 +15,7 @@ namespace FTServer
 
             db.GetConfig().EnsureTable<TextObject>("TextObject", "ID");
 
-            Engine engine = new Engine();
+            Engine engine = Engine.Instance;
             engine.Config(db.GetConfig());
 
             AutoBox auto = db.Open();

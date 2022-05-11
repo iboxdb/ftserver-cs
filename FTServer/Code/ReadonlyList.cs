@@ -48,7 +48,7 @@ namespace FTServer
                 AutoBoxHolder o = list[pos];
                 if (o.Auto != null)
                 {
-                    App.Log("Out of Cache " + (pos) + " / " + list.Length + " , set Config.Readonly_MaxDBCount bigger");
+                    App.Log("Out of Cache " + (pos) + " / " + list.Length + " ");
                     list[pos] = new AutoBoxHolder(null, o.address);
                 }
             }

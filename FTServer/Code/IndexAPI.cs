@@ -10,8 +10,6 @@ namespace FTServer
 
     public class IndexAPI
     {
-        public readonly static Engine ENGINE = new Engine();
-
         private class StartIdParam
         {
             //andBox,orBox, ids...
@@ -237,7 +235,7 @@ namespace FTServer
 
             using (var box = auto.Cube())
             {
-                foreach (KeyWord kw in ENGINE.searchDistinct(box, name, startId, pageCount))
+                foreach (KeyWord kw in Engine.Instance.searchDistinct(box, name, startId, pageCount))
                 {
                     pageCount--;
                     startId = kw.I - 1;
@@ -277,7 +275,7 @@ namespace FTServer
                     }
                     //never set Long.MAX 
                     long subCount = pageCount * 10;
-                    iters[i] = ENGINE.searchDistinct(box, sbkw.ToString(), startId[i], subCount).GetEnumerator();
+                    iters[i] = Engine.Instance.searchDistinct(box, sbkw.ToString(), startId[i], subCount).GetEnumerator();
                 }
 
                 int orStartPos = 3;
@@ -422,7 +420,7 @@ namespace FTServer
         {
             using (IBox box = App.Index.Cube())
             {
-                ENGINE.indexText(box, pt.id, pt.indexedText(), false, DelayService.delay);
+                Engine.Instance.indexText(box, pt.id, pt.indexedText(), false, DelayService.delay);
                 CommitResult cr = box.Commit(huggers);
                 Log("MEM:  " + cr.GetMemoryLength(box).ToString("#,#"));
             }
@@ -446,23 +444,6 @@ namespace FTServer
                 }
                 box.Commit().Assert();
             }
-        }
-        public static Page GetOldPage(String url)
-        {
-            List<Page> pages = App.Item.Select<Page>("from Page where url==? limit 0,1", url);
-            if (pages.Count > 0) { return pages[0]; }
-            return null;
-        }
-
-        public static String lastInputUrl()
-        {
-            List<Page> pages = App.Item.Select<Page>("from Page limit 0,2");
-            if (pages.Count < 2)
-            {
-                // App may exit without indexing the Page.
-                return "";
-            }
-            return pages[1].url;
         }
 
     }
