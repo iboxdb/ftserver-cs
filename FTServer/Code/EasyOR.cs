@@ -12,7 +12,7 @@ namespace FTServer
 
         static EasyOR()
         {
-            removedWords = new String[] { "\"", "and", "with", "of", "的" };
+            removedWords = new String[] { "\"", "and", "with", "how", "of", "的", "吗" };
         }
 
         internal static ArrayList<String> toOrCondition(String str)
@@ -90,39 +90,21 @@ namespace FTServer
         private static ArrayList<String> removeOneCN(String str)
         {
             ArrayList<String> r = new ArrayList<String>();
-            if (str.length() <= 2)
-            {
-                return r;
-            }
-            else if (str.length() <= 5)
-            {
-                String a1 = str.substring(0, 2).trim();
-                if (a1.length() > 1)
-                {
-                    r.add(a1);
-                }
-                String a2 = str.substring(str.length() - 2).trim();
-                if (a2.length() > 1)
-                {
-                    r.add(a2);
-                }
-            }
-            else
-            {
-                ArrayList<String> a1s = removeOneCN(str.substring(0, 5));
-                String a1 = link(a1s);
-                if (a1.length() > 1)
-                {
-                    r.add(a1);
-                }
 
-                ArrayList<String> a2s = removeOneCN(str.substring(str.length() - 5));
-                String a2 = link(a2s);
-                if (a2.length() > 1)
-                {
-                    r.add(a2);
-                }
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < str.length() - 2; i += 2)
+            {
+                sb.append(str.substring(i, i + 2) + " ");
             }
+            r.add(sb.toString().trim());
+
+            sb = new StringBuilder();
+            for (int i = str.length(); i > 2; i -= 2)
+            {
+                sb.append(str.substring(i - 2, i) + " ");
+            }
+            r.add(sb.toString().trim());
+
             return r;
         }
 
@@ -147,6 +129,10 @@ namespace FTServer
                     for (int j = 0; j < sps.Length; j++)
                     {
                         if (i == j)
+                        {
+                            continue;
+                        }
+                        if (sps[j].length() < 3)
                         {
                             continue;
                         }

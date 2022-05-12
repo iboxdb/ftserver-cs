@@ -52,9 +52,11 @@ namespace FTServer.Models
             ArrayList<KeyWord> kws = new ArrayList<KeyWord>();
             foreach (var pg in pages)
             {
-                kws.add(pg.keyWord);
-                if (pg.keyWord is KeyWordN ) { 
-                    kws.add(pg.keyWord.previous);
+                KeyWord kw = pg.keyWord;
+                while( kw is KeyWordN)
+                {  
+                   kws.add(kw);
+                   kw = kw.previous;
                 }
             }
             foreach(KeyWord kw in kws){
