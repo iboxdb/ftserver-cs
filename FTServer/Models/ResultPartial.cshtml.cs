@@ -48,14 +48,21 @@ namespace FTServer.Models
         public String ToKeyWordString()
         {
             HashSet<string> hc = new HashSet<string>();
+
+            ArrayList<KeyWord> kws = new ArrayList<KeyWord>();
             foreach (var pg in pages)
             {
-                if (pg.keyWord != null && pg.keyWord.previous != null) { continue; }
-                if (pg.keyWord is KeyWordE e)
+                kws.add(pg.keyWord);
+                if (pg.keyWord is KeyWordN ) { 
+                    kws.add(pg.keyWord.previous);
+                }
+            }
+            foreach(KeyWord kw in kws){
+                if (kw is KeyWordE e)
                 {
                     hc.Add(e.K);
                 }
-                if (pg.keyWord is KeyWordN n)
+                if (kw is KeyWordN n)
                 {
                     hc.Add(n.toKString());
                 }
@@ -73,7 +80,9 @@ namespace FTServer.Models
                 }
                 sb.Append(ids[i]);
             }
-            return sb.ToString();
+            String r = sb.ToString();
+            //App.Log(r);
+            return r;
         }
 
         public void Init()
