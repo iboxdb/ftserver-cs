@@ -115,7 +115,7 @@ namespace FTServer
         {
             public IndexConfig()
             {
-                CacheLength = Config.SwitchToReadonlyIndexLength;
+                CacheLength = Config.Index_CacheLength;
                 SwapFileBuffer = Config.ItemConfig_SwapFileBuffer;
                 //this size trigger "SWITCH" in Flush()
                 FileIncSize = Config.ItemConfig_SwapFileBuffer;
