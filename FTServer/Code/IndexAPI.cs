@@ -38,82 +38,17 @@ namespace FTServer
                 return false;
             }
 
-            internal virtual ArrayList<StringBuilder> ToOrCondition(String name)
+            internal virtual ArrayList<String> ToOrCondition(String name)
             {
-                String orName = new String(StringUtil.Instance.clear(name));
-                orName = orName.Replace("\"", " ").Trim();
 
-                ArrayList<StringBuilder> ors = new ArrayList<StringBuilder>();
-                ors.add(new StringBuilder());
-                for (int i = 0; i < orName.length(); i++)
-                {
-                    char c = orName[i];
-                    StringBuilder last = ors.get(ors.size() - 1);
+                ArrayList<String> ors = EasyOR.toOrCondition(name);
 
-                    if (c == ' ')
-                    {
-                        if (last.Length > 0)
-                        {
-                            ors.add(new StringBuilder());
-                        }
-                    }
-                    else if (last.Length == 0)
-                    {
-                        last.Append(c);
-                    }
-                    else if (!StringUtil.Instance.isWord(c))
-                    {
-                        if (!StringUtil.Instance.isWord(last[last.Length - 1]))
-                        {
-                            last.Append(c);
-                            ors.add(new StringBuilder());
-                        }
-                        else
-                        {
-                            last = new StringBuilder();
-                            last.Append(c);
-                            ors.add(last);
-                        }
-                    }
-                    else
-                    {
-                        if (!StringUtil.Instance.isWord(last[last.Length - 1]))
-                        {
-                            last = new StringBuilder();
-                            last.Append(c);
-                            ors.add(last);
-                        }
-                        else
-                        {
-                            last.Append(c);
-                        }
-                    }
-                }
-
-                if (ors.get(ors.size() - 1).length() == 0)
-                {
-                    ors.remove(ors.size() - 1);
-                }
-                for (int i = 1; i < ors.size(); i++)
-                {
-                    StringBuilder sbi = ors.get(i);
-                    StringBuilder sbp = ors.get(i - 1);
-                    if (sbi.length() == 1)
-                    {
-                        char c = sbi.charAt(0);
-                        char pc = sbp.charAt(sbp.length() - 1);
-                        if ((!StringUtil.Instance.isWord(c)) && (!StringUtil.Instance.isWord(pc)))
-                        {
-                            sbi.insert(0, pc);
-                        }
-                    }
-                }
-
+                //----SET----//
                 ors.add(0, null); //and box
                 ors.add(1, null); //or box
                 ors.add(2, null); //and startId
                 //full search
-                ors.add(3, new StringBuilder(name));
+                ors.add(3, name);
 
                 if (startId.Length != ors.size())
                 {
@@ -202,7 +137,7 @@ namespace FTServer
 
 
             //OR            
-            ArrayList<StringBuilder> ors = startId.ToOrCondition(name);
+            ArrayList<String> ors = startId.ToOrCondition(name);
             while (startId.isOr())
             {
                 DelayService.delayIndex();
@@ -257,7 +192,7 @@ namespace FTServer
             }
         }
         private static void SearchOr(AutoBox auto, List<PageText> outputPages,
-                       ArrayList<StringBuilder> ors, long[] startId, long pageCount)
+                       ArrayList<String> ors, long[] startId, long pageCount)
         {
 
             using (IBox box = auto.Cube())
@@ -267,7 +202,7 @@ namespace FTServer
 
                 for (int i = 0; i < ors.size(); i++)
                 {
-                    StringBuilder sbkw = ors.get(i);
+                    String sbkw = ors.get(i);
                     if (sbkw == null || sbkw.Length < 1)
                     {
                         iters[i] = null;
@@ -275,7 +210,7 @@ namespace FTServer
                     }
                     //never set Long.MAX 
                     long subCount = pageCount * 10;
-                    iters[i] = Engine.Instance.searchDistinct(box, sbkw.ToString(), startId[i], subCount).GetEnumerator();
+                    iters[i] = Engine.Instance.searchDistinct(box, sbkw, startId[i], subCount).GetEnumerator();
                 }
 
                 int orStartPos = 3;

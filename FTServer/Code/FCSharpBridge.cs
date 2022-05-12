@@ -21,6 +21,14 @@ namespace FTServer
         {
             return o.Equals(o2);
         }
+        public static StringBuilder append(this StringBuilder self, char str)
+        {
+            return self.Append(str);
+        }
+        public static StringBuilder append(this StringBuilder self, string str)
+        {
+            return self.Append(str);
+        }
 
         public static int length(this StringBuilder self)
         {
@@ -40,9 +48,18 @@ namespace FTServer
         {
             return self.Length == 0;
         }
+        public static bool contains(this String self, string s)
+        {
+            return self.Contains(s);
+        }
         public static int length(this String self)
         {
             return self.Length;
+        }
+
+        public static string[] split(this String self, String s)
+        {
+            return self.Split(s);
         }
 
         public static char[] toCharArray(this String self)
@@ -126,10 +143,7 @@ namespace FTServer
         {
             return self.Count;
         }
-        public static StringBuilder append(this StringBuilder self, string str)
-        {
-            return self.Append(str);
-        }
+
     }
 
     internal class ArrayList<T> : List<T>
@@ -143,7 +157,10 @@ namespace FTServer
         {
             this.Add(t);
         }
-
+        public void addAll(ArrayList<T> t)
+        {
+            this.AddRange(t);
+        }
         public void add(int index, T p)
         {
             this.Insert(index, p);
@@ -221,5 +238,5 @@ namespace FTServer
             return condition;
         }
     }
-  
+
 }
