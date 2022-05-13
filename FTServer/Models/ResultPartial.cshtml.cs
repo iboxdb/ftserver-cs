@@ -41,13 +41,14 @@ namespace FTServer.Models
             foreach (var pg in pages)
             {
                 KeyWord kw = pg.keyWord;
-                while( kw is KeyWordN)
-                {  
-                   kws.add(kw);
-                   kw = kw.previous;
+                while (kw is KeyWordN)
+                {
+                    kws.add(kw);
+                    kw = kw.previous;
                 }
             }
-            foreach(KeyWord kw in kws){
+            foreach (KeyWord kw in kws)
+            {
                 if (kw is KeyWordE e)
                 {
                     hc.Add(e.K);
@@ -56,7 +57,7 @@ namespace FTServer.Models
                 {
                     String ks = n.toKString();
                     if (ks.length() > 1)
-                      hc.Add(ks);
+                        hc.Add(ks);
                 }
             }
 

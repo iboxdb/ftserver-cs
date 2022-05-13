@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ApplicationIcon>fts.ico</ApplicationIcon>
-    <Version>1.8.1</Version>
+    <Version>1.9</Version>
     <!--  
 dotnet publish -r win-x64;linux-x64 -c Release - -no-self-contained
 dotnet publish -r win-x64 -c Release - -no-self-contained -o /mnt/hgfs/Share/fts/fts-win-1.8
