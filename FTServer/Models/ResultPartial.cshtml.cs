@@ -9,20 +9,15 @@ namespace FTServer.Models
     {
         //?q=
         public string Query { get; set; }
+
         //&s=
         public long[] StartId { get; set; }
-
-
-
         public List<PageText> pages;
         public DateTime begin;
-
         public bool isFirstLoad;
 
         // reset in ResultPartial.cshtml
         public long pageCount = 8;
-
-
         public String IdToString()
         {
             long[] ids = StartId;
@@ -38,13 +33,6 @@ namespace FTServer.Models
             }
             return sb.ToString();
         }
-
-        public bool IsEnd()
-        {
-            return StartId[0] < 0 && StartId[1] < 0;
-        }
-
-
         public String ToKeyWordString()
         {
             HashSet<string> hc = new HashSet<string>();
@@ -105,6 +93,10 @@ namespace FTServer.Models
 
             StartId = IndexAPI.Search(pages, Query, StartId, pageCount);
 
+        }
+        public bool IsEnd()
+        {
+            return StartId[0] < 0 && StartId[1] < 0;
         }
     }
 }
