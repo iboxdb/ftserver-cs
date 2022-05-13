@@ -66,7 +66,9 @@ namespace FTServer.Models
                 }
                 if (kw is KeyWordN n)
                 {
-                    hc.Add(n.toKString());
+                    String ks = n.toKString();
+                    if (ks.length() > 1)
+                      hc.Add(ks);
                 }
             }
 
