@@ -105,6 +105,11 @@ namespace FTServer
                 EnsureTable<Page>("Page", "textOrder");
                 //the 'textOrder' is used to control url's order
                 EnsureIndex<Page>("Page", "url(" + Page.MAX_URL_LENGTH + ")", "textOrder");
+
+
+                Log("ItemConfig CacheLength = " + (CacheLength / 1024L / 1024L) + " MB");
+                Log("ItemConfig SwapFileBuffer = " + (SwapFileBuffer / 1024L / 1024L) + " MB");
+                Log("ItemConfig ReadStreamCount = " + ReadStreamCount);
             }
         }
 
@@ -120,8 +125,10 @@ namespace FTServer
                 //this size trigger "SWITCH" in Flush()
                 FileIncSize = Config.ItemConfig_SwapFileBuffer;
 
-                Log("Index DB Cache = " + (CacheLength / 1024 / 1024) + " MB");
                 Engine.Instance.Config(this);
+
+                Log("IndexConfig CacheLength = " + (CacheLength / 1024L / 1024L) + " MB");
+                Log("IndexConfig FileSwitchLength = " + (Config.SwitchToReadonlyIndexLength / 1024L / 1024L) + " MB");
 
             }
 
