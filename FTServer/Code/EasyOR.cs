@@ -70,10 +70,10 @@ namespace FTServer
                 result.addAll(removeOneCN(cn));
             }
 
-            return result;
+            return filter(result);
         }
 
-        public static String compress(char[] cs)
+        private static String compress(char[] cs)
         {
             StringBuilder r = new StringBuilder();
             foreach (char c in cs)
@@ -144,6 +144,24 @@ namespace FTServer
             return r;
         }
 
+
+
+        private static ArrayList<String> filter(ArrayList<String> src)
+        {
+            ArrayList<String> r = new ArrayList<String>();
+            foreach (String s in src)
+            {
+                if (s != null)
+                {
+                    String s2 = s.trim();
+                    if (s2.length() > 1)
+                    {
+                        r.add(s2);
+                    }
+                }
+            }
+            return r;
+        }
         private static String link(ArrayList<String> aas)
         {
             StringBuilder sb = new StringBuilder();
