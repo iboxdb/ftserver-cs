@@ -12,7 +12,7 @@ namespace FTServer
 
         static EasyOR()
         {
-            removedWords = new String[] { "\"", "and", "with", "how", "of", "的", "吗" };
+            removedWords = new String[] { "\"", "and", "with", "how", "of", "the", "的", "吗" };
         }
 
         internal static ArrayList<String> toOrCondition(String str)
@@ -132,7 +132,7 @@ namespace FTServer
                         {
                             continue;
                         }
-                        if (sps[j].length() < 3)
+                        if (sps[j].length() < 2)
                         {
                             continue;
                         }
