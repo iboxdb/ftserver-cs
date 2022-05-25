@@ -1,4 +1,4 @@
-## Full Text Search Lightweight Server for CSharp
+## Full Text Search Engine Server for CSharp
 
 
 ### User Guide
