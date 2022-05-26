@@ -283,8 +283,9 @@ namespace FTServer
 
                                 if (last_r1_con_I_count > Engine.KeyWordMaxScan)
                                 {
-                                    nw.isLinked = false;
-                                    nw.isLinkedEnd = false;
+                                    r1_id = r1_con.I;
+                                    //nw.isLinked = false;
+                                    //nw.isLinkedEnd = false;
                                     //App.Log(DateTime.Now.Ticks + " No Join " + nw.ToFullString());
                                 }
                             }
