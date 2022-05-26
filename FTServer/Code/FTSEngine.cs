@@ -280,12 +280,8 @@ namespace FTServer
                             if (last_r1_con_I == r1_con.I)
                             {
                                 last_r1_con_I_count++;
-                                bool cnLastChar = false;
-                                if (nw is KeyWordN)
-                                {
-                                    cnLastChar = ((KeyWordN)nw).size() == 1;
-                                }
-                                if (last_r1_con_I_count > Engine.KeyWordMaxScan && (!cnLastChar))
+
+                                if (last_r1_con_I_count > Engine.KeyWordMaxScan)
                                 {
                                     nw.isLinked = false;
                                     nw.isLinkedEnd = false;
