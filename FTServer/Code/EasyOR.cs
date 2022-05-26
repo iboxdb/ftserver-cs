@@ -154,7 +154,7 @@ namespace FTServer
                 if (s != null)
                 {
                     String s2 = s.trim();
-                    if (s2.length() > 1)
+                    if (s2.length() > 1 && (!r.contains(s2)))
                     {
                         r.add(s2);
                     }

@@ -165,6 +165,10 @@ namespace FTServer
         {
             this.Insert(index, p);
         }
+        public bool contains(T t)
+        {
+            return this.Contains(t);
+        }
     }
 
     internal class EngineIterator<T> : Iterator<T>
