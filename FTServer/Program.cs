@@ -70,7 +70,9 @@ namespace FTServer
 
                 Log("ReadOnly Index DB (" + start + "), start from " + IndexServer.IndexDBStart);
                 Log("MinCache = " + (Config.minCache() / 1024L / 1024L) + " MB");
-
+                //bigger will more accurate, smaller will faster
+                Engine.KeyWordMaxScan = 10;
+                Log("KeyWordMaxScan = " + Engine.KeyWordMaxScan);
                 return Task.FromResult<IDisposable>(null);
             });
 

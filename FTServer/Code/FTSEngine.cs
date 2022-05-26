@@ -10,6 +10,7 @@ namespace FTServer
     public class Engine
     {
         public readonly static Engine Instance = new Engine();
+        public static int KeyWordMaxScan = int.MaxValue;
 
         private Engine()
         {
@@ -245,6 +246,11 @@ namespace FTServer
 
             KeyWord r1_con = null;
             long r1_id = -1;
+
+
+            long last_r1_con_I = -1;
+            long last_r1_con_I_count = 0;
+
             return new Iterable<KeyWord>()
             {
 
@@ -271,6 +277,26 @@ namespace FTServer
                                 r1_id = r1_con.I;
                             }
 
+                            if (last_r1_con_I == r1_con.I)
+                            {
+                                last_r1_con_I_count++;
+                                bool cnLastChar = false;
+                                if (nw is KeyWordN)
+                                {
+                                    cnLastChar = ((KeyWordN)nw).size() == 1;
+                                }
+                                if (last_r1_con_I_count > Engine.KeyWordMaxScan && (!cnLastChar))
+                                {
+                                    nw.isLinked = false;
+                                    nw.isLinkedEnd = false;
+                                    //App.Log(DateTime.Now.Ticks + " No Join " + nw.ToFullString());
+                                }
+                            }
+                            else
+                            {
+                                last_r1_con_I = r1_con.I;
+                                last_r1_con_I_count = 0;
+                            }
                             r1 = search(box, nw, r1_con, maxId).GetEnumerator();
                             if (r1.MoveNext())
                             {
