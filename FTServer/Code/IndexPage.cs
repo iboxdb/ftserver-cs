@@ -213,6 +213,10 @@ namespace FTServer
                             Console.WriteLine(e.ToString());
                         }
                     }
+                    else
+                    {
+                        Thread.Sleep(2000);
+                    }
                     if (!isshutdown)
                     {
                         Thread.Sleep(SLEEP_TIME);
