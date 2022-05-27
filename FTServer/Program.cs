@@ -125,6 +125,11 @@ namespace FTServer
            Host.CreateDefaultBuilder(args)
                .ConfigureWebHostDefaults(webBuilder =>
                {
+                   webBuilder.UseSockets((soc) =>
+                   {
+                       soc.Backlog = 2;
+                       Log("Backlog: " + soc.Backlog + ", IOQueueCount: " + soc.IOQueueCount + ", NoDelay: " + soc.NoDelay);
+                   });
                    webBuilder.ConfigureLogging(logging =>
                         {
                             logging.AddFilter((name, lev) =>

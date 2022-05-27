@@ -22,8 +22,8 @@ namespace FTServer.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult About(string q)
         {
-            if (q == null) { return NotFound(); }
-
+            if (q == null || q.Length == 0) { return NotFound(); }
+            //App.Log("Search " + q);
             var m = new AboutModel();
             q = q.Replace("<", "").Replace(">", "").Trim();
 
