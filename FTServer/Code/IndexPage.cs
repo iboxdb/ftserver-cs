@@ -14,23 +14,30 @@ namespace FTServer
 
         public static void addSearchTerm(String keywords)
         {
-            if (keywords.length() < PageSearchTerm.MAX_TERM_LENGTH)
+            if (keywords == null)
             {
-                PageSearchTerm pst = new PageSearchTerm();
-                pst.time = DateTime.Now;
-                pst.keywords = keywords;
-                pst.uid = Guid.NewGuid();
-
-                long huggersMem = 1024L * 1024L * 3L;
-
-                bool isShutdown = SystemShutdown.Equals(keywords);
-                if (isShutdown) { huggersMem = 0; }
-                using (var box = App.Item.Cube())
-                {
-                    box["/PageSearchTerm"].Insert(pst);
-                    box.Commit(huggersMem);
-                }
+                return;
             }
+            if (keywords.length() > PageSearchTerm.MAX_TERM_LENGTH)
+            {
+                keywords = keywords.substring(0, PageSearchTerm.MAX_TERM_LENGTH - 1);
+            }
+
+            PageSearchTerm pst = new PageSearchTerm();
+            pst.time = DateTime.Now;
+            pst.keywords = keywords;
+            pst.uid = Guid.NewGuid();
+
+            long huggersMem = 1024L * 1024L * 3L;
+
+            bool isShutdown = SystemShutdown.Equals(keywords);
+            if (isShutdown) { huggersMem = 0; }
+            using (var box = App.Item.Cube())
+            {
+                box["/PageSearchTerm"].Insert(pst);
+                box.Commit(huggersMem);
+            }
+
         }
 
 
