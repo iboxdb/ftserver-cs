@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
-
+using System.Threading;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -127,8 +127,16 @@ namespace FTServer
                {
                    webBuilder.UseSockets((soc) =>
                    {
+                       //Server doesn't wait clients.
                        soc.Backlog = 2;
                        Log("Backlog: " + soc.Backlog + ", IOQueueCount: " + soc.IOQueueCount + ", NoDelay: " + soc.NoDelay);
+                   });
+                   webBuilder.ConfigureKestrel((cfg) =>
+                   {
+                       ThreadPool.SetMinThreads(2, 2);
+                       ThreadPool.SetMaxThreads(10, 10);
+                       cfg.Limits.MaxConcurrentConnections = 8;
+                       cfg.Limits.MaxConcurrentUpgradedConnections = 8;
                    });
                    webBuilder.ConfigureLogging(logging =>
                         {
