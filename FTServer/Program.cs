@@ -135,8 +135,8 @@ namespace FTServer
                    {
                        ThreadPool.SetMinThreads(2, 2);
                        ThreadPool.SetMaxThreads(26, 26);
-                       cfg.Limits.MaxConcurrentConnections = 16;
-                       cfg.Limits.MaxConcurrentUpgradedConnections = 16;
+                       cfg.Limits.MaxConcurrentConnections = 15;
+                       cfg.Limits.MaxConcurrentUpgradedConnections = 15;
                    });
                    webBuilder.ConfigureLogging(logging =>
                         {
