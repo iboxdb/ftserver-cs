@@ -92,6 +92,11 @@ namespace FTServer
                 {
                     return null;
                 }
+                if (doc.StatusCode >= System.Net.HttpStatusCode.BadRequest)
+                {
+                    Log("Not OK " + url);
+                    return null;
+                }
                 if (doc.ContentType != null && doc.ContentType.toLowerCase().equals("text/xml"))
                 {
                     Log("XML " + url);
