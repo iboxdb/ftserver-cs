@@ -45,15 +45,15 @@
       String[] keywords = p.keywords.Split(sp);
 
 
-          <div hurl="@p.textOrder" style="display:none;">
-            <div class="spartcss" dir="auto"><a class="stext" target="_blank" href="@p.url">@p.title</a></div>
+      <div hurl="@p.textOrder" style="display:none;">
+        <div class="spartcss" dir="auto"><a class="stext" target="_blank" href="@p.url">@p.title</a></div>
 
-            <div class="stext" dir="auto"> @content </div>
+        <div class="stext" dir="auto"> @content </div>
         @{
           var css = isdesc ? "gt" : "gtt";
         }
-            <div class="@css">
-              [@p.dbOrder-@p.textOrder]
+        <div class="@css">
+          [@p.dbOrder-@p.textOrder]
           @if (p.isAndSearch)
           {
           }
@@ -76,14 +76,14 @@
             if (kw == null || kw.Length < 1) { continue; }
             if (kw.IndexOf(" ") > 0)
             {
-              kw = "\"" + kw + "\"";
+              //kw = "\"" + kw + "\"";
             }
-                  <a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(kw))" class="@css kw stext_s"> &nbsp; @kw &nbsp; </a>
+            <a href="About?q=@Html.Raw(System.Net.WebUtility.UrlEncode(kw))" class="@css kw stext_s"> &nbsp; @kw &nbsp; </a>
             <text> &nbsp; </text>
           }
-            </div>
-            <br>
-          </div>
+        </div>
+        <br>
+      </div>
     }
   }
 </div>
@@ -91,10 +91,10 @@
 <div class="ui teal message" id='@Html.Raw("s" + @Model.IdToString())' dir="auto">
   @{
     String tcontent = (DateTime.Now - Model.begin).TotalSeconds + "s, "
-        + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
+      + "MEM:" + (System.GC.GetTotalMemory(false) / 1024 / 1024) + "MB ";
 
     @: @Model.Query, TIME: @tcontent,
-      <a href="#btnsearch"><strong>
+    <a href="#btnsearch"><strong>
         @if (!@Model.IsEnd())
         {
           @:"Loading"
@@ -105,7 +105,7 @@
           @:"END"
 
         }
-        </strong></a>
+      </strong></a>
   }
 </div>
 <br>
