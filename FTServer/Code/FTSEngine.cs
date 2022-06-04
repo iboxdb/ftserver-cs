@@ -250,7 +250,7 @@ namespace FTServer
 
             long last_r1_con_I = -1;
             long last_r1_con_I_count = 0;
-
+            long jumpTime = 0;
             return new Iterable<KeyWord>()
             {
 
@@ -285,8 +285,8 @@ namespace FTServer
                                 {
                                     r1_id = r1_con.I;
 
-                                    maxId.jumpTime++;
-                                    if (maxId.jumpTime > Engine.KeyWordMaxScan)
+                                    jumpTime++;
+                                    if (jumpTime > Engine.KeyWordMaxScan)
                                     {
                                         return false;
                                     }
@@ -427,7 +427,6 @@ namespace FTServer
         private sealed class MaxID
         {
             public long id = long.MaxValue;
-            public long jumpTime = 0;
         }
     }
 
