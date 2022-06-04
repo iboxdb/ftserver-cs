@@ -284,9 +284,12 @@ namespace FTServer
                                 if (last_r1_con_I_count > Engine.KeyWordMaxScan)
                                 {
                                     r1_id = r1_con.I;
-                                    //nw.isLinked = false;
-                                    //nw.isLinkedEnd = false;
-                                    //App.Log(DateTime.Now.Ticks + " No Join " + nw.ToFullString());
+
+                                    maxId.jumpTime++;
+                                    if (maxId.jumpTime > Engine.KeyWordMaxScan)
+                                    {
+                                        return false;
+                                    }
                                 }
                             }
                             else
@@ -424,6 +427,7 @@ namespace FTServer
         private sealed class MaxID
         {
             public long id = long.MaxValue;
+            public long jumpTime = 0;
         }
     }
 
