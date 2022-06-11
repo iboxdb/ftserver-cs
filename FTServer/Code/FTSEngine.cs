@@ -297,6 +297,22 @@ namespace FTServer
                                 last_r1_con_I = r1_con.I;
                                 last_r1_con_I_count = 0;
                             }
+
+                            if (nw is KeyWordE && r1_con is KeyWordE)
+                            {
+                                if (((KeyWordE)nw).K.equals(((KeyWordE)r1_con).K))
+                                {
+                                    return false;
+                                }
+                            }
+                            if (nw is KeyWordN && r1_con is KeyWordN)
+                            {
+                                if (((KeyWordN)nw).K == ((KeyWordN)r1_con).K)
+                                {
+                                    return false;
+                                }
+                            }
+
                             r1 = search(box, nw, r1_con, maxId).GetEnumerator();
                             if (r1.MoveNext())
                             {

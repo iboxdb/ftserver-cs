@@ -134,7 +134,7 @@ namespace FTServer
                    webBuilder.ConfigureKestrel((cfg) =>
                    {
                        ThreadPool.SetMinThreads(2, 2);
-                       ThreadPool.SetMaxThreads(26, 26);
+                       ThreadPool.SetMaxThreads(25, 25);
                        cfg.Limits.MaxConcurrentConnections = 15;
                        cfg.Limits.MaxConcurrentUpgradedConnections = 15;
                    });
