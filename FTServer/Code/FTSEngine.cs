@@ -351,7 +351,7 @@ namespace FTServer
                             return false;
                         }
 
-                        if (currentMaxId > (maxId.id + 1))
+                        if (iter == null || currentMaxId > (maxId.id))
                         {
                             currentMaxId = maxId.id;
                             iter = kw is KeyWordE ?

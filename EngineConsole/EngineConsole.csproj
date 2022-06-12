@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
  <ItemGroup>
-    <PackageReference Include="iBoxDB" Version="3.2"/>    
+    <PackageReference Include="iBoxDB" Version="3.3"/>    
     <PackageReference Include="AngleSharp" Version="0.16"/>  
   </ItemGroup>
  <ItemGroup>
