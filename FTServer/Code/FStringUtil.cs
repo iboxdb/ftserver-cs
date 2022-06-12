@@ -204,7 +204,7 @@ namespace FTServer
                 return str;
             }
 
-            Regex p = new Regex("\\s(\\w{1,1})([’'])(\\w+)");
+            Regex p = new Regex("\\s(\\w+)([’'])(\\w+)");
 
             return p.Replace(" " + str.trim() + " ", " \"$1$2$3\"").Trim();
 
