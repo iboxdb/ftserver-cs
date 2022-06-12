@@ -96,7 +96,8 @@ namespace FTServer
         public static long[] Search(List<PageText> outputPages,
                 String name, long[] t_startId, long pageCount)
         {
-            name = name.Trim();
+            name = StringUtil.Instance.fromatFrenchInput(name);
+
             if (name.length() == 0 || name.Length > 150
                 || name == IndexingMessage
                 || name == IndexPage.SystemShutdown

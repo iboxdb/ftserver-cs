@@ -1,13 +1,15 @@
 using System;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FTServer
 {
     class StringUtil
     {
         public static StringUtil Instance = new StringUtil();
-        private StringUtil(){
-            
+        private StringUtil()
+        {
+
         }
         public bool isWord(char c)
         {
@@ -188,6 +190,23 @@ namespace FTServer
                     .append("... ");
             }
             return sb.ToString();
+
+        }
+
+        public String fromatFrenchInput(String str)
+        {
+            if (str == null)
+            {
+                return "";
+            }
+            if (str.contains("\""))
+            {
+                return str;
+            }
+
+            Regex p = new Regex("\\s(\\w{1,1})([’'])(\\w+)");
+
+            return p.Replace(" " + str.trim() + " ", " \"$1$2$3\"").Trim();
 
         }
     }
