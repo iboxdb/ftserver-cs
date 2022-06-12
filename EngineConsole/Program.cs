@@ -20,7 +20,7 @@ namespace EngineConsole
 
         static void FrenchTest()
         {
-            String str = "l’étranger ls’étranger S’inscrire S'Étatà d'étranger wouldn't I'm";
+            String str = "l’étranger ls’étranger S’inscrire S'Étatà d'étranger wouldn't I'm l'Europe l’Europe";
             Console.WriteLine(StringUtil.Instance.fromatFrenchInput(str));
         }
     }
