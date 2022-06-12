@@ -10,7 +10,7 @@ namespace FTServer
     public class Engine
     {
         public readonly static Engine Instance = new Engine();
-        public static int KeyWordMaxScan = int.MaxValue;
+        public static long KeyWordMaxScan = long.MaxValue;
 
         private Engine()
         {
@@ -247,10 +247,8 @@ namespace FTServer
             KeyWord r1_con = null;
             long r1_id = -1;
 
-
-            long last_r1_con_I = -1;
-            long last_r1_con_I_count = 0;
             long jumpTime = 0;
+
             return new Iterable<KeyWord>()
             {
 
@@ -277,27 +275,6 @@ namespace FTServer
                                 r1_id = r1_con.I;
                             }
 
-                            if (last_r1_con_I == r1_con.I)
-                            {
-                                last_r1_con_I_count++;
-
-                                if (last_r1_con_I_count > Engine.KeyWordMaxScan)
-                                {
-                                    r1_id = r1_con.I;
-
-                                    jumpTime++;
-                                    if (jumpTime > Engine.KeyWordMaxScan)
-                                    {
-                                        return false;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                last_r1_con_I = r1_con.I;
-                                last_r1_con_I_count = 0;
-                            }
-
                             if (nw is KeyWordE && r1_con is KeyWordE)
                             {
                                 if (((KeyWordE)nw).K.equals(((KeyWordE)r1_con).K))
@@ -316,7 +293,16 @@ namespace FTServer
                             r1 = search(box, nw, r1_con, maxId).GetEnumerator();
                             if (r1.MoveNext())
                             {
+                                jumpTime = 0;
                                 return true;
+                            }
+                            else
+                            {
+                                jumpTime++;
+                                if (jumpTime > Engine.KeyWordMaxScan)
+                                {
+                                    return false;
+                                }
                             }
 
                         }
