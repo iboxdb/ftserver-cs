@@ -73,6 +73,8 @@ namespace FTServer
                 //bigger will more accurate, smaller faster will jump some pages
                 Engine.KeyWordMaxScan = 200;
                 Log("KeyWordMaxScan = " + Engine.KeyWordMaxScan);
+                IndexPage.HttpGet_SleepTime = 0;                
+                Log("HttpGet_SleepTime = " + IndexPage.HttpGet_SleepTime + "ms");
                 return Task.FromResult<IDisposable>(null);
             });
 

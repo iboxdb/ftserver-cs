@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using static FTServer.App;
 using System.Runtime.CompilerServices;
+
+using static FTServer.App;
 
 namespace FTServer
 {
@@ -194,9 +194,10 @@ namespace FTServer
 
         private static ConcurrentLinkedDeque<ThreadStart> backgroundThreadQueue = new ConcurrentLinkedDeque<ThreadStart>();
         private static bool isshutdown = false;
+
+        public static int HttpGet_SleepTime = 1000;
         private static Thread backgroundTasks = new Func<Thread>(() =>
         {
-            int SLEEP_TIME = 0;//2000;
             var bt = new Thread(() =>
             {
                 while (!isshutdown)
@@ -217,9 +218,10 @@ namespace FTServer
                     {
                         Thread.Sleep(2000);
                     }
+
                     if (!isshutdown)
                     {
-                        Thread.Sleep(SLEEP_TIME);
+                        Thread.Sleep(HttpGet_SleepTime);
                     }
                 }
             });
