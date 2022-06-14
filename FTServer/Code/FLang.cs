@@ -45,11 +45,21 @@ namespace FTServer
 
             //https://unicode-table.com/en/blocks/arabic/
             //Punctuation Arabic
+            set.add((char)0x0609);
+            set.add((char)0x060A);
+            set.add((char)0x060B);
             set.add((char)0x060C);
             set.add((char)0x060D);
+
             set.add((char)0x061B);
             set.add((char)0x061E);
             set.add((char)0x061F);
+
+            set.add((char)0x066A);
+            set.add((char)0x066B);
+            set.add((char)0x066C);
+            set.add((char)0x066D);
+
             set.add((char)0x06D4);
 
             //Devanagari
