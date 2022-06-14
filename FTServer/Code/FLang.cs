@@ -62,6 +62,16 @@ namespace FTServer
 
             set.add((char)0x06D4);
 
+            //https://unicode-table.com/en/blocks/hebrew/
+            set.add((char)0x05BE);
+            set.add((char)0x05C0);
+            set.add((char)0x05C3);
+
+            set.add((char)0x05C6);
+
+            set.add((char)0x05F3);
+            set.add((char)0x05F4);
+
             //Devanagari
             set.add((char)0x0964);
             set.add((char)0x0965);
