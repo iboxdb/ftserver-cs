@@ -9,12 +9,12 @@ namespace EngineConsole
         {
             //FrenchTest();
 
-            //FTServer.EngineTest.test_main();
+            FTServer.EngineTest.test_main();
             //FTServer.EngineTest.test_order();
             //FTServer.ObjectSearch.test_main();
 
             //FTServer.EngineTest.test_big_n();
-            FTServer.EngineTest.test_big_e();
+            //FTServer.EngineTest.test_big_e();
 
         }
 

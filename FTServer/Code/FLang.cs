@@ -162,6 +162,7 @@ namespace FTServer
                 return true;
             }
 
+            //Korean
             // https://unicode-table.com/en/blocks/hangul-jamo/
             if (c >= 0x1100 && c <= 0x11FF)
             {
@@ -172,6 +173,12 @@ namespace FTServer
             {
                 return true;
             }
+            //https://unicode-table.com/en/blocks/hangul-syllables/        
+            if (c >= 0xAC00 && c <= 0xD7AF)
+            {
+                return true;
+            }
+
             //Japanese
             /*
             if (c >= 0x3040 && c <= 0x312F)
@@ -179,6 +186,7 @@ namespace FTServer
                 return true;
             }
             */
+
 
             // https://unicode-table.com/en/blocks/latin-extended-additional/
             if (c >= 0x1E00 && c <= 0x1EFF)
