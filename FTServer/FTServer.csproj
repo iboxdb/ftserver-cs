@@ -20,7 +20,7 @@ dotnet publish -r win-x64 -c Release - -no-self-contained -o /mnt/hgfs/Share/fts
   </PropertyGroup>
 
   <ItemGroup>  
-      <PackageReference Include="iBoxDB" Version="3.2.0"/>     
+      <PackageReference Include="iBoxDB" Version="3.5.0"/>     
       <PackageReference Include="AngleSharp" Version="0.16"/>  
   </ItemGroup>
 
