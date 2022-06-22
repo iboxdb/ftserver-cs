@@ -355,8 +355,8 @@ namespace FTServer
                         {
                             currentMaxId = maxId.id;
                             iter = kw is KeyWordE ?
-                                (IEnumerator<KeyWord>)box.Scaler<KeyWordE>(ql, kw.getKeyWord(), maxId.id).GetEnumerator() :
-                                    box.Scaler<KeyWordN>(ql, kw.getKeyWord(), maxId.id).GetEnumerator();
+                                (IEnumerator<KeyWord>)box.Scale<KeyWordE>(ql, kw.getKeyWord(), maxId.id).GetEnumerator() :
+                                    box.Scale<KeyWordN>(ql, kw.getKeyWord(), maxId.id).GetEnumerator();
                         }
 
                         while (iter.MoveNext())
@@ -417,12 +417,12 @@ namespace FTServer
         {
             if (kw is KeyWordE)
             {
-                return box.Scaler<KeyWordE>("from /E where K<=? limit 0, 50", kw.getKeyWord());
+                return box.Scale<KeyWordE>("from /E where K<=? limit 0, 50", kw.getKeyWord());
 
             }
             else
             {
-                return box.Scaler<KeyWordN>("from /N where K<=? limit 0, 50", kw.getKeyWord());
+                return box.Scale<KeyWordN>("from /N where K<=? limit 0, 50", kw.getKeyWord());
             }
         }
 
