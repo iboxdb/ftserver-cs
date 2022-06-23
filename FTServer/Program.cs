@@ -71,7 +71,7 @@ namespace FTServer
                 Log("ReadOnly Index DB (" + start + "), start from " + IndexServer.IndexDBStart);
                 Log("MinCache = " + (Config.minCache() / 1024L / 1024L) + " MB");
                 //bigger will more accurate, smaller faster will jump some pages
-                Engine.KeyWordMaxScan = 1000;
+                Engine.KeyWordMaxScan = 2000;
                 Log("KeyWordMaxScan = " + Engine.KeyWordMaxScan);
                 IndexPage.HttpGet_SleepTime = 0;
                 Log("HttpGet_SleepTime = " + IndexPage.HttpGet_SleepTime + "ms");
