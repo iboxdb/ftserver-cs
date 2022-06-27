@@ -221,7 +221,29 @@ namespace FTServer
 
             MaxID maxId = new MaxID();
             maxId.id = startId;
-            return search(box, map.ToArray(), maxId);
+            maxId.jumpTime = 0;
+
+            IEnumerator<KeyWord> cd = search(box, map.ToArray(), maxId).GetEnumerator();
+            return new Iterable<KeyWord>()
+            {
+
+                iterator = new EngineIterator<KeyWord>()
+                {
+                    hasNext = () =>
+                    {
+                        if (cd.MoveNext())
+                        {
+                            maxId.jumpTime = 0;
+                            return true;
+                        }
+                        return false;
+                    },
+                    next = () =>
+                    {
+                        return cd.Current;
+                    }
+                }
+            };
         }
 
         private IEnumerable<KeyWord> search(IBox box, KeyWord[] kws, MaxID maxId)
@@ -247,7 +269,6 @@ namespace FTServer
             KeyWord r1_con = null;
             long r1_id = -1;
 
-            long jumpTime = 0;
 
             return new Iterable<KeyWord>()
             {
@@ -275,34 +296,10 @@ namespace FTServer
                                 r1_id = r1_con.I;
                             }
 
-                            if (nw is KeyWordE && r1_con is KeyWordE)
-                            {
-                                if (((KeyWordE)nw).K.equals(((KeyWordE)r1_con).K))
-                                {
-                                    return false;
-                                }
-                            }
-                            if (nw is KeyWordN && r1_con is KeyWordN)
-                            {
-                                if (((KeyWordN)nw).K == ((KeyWordN)r1_con).K)
-                                {
-                                    return false;
-                                }
-                            }
-
                             r1 = search(box, nw, r1_con, maxId).GetEnumerator();
                             if (r1.MoveNext())
                             {
-                                jumpTime = 0;
                                 return true;
-                            }
-                            else
-                            {
-                                jumpTime++;
-                                if (jumpTime > Engine.KeyWordMaxScan)
-                                {
-                                    return false;
-                                }
                             }
 
                         }
@@ -325,6 +322,22 @@ namespace FTServer
                                                     KeyWord kw, KeyWord con, MaxID maxId)
         {
 
+
+            if (kw is KeyWordE && con is KeyWordE)
+            {
+                if (((KeyWordE)kw).K.equals(((KeyWordE)con).K))
+                {
+                    return new List<KeyWord>();
+                }
+            }
+            if (kw is KeyWordN && con is KeyWordN)
+            {
+                if (((KeyWordN)kw).K == ((KeyWordN)con).K)
+                {
+                    return new List<KeyWord>();
+                }
+            }
+
             String ql = kw is KeyWordE
                 ? "from /E where K==? & I<=?"
                     : "from /N where K==? & I<=?";
@@ -342,7 +355,6 @@ namespace FTServer
             {
                 iterator = new EngineIterator<KeyWord>()
                 {
-
 
                     hasNext = () =>
                     {
@@ -365,6 +377,12 @@ namespace FTServer
                             cache = iter.Current;
 
                             maxId.id = cache.I;
+                            maxId.jumpTime++;
+                            if (maxId.jumpTime > Engine.KeyWordMaxScan)
+                            {
+                                break;
+                            }
+
                             currentMaxId = maxId.id;
                             if (con != null && con.I != maxId.id)
                             {
@@ -429,6 +447,8 @@ namespace FTServer
         private sealed class MaxID
         {
             public long id = long.MaxValue;
+            public long jumpTime = 0;
+
         }
     }
 
