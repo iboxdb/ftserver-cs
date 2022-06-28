@@ -327,6 +327,7 @@ namespace FTServer
             {
                 if (((KeyWordE)kw).K.equals(((KeyWordE)con).K))
                 {
+                    maxId.id = -1;
                     return new List<KeyWord>();
                 }
             }
@@ -334,6 +335,7 @@ namespace FTServer
             {
                 if (((KeyWordN)kw).K == ((KeyWordN)con).K)
                 {
+                    maxId.id = -1;
                     return new List<KeyWord>();
                 }
             }
