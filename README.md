@@ -128,6 +128,12 @@ $ vi /etc/security/limits.conf
 root      hard    nofile      500000
 root      soft    nofile      500000
 
+
+[user@localhost ~]$ firewall-cmd --add-port=5066/tcp --permanent
+
+//Stop OS File Indexing, Faster
+[user@localhost ~]$ tracker daemon -k
+
 ```
 
 
