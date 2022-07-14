@@ -157,9 +157,9 @@ namespace FTServer
         {
             this.Add(t);
         }
-        public void addAll(ArrayList<T> t)
+        public void addAll(IEnumerable<T> t)
         {
-            this.AddRange(t);
+            base.AddRange(t);
         }
         public void add(int index, T p)
         {
@@ -168,6 +168,19 @@ namespace FTServer
         public bool contains(T t)
         {
             return this.Contains(t);
+        }
+    }
+
+    public class LinkedHashSet<T> : SortedSet<T>
+    {
+        public int size()
+        {
+            return base.Count;
+        }
+
+        public void add(T t)
+        {
+            base.Add(t);
         }
     }
 

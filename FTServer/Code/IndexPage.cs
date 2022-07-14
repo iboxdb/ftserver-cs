@@ -58,15 +58,30 @@ namespace FTServer
         {
             using (var box = App.Index.Cube())
             {
-                List<String> result = new List<string>();
-                result.AddRange(Engine.Instance.discover(box, (char)0x0061, (char)0x007A, 2,
-                    (char)0x4E00, (char)0x9FFF, 2));
+                ArrayList<String> result = new ArrayList<string>();
 
-                result.AddRange(Engine.Instance.discover(box, (char)0x0621, (char)0x064A, 2,
-                    (char)0x3040, (char)0x312F, 2));
+                //English           
+                result.addAll(Engine.Instance.discoverEN(box, (char)0x0061, (char)0x007A, 2));
 
-                result.AddRange(Engine.Instance.discover(box, (char)0x0410, (char)0x044F, 2,
-                    (char)0xAC00, (char)0xD7AF, 2));
+                //Russian
+                result.addAll(Engine.Instance.discoverEN(box, (char)0x0410, (char)0x044F, 2));
+
+                //arabic
+                result.addAll(Engine.Instance.discoverEN(box, (char)0x0621, (char)0x064A, 2));
+
+                //India
+                result.addAll(Engine.Instance.discoverEN(box, (char)0x0900, (char)0x097F, 2));
+
+                //Japanese            
+                result.addAll(Engine.Instance.discoverCN(box, (char)0x3040, (char)0x312F, 2));
+
+                //Chinese
+                result.addAll(Engine.Instance.discoverCN(box, (char)0x4E00, (char)0x9FFF, 2));
+
+                //Korean
+                result.addAll(Engine.Instance.discoverEN(box, (char)0xAC00, (char)0xD7AF, 2));
+
+
                 return result;
             }
         }

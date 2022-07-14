@@ -1,7 +1,8 @@
 using System;
 using IBoxDB.LocalServer;
 
-namespace FTServer{
+namespace FTServer
+{
 
     public abstract class KeyWord
     {
@@ -17,11 +18,6 @@ namespace FTServer{
             c.EnsureTable<KeyWordN>("/N", "K", "I", "P");
 
         }
-
-        public abstract Object getKeyWord();
-
-        public abstract void setKeyWord(Object k);
-
         public abstract int size();
         //Position
         public int P;
@@ -49,19 +45,14 @@ namespace FTServer{
         //Key Word
         public String K;
 
-        public override Object getKeyWord()
-        {
-            return K;
-        }
 
-        public override void setKeyWord(Object k)
+        public void keyWord(String k)
         {
-            String t = (String)k;
-            if (t.length() > KeyWord.MAX_WORD_LENGTH)
+            if (k.length() > KeyWord.MAX_WORD_LENGTH)
             {
                 return;
             }
-            K = t;
+            K = k;
         }
 
         public override int size()
@@ -80,15 +71,6 @@ namespace FTServer{
         //Key Word 
         public long K;
 
-        public override Object getKeyWord()
-        {
-            return K;
-        }
-
-        public override void setKeyWord(Object k)
-        {
-            K = (long)k;
-        }
 
         public override int size()
         {

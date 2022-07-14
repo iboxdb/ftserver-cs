@@ -82,11 +82,11 @@ namespace FTServer
             Binder binder;
             if (kw is KeyWordE)
             {
-                binder = box["/E", kw.getKeyWord(), kw.I, kw.P];
+                binder = box["/E", ((KeyWordE)kw).K, kw.I, kw.P];
             }
             else
             {
-                binder = box["/N", kw.getKeyWord(), kw.I, kw.P];
+                binder = box["/N", ((KeyWordN)kw).K, kw.I, kw.P];
             }
             if (isRemove)
             {
@@ -105,32 +105,32 @@ namespace FTServer
             }
         }
 
-        public SortedSet<String> discover(IBox box,
-                                            char efrom, char eto, int elength,
-                                            char nfrom, char nto, int nlength)
+        private Random ran = new Random();
+
+        public LinkedHashSet<String> discoverEN(IBox box,
+                char efrom, char eto, int elength)
         {
-            SortedSet<String> list = new SortedSet<String>();
-            Random ran = new Random();
+            LinkedHashSet<String> list = new LinkedHashSet<String>();
             if (elength > 0)
             {
-                int len = ran.Next(KeyWord.MAX_WORD_LENGTH) + 1;
+                int len = ran.nextInt(KeyWord.MAX_WORD_LENGTH) + 1;
                 char[] cs = new char[len];
                 for (int i = 0; i < cs.Length; i++)
                 {
-                    cs[i] = (char)(ran.Next(eto - efrom) + efrom);
+                    cs[i] = (char)(ran.nextInt(eto - efrom) + efrom);
                 }
                 KeyWordE kw = new KeyWordE();
-                kw.setKeyWord(new String(cs));
-                foreach (KeyWord tkw in lessMatch(box, kw))
+                kw.keyWord(new String(cs));
+                foreach (KeyWordE tkw in lessMatch(box, kw))
                 {
-                    String str = tkw.getKeyWord().ToString();
-                    if (str[0] < efrom)
+                    String str = tkw.K;
+                    if (str.charAt(0) < efrom)
                     {
                         break;
                     }
-                    int c = list.Count;
-                    list.Add(str);
-                    if (list.Count > c)
+                    int c = list.size();
+                    list.add(str);
+                    if (list.size() > c)
                     {
                         elength--;
                         if (elength <= 0)
@@ -140,25 +140,33 @@ namespace FTServer
                     }
                 }
             }
+            return list;
+        }
+
+        public LinkedHashSet<String> discoverCN(IBox box,
+                char nfrom, char nto, int nlength)
+        {
+
+            LinkedHashSet<String> list = new LinkedHashSet<String>();
             if (nlength > 0)
             {
                 char[] cs = new char[2];
                 for (int i = 0; i < cs.Length; i++)
                 {
-                    cs[i] = (char)(ran.Next(nto - nfrom) + nfrom);
+                    cs[i] = (char)(ran.nextInt(nto - nfrom) + nfrom);
                 }
                 KeyWordN kw = new KeyWordN();
                 kw.longKeyWord(cs[0], cs[1], (char)0);
                 foreach (KeyWord tkw in lessMatch(box, kw))
                 {
                     String str = ((KeyWordN)tkw).toKString();
-                    if (str[0] < nfrom)
+                    if (str.charAt(0) < nfrom)
                     {
                         break;
                     }
-                    int c = list.Count;
-                    list.Add(str);
-                    if (list.Count > c)
+                    int c = list.size();
+                    list.add(str);
+                    if (list.size() > c)
                     {
                         nlength--;
                         if (nlength <= 0)
@@ -170,6 +178,7 @@ namespace FTServer
             }
             return list;
         }
+
 
         public IEnumerable<KeyWord> searchDistinct(IBox box, String str)
         {
@@ -369,8 +378,8 @@ namespace FTServer
                         {
                             currentMaxId = maxId.id;
                             iter = kw is KeyWordE ?
-                                (IEnumerator<KeyWord>)box.Scale<KeyWordE>(ql, kw.getKeyWord(), maxId.id).GetEnumerator() :
-                                    box.Scale<KeyWordN>(ql, kw.getKeyWord(), maxId.id).GetEnumerator();
+                                (IEnumerator<KeyWord>)box.Scale<KeyWordE>(ql, ((KeyWordE)kw).K, maxId.id).GetEnumerator() :
+                                    box.Scale<KeyWordN>(ql, ((KeyWordN)kw).K, maxId.id).GetEnumerator();
                         }
 
                         while (iter.MoveNext())
@@ -437,12 +446,12 @@ namespace FTServer
         {
             if (kw is KeyWordE)
             {
-                return box.Scale<KeyWordE>("from /E where K<=? limit 0, 50", kw.getKeyWord());
+                return box.Scale<KeyWordE>("from /E where K<=? limit 0, 50", ((KeyWordE)kw).K);
 
             }
             else
             {
-                return box.Scale<KeyWordN>("from /N where K<=? limit 0, 50", kw.getKeyWord());
+                return box.Scale<KeyWordN>("from /N where K<=? limit 0, 50", ((KeyWordN)kw).K);
             }
         }
 

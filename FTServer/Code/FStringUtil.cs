@@ -76,7 +76,7 @@ namespace FTServer
                     {
                         k = new KeyWordE();
                         k.I = id;
-                        k.setKeyWord("");
+                        k.keyWord("");
                         k.P = i;
                         if (linkedCount > 0)
                         {
@@ -89,7 +89,7 @@ namespace FTServer
                     }
                     if (k != null)
                     {
-                        k.setKeyWord(k.getKeyWord() + c.ToString());
+                        k.keyWord(k.K + c.ToString());
                     }
                 }
                 else
@@ -169,8 +169,8 @@ namespace FTServer
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < ps.Length; i++)
             {
-                int len = ps[i] is KeyWordE ? ps[i].getKeyWord()
-                    .ToString().length() : ((KeyWordN)ps[i]).size();
+                int len = ps[i].size();
+
                 start = ps[i].P;
                 if ((start + len) <= end)
                 {
