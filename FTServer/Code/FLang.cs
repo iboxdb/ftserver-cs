@@ -75,6 +75,11 @@ namespace FTServer
             //Devanagari
             set.add((char)0x0964);
             set.add((char)0x0965);
+
+            //Katakana
+            set.add((char)0x30A0);
+            set.add((char)0x30FB);
+            set.add((char)0x30FC);
         }
 
         public bool isPunctuation(char c)
