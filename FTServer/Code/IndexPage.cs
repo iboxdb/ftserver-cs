@@ -72,8 +72,8 @@ namespace FTServer
                 //India
                 result.addAll(Engine.Instance.discoverEN(box, (char)0x0900, (char)0x097F, 2));
 
-                //Japanese            
-                result.addAll(Engine.Instance.discoverCN(box, (char)0x3040, (char)0x312F, 2));
+                //Japanese  Hiragana(0x3040-309F), Katakana(0x30A0-30FF)           
+                result.addAll(Engine.Instance.discoverCN(box, (char)0x3040, (char)0x30FF, 2));
 
                 //Chinese
                 result.addAll(Engine.Instance.discoverCN(box, (char)0x4E00, (char)0x9FFF, 2));
