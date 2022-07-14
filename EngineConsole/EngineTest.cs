@@ -215,8 +215,12 @@ prev | next
                             Console.WriteLine();
                         }
                     }
-                    foreach (String skw in engine.discover(box,
-                                                  'n', 's', 2,
+                    foreach (String skw in engine.discoverEN(box,
+                                                  'n', 's', 2))
+                    {
+                        Console.WriteLine(skw);
+                    }
+                    foreach (String skw in engine.discoverCN(box,
                                                   '\u2E80', '\u9fa5', 2))
                     {
                         Console.WriteLine(skw);
