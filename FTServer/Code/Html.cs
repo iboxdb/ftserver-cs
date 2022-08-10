@@ -224,7 +224,7 @@ namespace FTServer
             }
             catch (Exception ex)
             {
-                Log(ex.ToString());
+                Log(ex.Message);
                 return null;
             }
         }
