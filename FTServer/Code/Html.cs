@@ -102,8 +102,18 @@ namespace FTServer
                     }
                     if (!isHTML)
                     {
-                        Log("ContextType Not HTML, " + r.Address.Href);
-                        r.Dispose();
+                        String Location = "Location";
+                        if (r.Headers.ContainsKey(Location))
+                        {
+                            // https://blog.nuget.org/ 
+                            Log(r.StatusCode + " Location: " + r.Headers[Location] + " from " + r.Address.Href);
+                        }
+                        else
+                        {
+                            // https://www.nuget.org/api/v2/package/iBoxDB/3.5.0
+                            Log(r.StatusCode + " ContextType Not HTML, " + r.Address.Href);
+                            r.Dispose();
+                        }
                     }
                 });
                 var doc = context.OpenAsync(url).GetAwaiter().GetResult();
