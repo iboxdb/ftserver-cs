@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using AngleSharp.Dom.Events;
 
 using static FTServer.App;
 
@@ -87,7 +88,25 @@ namespace FTServer
                 }
 
                 var config = Configuration.Default.WithDefaultLoader();
-                var doc = BrowsingContext.New(config).OpenAsync(url).GetAwaiter().GetResult();
+                var context = BrowsingContext.New(config);
+
+                context.AddEventListener(AngleSharp.Dom.EventNames.Requested, (s, e) =>
+                {
+                    var r = ((RequestEvent)e).Response;
+                    //Content-Type = text/html; charset=utf-8
+                    bool isHTML = false;
+                    foreach (var h in r.Headers)
+                    {
+                        if (h.Value == null) { continue; }
+                        isHTML |= h.Value.Contains("text/html", StringComparison.InvariantCultureIgnoreCase);
+                    }
+                    if (!isHTML)
+                    {
+                        Log("ContextType Not HTML, " + r.Address.Href);
+                        r.Dispose();
+                    }
+                });
+                var doc = context.OpenAsync(url).GetAwaiter().GetResult();
                 if (doc == null)
                 {
                     return null;
