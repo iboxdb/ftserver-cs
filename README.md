@@ -131,16 +131,19 @@ root      soft    nofile      500000
 
 [user@localhost ~]$ firewall-cmd --add-port=5066/tcp --permanent
 
-//Stop OS File Indexing, Faster
-[user@localhost ~]$ tracker daemon -k
-
-//Remove cache, it has a slow db inside
-[user@localhost ~]$ rm -rf .cache/tracker/
-
-
 ```
 
+
+#### Stop Tracker daemon
+
 [Why does Tracker consume resources on my PC?](https://gnome.pages.gitlab.gnome.org/tracker/faq/#why-does-tracker-consume-resources-on-my-pc)
+
+```sh
+[user@localhost ~]$ tracker daemon -k
+
+[user@localhost ~]$ rm -rf .cache/tracker/
+```
+
 
 
 #### More
