@@ -140,8 +140,7 @@ root      soft    nofile      500000
 
 ```
 
-
-
+[Why does Tracker consume resources on my PC?](https://gnome.pages.gitlab.gnome.org/tracker/faq/#why-does-tracker-consume-resources-on-my-pc)
 
 
 #### More
