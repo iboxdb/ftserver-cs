@@ -5,7 +5,7 @@
 
 #### Setup
 
-1. [Install NET6.0](https://dotnet.microsoft.com/download)
+1. [Install NET 7.0+](https://dotnet.microsoft.com/download)
 
 2. Download this Project.
 
@@ -61,8 +61,6 @@ A Page has many PageTexts. if don't need multiple Texts, modify **Html.getDefaul
 the Page.GetRandomContent() method is used to keep the Search-Page-Content always changing, doesn't affect the real PageText order.
 
 Use the ID number to control the order instead of loading all pages to memory. 
-Or load top 100 pages to memory then re-order it by favor. 
-
 
 
 #### Search Method
@@ -146,7 +144,7 @@ root      soft    nofile      500000
 ```sh
 [user@localhost ~]$ tracker daemon -k
 
-[user@localhost ~]$ rm -rf .cache/tracker/
+[user@localhost project]$ tracker reset --hard
 ```
 
 
