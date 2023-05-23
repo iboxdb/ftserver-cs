@@ -223,13 +223,26 @@ namespace FTServer
                 }
                 if (description.length() > 500)
                 {
+                    //En
                     description = description.substring(0, 500);
+                }
+                if (description.length() > 300)
+                {
+                    if (!StringUtil.Instance.isWord(description.charAt(0)))
+                    {
+                        //CN
+                        description = description.substring(0, 300);
+                    }
                 }
 
                 page.title = title;
                 page.keywords = keywords;
                 page.description = description;
 
+                if (Config.DescriptionOnly)
+                {
+                    page.text = "";
+                }
                 return page;
             }
             catch (Exception ex)

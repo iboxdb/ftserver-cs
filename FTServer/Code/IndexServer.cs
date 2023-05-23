@@ -52,6 +52,10 @@ namespace FTServer
                 this.address = address;
                 this.OutOfCache = outOfCache;
                 this.CacheLength = Config.Readonly_CacheLength;
+                if (outOfCache)
+                {
+                    this.CacheLength = Config.ShortCacheLength;
+                }
                 if (this.CacheLength < Config.lowReadonlyCache)
                 {
                     this.CacheLength = Config.lowReadonlyCache;

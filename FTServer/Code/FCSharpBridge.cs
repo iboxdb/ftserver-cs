@@ -109,17 +109,20 @@ namespace FTServer
         {
             return self.Contains(v);
         }
-
+        public static int size<T>(this ICollection<T> self)
+        {
+            return self.Count;
+        }
         public static void remove<T>(this ArrayList<T> self, int pos)
         {
             self.RemoveAt(pos);
         }
-
+        /*
         public static int size<T>(this ArrayList<T> self)
         {
             return self.Count;
         }
-
+        */
         public static T[] toArray<T>(this ArrayList<T> self)
         {
             return self.ToArray();

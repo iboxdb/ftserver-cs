@@ -343,6 +343,11 @@ namespace FTServer
             List<PageText> ptlist = Html.getDefaultTexts(page);
 
             int count = 0;
+
+            if (ptlist.size() == 0)
+            {
+                Log("[No Description]");
+            }
             foreach (PageText pt in ptlist)
             {
                 count++;

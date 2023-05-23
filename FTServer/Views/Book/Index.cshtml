@@ -15,9 +15,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>@Model.Title</title>
-        <meta name="description" content="@Model.Description">
-        <meta name="keywords" content="@Model.Keywords">        
-
+        @if (Model.Description.length() >0){ 
+          <meta name="description" content="@Model.Description">
+          <meta name="keywords" content="@Model.Keywords">        
+        }
     </head>
     <body>
         <p>@Model.Ex</p>

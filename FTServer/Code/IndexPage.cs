@@ -102,7 +102,13 @@ namespace FTServer
             DateTime begin = DateTime.Now;
             Page p = Html.Get(url, subUrls);
             DateTime ioend = DateTime.Now;
-
+            if (subUrls.size() > 0)
+            {
+                subUrls.remove(url);
+                subUrls.remove(url + "/");
+                subUrls.remove(url.substring(0, url.length() - 1));
+                runBGTask(subUrls, isKeyPage);
+            }
             if (p == null)
             {
                 return "Temporarily Unreachable";
@@ -125,12 +131,6 @@ namespace FTServer
                 DateTime indexend = DateTime.Now;
                 Log("TIME IO:" + (ioend - begin).TotalSeconds
                     + " INDEX:" + (indexend - ioend).TotalSeconds + "  TEXTORDER:" + textOrder + " (" + dbaddr + ") ");
-
-                subUrls.remove(url);
-                subUrls.remove(url + "/");
-                subUrls.remove(url.substring(0, url.length() - 1));
-
-                runBGTask(subUrls, isKeyPage);
 
                 return url;
             }

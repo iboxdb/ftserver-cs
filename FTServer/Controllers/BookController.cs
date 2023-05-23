@@ -51,8 +51,10 @@ namespace FTServer.Controllers
             String content = Books[book].Substring(startIndex, endIndex - startIndex);
 
             String title = content.Length > 200 ? content.Substring(0, 200) : content;
-            String description = content.Length > 400 ? content.Substring(100, 300) : content;
+            String description = content.length() > 1000 ? content.substring(200, 1000) : content;
             String text = content.Length > 500 ? content.Substring(300) : content;
+
+
             String keywords = "keyword1 keywords2,keyword3 hello";
 
             title = Regex.Replace(title, "\t|\r|\n|�|<|>|\\s+", " ");
