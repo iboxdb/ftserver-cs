@@ -17,7 +17,7 @@ namespace FTServer
 
         //only index description, not full text, faster indexing    
         //if wanting more Pages, dotn't care the content, set it to True
-        public static bool DescriptionOnly = true;
+        public static bool DescriptionOnly = false;
 
         public static long Index_CacheLength = mb(800L) / DSize;
 
