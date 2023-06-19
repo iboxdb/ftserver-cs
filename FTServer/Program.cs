@@ -69,6 +69,7 @@ namespace FTServer
 
                 App.Index = App.Indices.get(App.Indices.length() - 1);
 
+                Log("Index Description Only = " + Config.DescriptionOnly);
                 Log("ReadOnly Index DB (" + start + "), start from " + IndexServer.IndexDBStart);
                 Log("MinCache = " + (Config.minCache() / 1024L / 1024L) + " MB");
                 //bigger will more accurate, smaller faster will jump some pages
