@@ -5,7 +5,7 @@
 
 #### Setup
 
-1. [Install NET 7.0+](https://dotnet.microsoft.com/download)
+1. [Install .NET](https://dotnet.microsoft.com/download)
 
 2. Download this Project.
 
